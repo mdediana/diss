@@ -40,7 +40,7 @@ a escolha de experimentação, pela qual é possível analisar o comportamento de um
 sistema de armazenamento que represente o resultado da interação de vários dos
 fatores que afetam o desempenho de um modelo de consistência.
 
-O experimento consiste em rodar o sistema dividido entre dois centros de dados
+Esse estudo consiste em rodar o sistema dividido entre dois centros de dados
 simulados. Os centros de dados são ligados por uma WAN emulada. A carga de
 trabalho é executada por uma aplicação de testes simulando clientes localizados
 em cada um dos centros de dados. Cada experimento consiste em uma configuração
@@ -52,8 +52,6 @@ ambiente dos experimentos, a forma como a rede é emulada e o sistema de
 armazenamento no qual os diferentes modelos de consistência são implementados. A
 seção \ref{sec:projeto_dos_experimentos} trata do projeto dos experimentos.
 
-%TODO: Experimento x experimentos x campanhas x estudo x testes (considerações
-%preliminares)
 
 %TODO: Simulação x emulação
 
@@ -119,7 +117,7 @@ Os sítios do Grid5000 são conectados por redes de alta velocidade. Suas redes
 apresentam latências da ordem de dezenas de nanosegundos entre nós de um mesmo
 aglomerado e da ordem de 20 ms entre sítios, e portanto não caracterizam uma
 WAN. De qualquer forma, mesmo que caracterizassem, é importante para esse
-experimento ter controle sobre esses valores para poder testar os sistema em
+estudo ter controle sobre esses valores para poder testar os sistema em
 diferentes configurações e possibilitar sua reprodutibilidade.
 
 Assim, os experimentos implementam uma latência artificial para simular uma WAN
@@ -134,7 +132,7 @@ Existem outras ferramentas como o
 dummynet\footnote{\url{http://info.iet.unipi.it/~luigi/dummynet/}} e o
 NISTNet\footnote{\url{http://snad.ncsl.nist.gov/itg/nistnet/}}, mas elas foram
 desconsideradas dado que o netem já vem integrado ao tc e satisfaz os requisitos
-funcionais do experimento.
+funcionais desse estudo.
 
 \subsubsection{Simulação de centros de dados}
 \label{sec:simulacao_de_centros_de_dados}
@@ -146,9 +144,9 @@ de CD1 e CD2, respectivamente. Ao final, cada servidor possui dois IPs, o seu IP
 da rede do Grid5000 e um IP de uma das sub-redes.
 
 Todos os servidores no Grid5000 possuem um nome registrado no DNS que aponta
-para o seu IP da rede do Grid5000. Nesse experimento, são criados dois arquivos
-/etc/hosts, um por centro de dados. Um deles é colocado em todos os servidores
-de CD1 e o outro em todos os servidores de CD2. A partir dessa configuração, os
+para o seu IP da rede do Grid5000. Nos experimentos dois arquivos /etc/hosts são
+criados, um por centro de dados. Um deles é colocado em todos os servidores de
+CD1 e o outro em todos os servidores de CD2. A partir dessa configuração, os
 servidores do CD1 resolvem os nomes dos servidores do CD2 para os IPs de SR2 e
 vice-versa. Como o /etc/hosts tem prioridade sobre o DNS na resolução de nomes,
 todas as requisições que saem de um centro de dados para o outro usam o IP
@@ -170,7 +168,7 @@ Uma abordagem para a comparação dos modelos de consistência é o uso de um
 sistema de armazenamento já existente que implemente os dois modelos de
 consistência, mas tal sistema não foi encontrado. A partir disso, uma segunda
 abordagem possível é o uso de sistemas diferentes, cada um implementando um
-modelo de consistência. Apesar de existirem experimentos que usem essa abordagem
+modelo de consistência. Apesar de existirem experimentos que usam essa abordagem
 \cite{Cooper2008,Stonebraker2007,Pavlo2009}, dois problemas foram identificados.
 O primeiro é que o desempenho de cada sistema pode ser afetado por fatores
 particulares do sistema que não o modelo de consistência, como a tecnologia
@@ -257,24 +255,24 @@ Outra aplicação de execução de testes considerada foi o YCSB \cite{Cooper2010}.
 Apesar de possuir mais flexibilidade que o Basho Bench nas suas configurações,
 ela não está preparada para acessar o Riak, acesso esse que precisaria ser
 implementado. Além disso, ela também não oferece todas as funcionalidades
-necessárias para o experimento, que precisariam ser implementadas.
+necessárias para os experimentos, que precisariam ser implementadas.
 
-Para os experimentos, cada instância da aplicação de execução dos testes é
-dedicada a um centro de dados. Essa configuração facilita a interpretação dos
-dados e evita possíveis gargalos.
+Nos experimentos, cada instância da aplicação de execução dos testes é dedicada
+a um centro de dados. Essa configuração facilita a interpretação dos dados e
+evita possíveis gargalos.
 
 %% ------------------------------------------------------------------------- %%
 \subsection{Imagem} \label{sec:imagem}
 
-A imagem usada nessa pesquisa é um Debian Squeeze baseado em uma imagem
+A imagem usada nesse estudo é um Debian Squeeze baseado em uma imagem
 pré-configurada disponibilizada pelo Grid5000. Além do conteúdo, essa imagem
 possui o Riak e o Basho Bench modificados e algumas ferramentas de monitoração e
 análise de desempenho como
 sysstat\footnote{\url{http://sebastien.godard.pagesperso-orange.fr/}},
 bwm-ng\footnote{\url{http://www.gropp.org/?id=projects&sub=bwm-ng}} e
-iperf\footnote{\url{http://iperf.sourceforge.net/}}. Existe uma
-única imagem, a distinção entre servidores com Riak ou Basho Bench é feita
-através dos scripts que gerenciam o experimento
+iperf\footnote{\url{http://iperf.sourceforge.net/}}. Existe uma única imagem, a
+distinção entre servidores executando instâncias do Riak ou do Basho Bench é
+feita através dos scripts que gerenciam os experimentos
 (\ref{sec:infraestrutura_dos_experimentos}).
 
 %% ------------------------------------------------------------------------- %%
@@ -529,7 +527,7 @@ nos resultados.
 Os experimentos consideram que todos os nós sempre operam sem falhas. Os
 resultados de experimentos com o sistema operando em algum modo de falha (desde
 a falha de um nó até de um centro de dados inteiro) devem ser diferentes dos
-obtidos com este experimento.
+obtidos nesse estudo.
 
 %% ------------------------------------------------------------------------- %%
 \subsection{Resultados parciais} \label{sec:resultados_parciais}

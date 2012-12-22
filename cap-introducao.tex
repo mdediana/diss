@@ -58,27 +58,26 @@ baseados nesse relaxamento de consistência
 A consistência em momento indeterminado é um modelo mais relaxado e se tornou
 especialmente popular após a publicação sobre o Dynamo \cite{DeCandia2007},
 sistema de armazenamento chave-valor usado tanto pela loja virtual quanto pela
-estrutura de computação em nuvem da Amazon
-\footnote{\url{http://www.amazon.com/} e \url{http://aws.amazon.com/}}
-\cite{Vogels2007}. A consistência em momento indeterminado garante que as
-réplicas vão sempre convergir em algum momento no futuro desde que novas
-atualizações cessem. Enquanto atualizações estiverem acontecendo, existe a
-possibilidade de surgirem inconsistências entre as réplicas. Como a consistência
-em momento indeterminado permite conflitos entre réplicas, clientes podem
-acessar dados desatualizados ou divergentes dependendo da réplica acessada. Os
-conflitos que surgem precisam ser resolvidos por algoritmos de detecção e
-resolução de conflitos e caso ações tenham sido tomadas com base em valores
-inconsistentes, ações de compensação são necessárias. O uso de consistência em
-momento indeterminado em um sistema geo-replicado resulta em baixa latência e
-alta disponibilidade, tendo como contraponto uma maior complexidade no
-desenvolvimento da aplicação, que precisa estar preparada para lidar com
-inconsistências. Após o Dynamo, diversos sistemas de armazenamento que lidam com
-consistência em momento indeterminado foram implementados e colocados em
-produção, como Cassandra \cite{Lakshman2010} e Voldemort \cite{Voldemort},
-implementados respectivamente pelo Facebook
-\footnote{\url{http://www.facebook.com/}} e LinkedIn
-\footnote{\url{http://www.linkedin.com/}}. Outras empresas web de larga escala
-utilizando Cassandra são Twitter\footnote{\url{http://twitter.com/}}
+estrutura de computação em nuvem da Amazon\footnote{\url{http://www.amazon.com/}
+e \url{http://aws.amazon.com/}} \cite{Vogels2007}. A consistência em momento
+indeterminado garante que as réplicas vão sempre convergir em algum momento no
+futuro desde que novas atualizações cessem. Enquanto atualizações estiverem
+acontecendo, existe a possibilidade de surgirem inconsistências entre as
+réplicas. Como a consistência em momento indeterminado permite conflitos entre
+réplicas, clientes podem acessar dados desatualizados ou divergentes dependendo
+da réplica acessada. Os conflitos que surgem precisam ser resolvidos por
+algoritmos de detecção e resolução de conflitos e caso ações tenham sido tomadas
+com base em valores inconsistentes, ações de compensação são necessárias. O uso
+de consistência em momento indeterminado em um sistema geo-replicado resulta em
+baixa latência e alta disponibilidade, tendo como contraponto uma maior
+complexidade no desenvolvimento da aplicação, que precisa estar preparada para
+lidar com inconsistências. Após o Dynamo, diversos sistemas de armazenamento que
+lidam com consistência em momento indeterminado foram implementados e colocados
+em produção, como Cassandra \cite{Lakshman2010} e Voldemort \cite{Voldemort},
+implementados respectivamente pelo
+Facebook\footnote{\url{http://www.facebook.com/}} e
+LinkedIn\footnote{\url{http://www.linkedin.com/}}. Outras empresas web de larga
+escala utilizando Cassandra são Twitter\footnote{\url{http://twitter.com/}}
 \cite{King2010}, Reddit\footnote{\url{http://www.reddit.com/}} \cite{King2010a}
 e Rackspace\footnote{\url{http://www.rackspace.com/}} \cite{Hood2010}.
 
@@ -164,7 +163,7 @@ opção interessante por oferecer um modelo de programação mais simples, desde que
 seu desempenho seja comparável ao da consistência em momento indeterminado e a
 aplicação tolere níveis mais baixos de disponibilidade.
 
-Há diversos experimentos sobre desempenho de modelos de consistência
+Há diversos estudos experimentais sobre desempenho de modelos de consistência
 \cite{DeCandia2007,Cooper2008,Lloyd2011,Beyer2011}, mas não foi encontrada uma
 comparação quantitativa entre esses dois modelos mostrando como cada um se
 comporta em diferentes condições de latência de rede e carga de trabalho. Dados
@@ -197,22 +196,29 @@ termos em inglês, mas não cientes de suas traduções para o português.
 \begin{tabular}{ll} \emph{Benchmark}			& Aplicação para execução dos testes\\
 \emph{Burstiness}			& Explosões\\ \emph{Cluster}				& Aglomerado\\
 \emph{Data center}			& Centros de dados\\ \emph{Design}				& Projeto\\
-\emph{Distributed hash table (DHT)}	& Tabela de espalhamento\\ \emph{Lazy}
-& Preguiçoso\\ \emph{Link}					& Enlace\\ \emph{Locking}				& Bloqueio\\
+\emph{Distributed hash table (DHT)}	& Tabela de espalhamento\\ \emph{Lazy} &
+Preguiçoso\\ \emph{Link}					& Enlace\\ \emph{Locking}				& Bloqueio\\
 \emph{Rack}					& Bastidor\\ \emph{Read repair}			& Correção na leitura\\
 \emph{Round-trip latency}	& Latência de ida e volta\\ \emph{Stateful/stateless}
 & Com estado/sem estado\\ \emph{Vector clock}         & Relógio vetor\\
 \end{tabular}
 
 %% ------------------------------------------------------------------------- %%
-\section{Considerações preliminares} \label{sec:consideracoes_preliminares} A
+\section{Considerações preliminares} \label{sec:consideracoes_preliminares}
+
+Essa seção apresenta clarificações relacionadas às nomenclaturas utilizadas para
+os sistemas estudados (sub-seção \ref{sec:sistemas_de_armazenamento}) e para os
+experimentos (sub-seção \ref{sec:nomenclatura_de_experimentos}) ao longo da
+dissertação.
+
+\subsection{Sistemas de armazenamento} \label{sec:sistemas_de_armazenamento} A
 área de bancos de dados tradicionalmente trata de bancos de dados que utilizam o
 modelo relacional de dados, criado no início dos anos 70 \cite{Codd1970}. Essa
 tradição é enraizada a ponto de a área normalmente utilizar os conceitos de
 bancos de dados e bancos de dados relacionais como sinônimos (o mesmo valendo
 para SGBDs e SGBDs relacionais, e SGBDDs e SGBDDs relacionais). Mas outros
 modelos de dados também são usados para resolver problemas específicos de
-armazenamento, como o modelos de dados de grafos \cite{Angles2008} ou o
+armazenamento, como os modelos de dados de grafos \cite{Angles2008} e o
 semiestruturado \cite{Abiteboul1997}. Esses modelos se popularizaram no contexto
 de grandes aplicações web a partir da segunda metade dos anos 2000. Ao usar os
 termos banco de dados, SGBDs e SGBDDs, este trabalho não faz distinção sobre
@@ -227,6 +233,19 @@ aplicadas em outro. Considerando que muitas vezes a distinção entre esses
 diferentes tipos de sistema não é clara, sempre que possível o termo sistema de
 armazenamento é utilizado ao longo deste trabalho para se referir a eles de
 forma genérica.
+
+\subsection{Nomenclatura de experimentos}
+\label{sec:nomenclatura_de_experimentos}
+
+A nomenclatura de experimentos utilizada é baseada na mesma encontrada em
+\cite{Jain1991}. A partir dela, a palavra ``experimento'' indica uma execução da
+aplicação de testes cujo resultado relaciona um conjunto de variáveis
+dependentes (efeitos) ao conjunto de variáveis independentes que o causou
+(fatores). Um ``estudo'' é um conjunto de experimentos. O plural
+``experimentos'' também é usado no lugar de ``estudo''. Dessa forma, essa
+pesquisa é um estudo de desempenho composto por diversos experimentos com
+fatores como localidade de requisições e latência de rede que causam efeitos
+como o tempo de resposta das requisições.
 
 %% ------------------------------------------------------------------------- %%
 \section{Organização do trabalho} \label{sec:organizacao_trabalho}
