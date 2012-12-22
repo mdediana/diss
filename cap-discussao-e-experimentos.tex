@@ -102,11 +102,11 @@ Dentre as ferramentas mais importantes estão as de reserva e gerenciamento de
 máquinas. O Grid5000 é uma infraestrutura compartilhada por diversos
 pesquisadores. Portanto, ele oferece um conjunto de ferramentas
 (OAR\footnote{\url{http://oar.imag.fr/}}) e regras para que um pesquisador
-reserve exclusivamente para ele servidores por um determinado período de tempo.
-Além de servidores, é possível reservar IPs para compor sub-redes, recurso
+reserve nós exclusivamente para ele por um determinado período de tempo.
+Além de nós, é possível reservar IPs para compor sub-redes, recurso
 também utilizado nessa pesquisa (ver \ref{sec:rede}). Outra ferramenta bastante
 utilizada é o kadeploy\footnote{\url{http://kadeploy.imag.fr/}}, responsável
-pela implantação de imagens nos servidores reservados pelo usuário.
+pela implantação de imagens nos nós reservados pelo usuário.
 
 %TODO: Falar do HW
 
@@ -137,17 +137,17 @@ funcionais desse estudo.
 \subsubsection{Simulação de centros de dados}
 \label{sec:simulacao_de_centros_de_dados}
 
-Os servidores que compõem o sistema são divididos em dois conjuntos CD1 e CD2,
-cada um representando um centro de dados. Além dos servidores, são reservadas
-duas sub-redes SR1 e SR2. IPs de SR1 e SR2 são alocados para cada cada servidor
-de CD1 e CD2, respectivamente. Ao final, cada servidor possui dois IPs, o seu IP
+Os nós que compõem o sistema são divididos em dois conjuntos CD1 e CD2,
+cada um representando um centro de dados. Além dos nós, são reservadas
+duas sub-redes SR1 e SR2. IPs de SR1 e SR2 são alocados para cada cada nó
+de CD1 e CD2, respectivamente. Ao final, cada nó possui dois IPs, o seu IP
 da rede do Grid5000 e um IP de uma das sub-redes.
 
-Todos os servidores no Grid5000 possuem um nome registrado no DNS que aponta
+Todos os nós no Grid5000 possuem um nome registrado no DNS que aponta
 para o seu IP da rede do Grid5000. Nos experimentos dois arquivos /etc/hosts são
-criados, um por centro de dados. Um deles é colocado em todos os servidores de
-CD1 e o outro em todos os servidores de CD2. A partir dessa configuração, os
-servidores do CD1 resolvem os nomes dos servidores do CD2 para os IPs de SR2 e
+criados, um por centro de dados. Um deles é colocado em todos os nós de
+CD1 e o outro em todos os nós de CD2. A partir dessa configuração, os
+nós do CD1 resolvem os nomes dos nós do CD2 para os IPs de SR2 e
 vice-versa. Como o /etc/hosts tem prioridade sobre o DNS na resolução de nomes,
 todas as requisições que saem de um centro de dados para o outro usam o IP
 daquela sub-rede, enquanto as requisições para o mesmo centro de dados usam o IP
@@ -271,7 +271,7 @@ análise de desempenho como
 sysstat\footnote{\url{http://sebastien.godard.pagesperso-orange.fr/}},
 bwm-ng\footnote{\url{http://www.gropp.org/?id=projects&sub=bwm-ng}} e
 iperf\footnote{\url{http://iperf.sourceforge.net/}}. Existe uma única imagem, a
-distinção entre servidores executando instâncias do Riak ou do Basho Bench é
+distinção entre nós executando instâncias do Riak ou do Basho Bench é
 feita através dos scripts que gerenciam os experimentos
 (\ref{sec:infraestrutura_dos_experimentos}).
 
@@ -281,7 +281,7 @@ feita através dos scripts que gerenciam os experimentos
 
 Os experimentos são basicamente conduzidos através de dois conjuntos de scripts.
 O primeiro (cmb) deles se localiza no frontend do Grid5000, e é usado para
-reserva de servidores, instalação da imagem, gerenciamento do Riak, configuração
+reserva de nós, instalação da imagem, gerenciamento do Riak, configuração
 e execução da aplicação de testes e coleta de resultados. Os scripts são
 escritos em bash.  O segundo (cmb-local) se localiza na máquina do pesquisador e
 são utilizados para manipulação e análise dos dados. Esses scripts são escritos
