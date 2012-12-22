@@ -1,0 +1,23 @@
+#!/bin/bash
+
+set -u
+
+# Before:
+# @misc{
+# ...
+# url = {http://google.com}
+# ...
+# }
+
+# After:
+# @misc{
+# ...
+# howpublished = {\url{http://google.com}}
+# ...
+# }
+
+sed -i '/@misc{/,/^}$/{
+	/^url = \(.*\)/ {
+		s/url = \(.*\)/howpublished = {\\url\1}/
+	}
+}' $1
