@@ -1,77 +1,247 @@
 %% ------------------------------------------------------------------------- %%
-\chapter{Introdução}
-\label{cap:introducao}
+\chapter{Introdução} \label{cap:introducao}
 
-Para atender centenas de milhares de usuários ininterruptamente em sistemas web de larga escala, dados são replicados em milhares de servidores distribuídos em múltiplos centros de dados em diferentes localizações geográficas. A replicação de dados objetiva a redução da latência, o aumento da vazão e/ou disponibilidade \cite{Saito2005}. A latência, ou tempo de resposta de requisições, é menor devido à localidade dos dados, pois a réplica usada para a resposta é a mais próxima do usuário que faz a requisição. A vazão aumenta pois o sistema é capaz de receber uma quantidade maior de requisições simultâneas para o mesmo dado já que há mais servidores disponíveis para atendê-las. A disponibilidade aumenta pois caso um servidor ou até um centro de dados inteiro fique indisponível, outros ainda podem atender requisições para os dados mantidos naquele elemento que falhou. A durabilidade é um outro motivo que pode ser visto como um caso especial de disponibilidade. Devido à replicação, os dados não se perdem no caso em que um nó fique permanentemente indisponível, o que pode acontecer devido a uma falha em um disco rígido ou até mesmo a destruição de um centro de dados inteiro devido a uma catástrofe natural, por exemplo.
+Para atender centenas de milhares de usuários ininterruptamente em sistemas web
+de larga escala, dados são replicados em milhares de servidores distribuídos em
+múltiplos centros de dados em diferentes localizações geográficas. A replicação
+de dados objetiva a redução da latência, o aumento da vazão e/ou disponibilidade
+\cite{Saito2005}. A latência, ou tempo de resposta de requisições, é menor
+devido à localidade dos dados, pois a réplica usada para a resposta é a mais
+próxima do usuário que faz a requisição. A vazão aumenta pois o sistema é capaz
+de receber uma quantidade maior de requisições simultâneas para o mesmo dado já
+que há mais servidores disponíveis para atendê-las. A disponibilidade aumenta
+pois caso um servidor ou até um centro de dados inteiro fique indisponível,
+outros ainda podem atender requisições para os dados mantidos naquele elemento
+que falhou. A durabilidade é um outro motivo que pode ser visto como um caso
+especial de disponibilidade. Devido à replicação, os dados não se perdem no caso
+em que um nó fique permanentemente indisponível, o que pode acontecer devido a
+uma falha em um disco rígido ou até mesmo a destruição de um centro de dados
+inteiro devido a uma catástrofe natural, por exemplo.
 
-O principal problema do uso de replicação em redes de longa distância (WANs) é a dificuldade de garantir que os dados presentes nas réplicas fiquem consistentes entre si. Um motivo para divergência entre réplicas é que a replicação entre centros de dados pode apresentar centenas de milissegundos de latência, período durante o qual as réplicas podem divergir. Essa latência é resultado não só das distâncias físicas entre os nós, mas também de limitações na largura da banda disponível, congestionamento e perda de pacotes. Outro motivo que pode gerar divergência entre réplicas é a falha temporária de um nó, que deixa de receber atualizações por um período de tempo. Um terceiro motivo é a falha em um equipamento ou enlace de rede que impeça a comunicação entre réplicas.
+O principal problema do uso de replicação em redes de longa distância (WANs) é a
+dificuldade de garantir que os dados presentes nas réplicas fiquem consistentes
+entre si. Um motivo para divergência entre réplicas é que a replicação entre
+centros de dados pode apresentar centenas de milissegundos de latência, período
+durante o qual as réplicas podem divergir. Essa latência é resultado não só das
+distâncias físicas entre os nós, mas também de limitações na largura da banda
+disponível, congestionamento e perda de pacotes. Outro motivo que pode gerar
+divergência entre réplicas é a falha temporária de um nó, que deixa de receber
+atualizações por um período de tempo. Um terceiro motivo é a falha em um
+equipamento ou enlace de rede que impeça a comunicação entre réplicas.
 
-Dessa forma, desenvolvedores e administradores de sistemas web de larga escala precisam buscar um balanço entre disponibilidade, desempenho e consistência dos dados. Uma decisão comum a vários desses sistemas é o relaxamento da consistência em troca de alta disponibilidade e baixa latência. Há diversos modelos de consistência propostos na literatura, cada um com diferentes garantias e condições em que as réplicas dos dados podem ficar inconsistentes. Os modelos mais rígidos, que oferecem mais garantias, são mais simples de serem usados pelos desenvolvedores. Modelos que oferecem menos garantias de consistência possibilitam réplicas com dados desatualizados e/ou o aparecimento de divergências e conflitos entre elas. Com isso, esses conflitos precisam ser detectados e corrigidos e ações de compensação podem ser necessárias devido a ações no sistema tomadas a partir de dados inconsistentes. Isso afeta negativamente a manutenibilidade do sistema, já que sua lógica torna-se mais complexa. Por outro lado, quanto mais garantias um modelo oferece, mais comunicação e estruturas de sincronização são necessárias entre as réplicas. Por isso, quanto mais rígido um modelo de consistência, mais baixo é o seu desempenho.
+Dessa forma, desenvolvedores e administradores de sistemas web de larga escala
+precisam buscar um balanço entre disponibilidade, desempenho e consistência dos
+dados. Uma decisão comum a vários desses sistemas é o relaxamento da
+consistência em troca de alta disponibilidade e baixa latência. Há diversos
+modelos de consistência propostos na literatura, cada um com diferentes
+garantias e condições em que as réplicas dos dados podem ficar inconsistentes.
+Os modelos mais rígidos, que oferecem mais garantias, são mais simples de serem
+usados pelos desenvolvedores. Modelos que oferecem menos garantias de
+consistência possibilitam réplicas com dados desatualizados e/ou o aparecimento
+de divergências e conflitos entre elas. Com isso, esses conflitos precisam ser
+detectados e corrigidos e ações de compensação podem ser necessárias devido a
+ações no sistema tomadas a partir de dados inconsistentes. Isso afeta
+negativamente a manutenibilidade do sistema, já que sua lógica torna-se mais
+complexa. Por outro lado, quanto mais garantias um modelo oferece, mais
+comunicação e estruturas de sincronização são necessárias entre as réplicas. Por
+isso, quanto mais rígido um modelo de consistência, mais baixo é o seu
+desempenho.
 
-A consistência forte (linearibilidade) \cite{Herlihy1990} garante que todas as réplicas são idênticas a qualquer momento. O problema desse modelo de consistência é que ele é pouco escalável. Por isso, os desenvolvedores dos sistemas web de larga escala geo-replicados passaram a abrir mão de consistência forte em seus sistemas, e essa prática resultou em padrões arquiteturais baseados nesse relaxamento de consistência \cite{Gilbert2002,Brewer2000,Vogels2009,Helland2009,DeCandia2007}.
+A consistência forte (linearibilidade) \cite{Herlihy1990} garante que todas as
+réplicas são idênticas a qualquer momento. O problema desse modelo de
+consistência é que ele é pouco escalável. Por isso, os desenvolvedores dos
+sistemas web de larga escala geo-replicados passaram a abrir mão de consistência
+forte em seus sistemas, e essa prática resultou em padrões arquiteturais
+baseados nesse relaxamento de consistência
+\cite{Gilbert2002,Brewer2000,Vogels2009,Helland2009,DeCandia2007}.
 
-A consistência em momento indeterminado é um modelo mais relaxado e se tornou especialmente popular após a publicação sobre o Dynamo \cite{DeCandia2007}, sistema de armazenamento chave-valor usado tanto pela loja virtual quanto pela estrutura de computação em nuvem da Amazon \footnote{\url{http://www.amazon.com/} e \url{http://aws.amazon.com/}} \cite{Vogels2007}. A consistência em momento indeterminado garante que as réplicas vão sempre convergir em algum momento no futuro desde que novas atualizações cessem. Enquanto atualizações estiverem acontecendo, existe a possibilidade de surgirem inconsistências entre as réplicas. Como a consistência em momento indeterminado permite conflitos entre réplicas, clientes podem acessar dados desatualizados ou divergentes dependendo da réplica acessada. Os conflitos que surgem precisam ser resolvidos por algoritmos de detecção e resolução de conflitos e caso ações tenham sido tomadas com base em valores inconsistentes, ações de compensação são necessárias. O uso de consistência em momento indeterminado em um sistema geo-replicado resulta em baixa latência e alta disponibilidade, tendo como contraponto uma maior complexidade no desenvolvimento da aplicação, que precisa estar preparada para lidar com inconsistências. Após o Dynamo, diversos sistemas de armazenamento que lidam com consistência em momento indeterminado foram implementados e colocados em produção, como Cassandra \cite{Lakshman2010} e Voldemort \cite{Voldemort}, implementados respectivamente pelo Facebook \footnote{\url{http://www.facebook.com/}} e LinkedIn \footnote{\url{http://www.linkedin.com/}}. Outras empresas web de larga escala utilizando Cassandra são Twitter \footnote{\url{http://twitter.com/}} \cite{King2010}, Reddit \footnote{\url{http://www.reddit.com/}} \cite{King2010a} e Rackspace \footnote{\url{http://www.rackspace.com/}} \cite{Hood2010}.
+A consistência em momento indeterminado é um modelo mais relaxado e se tornou
+especialmente popular após a publicação sobre o Dynamo \cite{DeCandia2007},
+sistema de armazenamento chave-valor usado tanto pela loja virtual quanto pela
+estrutura de computação em nuvem da Amazon
+\footnote{\url{http://www.amazon.com/} e \url{http://aws.amazon.com/}}
+\cite{Vogels2007}. A consistência em momento indeterminado garante que as
+réplicas vão sempre convergir em algum momento no futuro desde que novas
+atualizações cessem. Enquanto atualizações estiverem acontecendo, existe a
+possibilidade de surgirem inconsistências entre as réplicas. Como a consistência
+em momento indeterminado permite conflitos entre réplicas, clientes podem
+acessar dados desatualizados ou divergentes dependendo da réplica acessada. Os
+conflitos que surgem precisam ser resolvidos por algoritmos de detecção e
+resolução de conflitos e caso ações tenham sido tomadas com base em valores
+inconsistentes, ações de compensação são necessárias. O uso de consistência em
+momento indeterminado em um sistema geo-replicado resulta em baixa latência e
+alta disponibilidade, tendo como contraponto uma maior complexidade no
+desenvolvimento da aplicação, que precisa estar preparada para lidar com
+inconsistências. Após o Dynamo, diversos sistemas de armazenamento que lidam com
+consistência em momento indeterminado foram implementados e colocados em
+produção, como Cassandra \cite{Lakshman2010} e Voldemort \cite{Voldemort},
+implementados respectivamente pelo Facebook
+\footnote{\url{http://www.facebook.com/}} e LinkedIn
+\footnote{\url{http://www.linkedin.com/}}. Outras empresas web de larga escala
+utilizando Cassandra são Twitter \footnote{\url{http://twitter.com/}}
+\cite{King2010}, Reddit \footnote{\url{http://www.reddit.com/}} \cite{King2010a}
+e Rackspace \footnote{\url{http://www.rackspace.com/}} \cite{Hood2010}.
 
-Para algumas aplicações web, é importante que os usuários sempre encontrem a aplicação disponível, mesmo que isso cause algum tipo de inconveniente. Os sistema de armazenamento usado pela loja virtual Amazon apresenta disponibilidade de 99,995\% \cite{DeCandia2007}. A Amazon almeja esse nível de disponibilidade pois considera fundamental que seus usuários consigam adicionar itens em seus carrinhos de compras, mesmo que isso implique em problemas que precisem ser corrigidos depois, como itens previamente removidos do carrinho ressurgirem -- algo que pode acontecer ao usar o Dynamo como sistema de armazenamento.
+Para algumas aplicações web, é importante que os usuários sempre encontrem a
+aplicação disponível, mesmo que isso cause algum tipo de inconveniente. Os
+sistema de armazenamento usado pela loja virtual Amazon apresenta
+disponibilidade de 99,995\% \cite{DeCandia2007}. A Amazon almeja esse nível de
+disponibilidade pois considera fundamental que seus usuários consigam adicionar
+itens em seus carrinhos de compras, mesmo que isso implique em problemas que
+precisem ser corrigidos depois, como itens previamente removidos do carrinho
+ressurgirem -- algo que pode acontecer ao usar o Dynamo como sistema de
+armazenamento.
 
-Mas nem todas as aplicações web de larga escala podem usar consistência em momento indeterminado. Existem aplicações que necessitam de modelos de consistência mais rígidos, embora não necessariamente consistência forte, para funcionar corretamente. Por exemplo, uma aplicação de leilão não pode permitir conflitos no histórico de lances de um produto. Num sistema que usa consistência em momento indeterminado, no caso de uma falha que divida a rede em duas partições, usuários em cada partição têm uma visão própria do histórico de lances. Na prática, isso seriam dois leilões simultâneos sobre o mesmo item, conflito que não tem como ser resolvido depois sem desprezar lances. Outro exemplo é um usuário de uma aplicação web de planilha, que não pode ver um valor que acabou de ser inserido desaparecer espontaneamente, mesmo que temporariamente -- algo que pode acontecer em um sistema usando consistência em momento indeterminado.
+Mas nem todas as aplicações web de larga escala podem usar consistência em
+momento indeterminado. Existem aplicações que necessitam de modelos de
+consistência mais rígidos, embora não necessariamente consistência forte, para
+funcionar corretamente. Por exemplo, uma aplicação de leilão não pode permitir
+conflitos no histórico de lances de um produto. Num sistema que usa consistência
+em momento indeterminado, no caso de uma falha que divida a rede em duas
+partições, usuários em cada partição têm uma visão própria do histórico de
+lances. Na prática, isso seriam dois leilões simultâneos sobre o mesmo item,
+conflito que não tem como ser resolvido depois sem desprezar lances. Outro
+exemplo é um usuário de uma aplicação web de planilha, que não pode ver um valor
+que acabou de ser inserido desaparecer espontaneamente, mesmo que
+temporariamente -- algo que pode acontecer em um sistema usando consistência em
+momento indeterminado.
 
-Além disso, existem aplicações que não precisam apresentar índices de disponibilidade tão altos. Em uma aplicação de rede social, por exemplo, uma indisponibilidade curta pode ser tolerada pelos usuários. Um exemplo dessa tolerância pode ser percebida nos usuários do Twitter -- segundo o serviço de monitoramento Pingdom, a disponibilidade do serviço em outubro de 2011 foi de 98,83\% \cite{Pingdom2010}.
+Além disso, existem aplicações que não precisam apresentar índices de
+disponibilidade tão altos. Em uma aplicação de rede social, por exemplo, uma
+indisponibilidade curta pode ser tolerada pelos usuários. Um exemplo dessa
+tolerância pode ser percebida nos usuários do Twitter -- segundo o serviço de
+monitoramento Pingdom, a disponibilidade do serviço em outubro de 2011 foi de
+98,83\% \cite{Pingdom2010}.
 
-Um modelo de consistência para sistemas geo-replicados que busca um meio termo entre consistência forte e consistência em momento indeterminado é a consistência na linha do tempo, usada no PNUTS do Yahoo! \cite{Cooper2008}. Para cada objeto armazenado, esse modelo de consistência permite atualizações em apenas uma de suas réplicas, evitando assim a possibilidade de conflitos ao mesmo tempo em que evita o uso de bloqueios e propagação de atualizações síncrona. Com a propagação assíncrona, réplicas podem ter valores desatualizados devido à latência de rede ou falhas, mas a qualquer instante sabe-se qual é a réplica com o valor mais recente. Os clientes podem escolher em cada acesso se aceitam como resposta apenas o valor mais recente ou se aceitam valores desatualizados. A principal desvantagem da consistência na linha do tempo é que a existência de uma réplica mestre implica que escritas e leituras consistentes (leituras do valor mais recente) ficam indisponíveis em caso de uma falha que impeça um cliente de acessar essa réplica.
+Um modelo de consistência para sistemas geo-replicados que busca um meio termo
+entre consistência forte e consistência em momento indeterminado é a
+consistência na linha do tempo, usada no PNUTS do Yahoo! \cite{Cooper2008}. Para
+cada objeto armazenado, esse modelo de consistência permite atualizações em
+apenas uma de suas réplicas, evitando assim a possibilidade de conflitos ao
+mesmo tempo em que evita o uso de bloqueios e propagação de atualizações
+síncrona. Com a propagação assíncrona, réplicas podem ter valores desatualizados
+devido à latência de rede ou falhas, mas a qualquer instante sabe-se qual é a
+réplica com o valor mais recente. Os clientes podem escolher em cada acesso se
+aceitam como resposta apenas o valor mais recente ou se aceitam valores
+desatualizados. A principal desvantagem da consistência na linha do tempo é que
+a existência de uma réplica mestre implica que escritas e leituras consistentes
+(leituras do valor mais recente) ficam indisponíveis em caso de uma falha que
+impeça um cliente de acessar essa réplica.
 
-Um modelo de consistência oferece portanto um balanço entre desempenho, disponibilidade e consistência. Considerando que usuários de algumas aplicações web toleram indisponibilidades, a consistência na linha do tempo pode ser uma opção interessante por oferecer um modelo de programação mais simples, desde que seu desempenho seja similar ao da consistência em momento indeterminado. O maior fator de impacto no desempenho da  consistência na linha do tempo é o fato de que todas as escritas e leituras consistentes que não são feitas no centro de dados em que está a réplica mestre incorrem no custo de latência da WAN. Entretanto, em aplicações como redes sociais, por exemplo, é de se esperar que a localidade dos acessos seja alta (a maioria dos usuários acessa o sistema de um único país e tem a maioria de seus contatos no mesmo país) e que a relação escrita/leitura seja baixa (cada item criado, como uma postagem ou um comentário, seja lido diversas vezes). De fato, os autores do PNUTS indicam que em sua rede social 60\% dos acessos é local e a relação escrita/leitura observada é de 0,06 \cite{Kadambi2011}. Eles indicam também que outras aplicações chegam a ter 85\% dos acessos locais \cite{Cooper2008}. Dado isso, eles usam a estratégia de sempre mover dinamicamente a réplica mestre para o centro de dados que processa a maior quantidade de requisições para dado objeto. Com isso, em uma aplicação na qual a quantidade de leituras é muito maior do que a quantidade de escritas, o custo de latência pode ser baixo, em especial se as leituras não precisarem necessariamente do valor mais recente.
+Um modelo de consistência oferece portanto um balanço entre desempenho,
+disponibilidade e consistência. Considerando que usuários de algumas aplicações
+web toleram indisponibilidades, a consistência na linha do tempo pode ser uma
+opção interessante por oferecer um modelo de programação mais simples, desde que
+seu desempenho seja similar ao da consistência em momento indeterminado. O maior
+fator de impacto no desempenho da  consistência na linha do tempo é o fato de
+que todas as escritas e leituras consistentes que não são feitas no centro de
+dados em que está a réplica mestre incorrem no custo de latência da WAN.
+Entretanto, em aplicações como redes sociais, por exemplo, é de se esperar que a
+localidade dos acessos seja alta (a maioria dos usuários acessa o sistema de um
+único país e tem a maioria de seus contatos no mesmo país) e que a relação
+escrita/leitura seja baixa (cada item criado, como uma postagem ou um
+comentário, seja lido diversas vezes). De fato, os autores do PNUTS indicam que
+em sua rede social 60\% dos acessos é local e a relação escrita/leitura
+observada é de 0,06 \cite{Kadambi2011}. Eles indicam também que outras
+aplicações chegam a ter 85\% dos acessos locais \cite{Cooper2008}. Dado isso,
+eles usam a estratégia de sempre mover dinamicamente a réplica mestre para o
+centro de dados que processa a maior quantidade de requisições para dado objeto.
+Com isso, em uma aplicação na qual a quantidade de leituras é muito maior do que
+a quantidade de escritas, o custo de latência pode ser baixo, em especial se as
+leituras não precisarem necessariamente do valor mais recente.
 
-Consistência em momento indeterminado é bastante difundida em sistemas web de larga escala. Ela é item de destaque em padrões arquiteturais usados por esse tipo de sistema \cite{Vogels2009,Helland2009}, e é possível encontrá-la em vários sistemas de armazenamento apresentados na literatura e em projetos de software livre / código aberto  \cite{DeCandia2007,Lakshman2010,Voldemort,Riak,Carstoiu2010}. Enquanto isso, a consistência na linha do tempo é pouco usada e reconhecida \cite{Abadi2010} -- encontramos apenas dois sistemas na literatura e nenhum projeto de software livre / código aberto usando esse tipo de consistência \cite{Cooper2008,Rao2011}. Mas a consistência na linha do tempo pode ser uma opção interessante por oferecer um modelo de programação mais simples, desde que seu desempenho seja comparável ao da consistência em momento indeterminado e a aplicação tolere níveis mais baixos de disponibilidade.
+Consistência em momento indeterminado é bastante difundida em sistemas web de
+larga escala. Ela é item de destaque em padrões arquiteturais usados por esse
+tipo de sistema \cite{Vogels2009,Helland2009}, e é possível encontrá-la em
+vários sistemas de armazenamento apresentados na literatura e em projetos de
+software livre / código aberto
+\cite{DeCandia2007,Lakshman2010,Voldemort,Riak,Carstoiu2010}. Enquanto isso, a
+consistência na linha do tempo é pouco usada e reconhecida \cite{Abadi2010} --
+encontramos apenas dois sistemas na literatura e nenhum projeto de software
+livre / código aberto usando esse tipo de consistência
+\cite{Cooper2008,Rao2011}. Mas a consistência na linha do tempo pode ser uma
+opção interessante por oferecer um modelo de programação mais simples, desde que
+seu desempenho seja comparável ao da consistência em momento indeterminado e a
+aplicação tolere níveis mais baixos de disponibilidade.
 
-Há diversos experimentos sobre desempenho de modelos de consistência \cite{DeCandia2007,Cooper2008,Lloyd2011,Beyer2011}, mas não foi encontrada uma comparação quantitativa entre esses dois modelos mostrando como cada um se comporta em diferentes condições de latência de rede e carga de trabalho. Dados sobre essa comparação podem oferecer subsídios para desenvolvedores e administradores de sistemas estimarem melhor custos de desenvolvimento e fazerem um planejamento de capacidade mais eficaz.
+Há diversos experimentos sobre desempenho de modelos de consistência
+\cite{DeCandia2007,Cooper2008,Lloyd2011,Beyer2011}, mas não foi encontrada uma
+comparação quantitativa entre esses dois modelos mostrando como cada um se
+comporta em diferentes condições de latência de rede e carga de trabalho. Dados
+sobre essa comparação podem oferecer subsídios para desenvolvedores e
+administradores de sistemas estimarem melhor custos de desenvolvimento e fazerem
+um planejamento de capacidade mais eficaz.
 
 %% ------------------------------------------------------------------------- %%
-\section{Objetivos}
-\label{sec:objetivo}
-O objetivo geral deste trabalho é comparar em termos de desempenho os modelos de consistência ``em momento indeterminado'' e ``na linha do tempo'' para diferentes latências de rede e cargas de trabalho.
+\section{Objetivos} \label{sec:objetivo} O objetivo geral deste trabalho é
+comparar em termos de desempenho os modelos de consistência ``em momento
+indeterminado'' e ``na linha do tempo'' para diferentes latências de rede e
+cargas de trabalho.
 
 Os objetivos específicos desse trabalho são:
 
-\begin{enumerate}
-\item Caracterizar latências e cargas de trabalho de sistemas web geo-replicados.
-\item Implementar os dois modelos de consistência em um único sistema (mesmo código).
-\item Implementar uma aplicação para execução de testes que simule as cargas de trabalho caracterizados no item 1.
-\item Criar a infraestrutura para a execução dos experimentos em um aglomerado.
+\begin{enumerate} \item Caracterizar latências e cargas de trabalho de sistemas
+web geo-replicados.  \item Implementar os dois modelos de consistência em um
+único sistema (mesmo código).  \item Implementar uma aplicação para execução de
+testes que simule as cargas de trabalho caracterizados no item 1.  \item Criar a
+infraestrutura para a execução dos experimentos em um aglomerado.
 \end{enumerate}
 
 %% ------------------------------------------------------------------------- %%
-\section{Traduções de termos}
-\label{sec:traducoes_termos}
+\section{Traduções de termos} \label{sec:traducoes_termos}
 
-Esta subseção apresenta uma lista de traduções de termos do inglês para o português. O objetivo dessa lista é informar os leitores acostumados com os termos em inglês, mas não cientes de suas traduções para o português.
+Esta subseção apresenta uma lista de traduções de termos do inglês para o
+português. O objetivo dessa lista é informar os leitores acostumados com os
+termos em inglês, mas não cientes de suas traduções para o português.
 
-\begin{tabular}{ll}
- 		\emph{Benchmark}			& Aplicação para execução dos testes\\
- 		\emph{Burstiness}			& Explosões\\
- 		\emph{Cluster}				& Aglomerado\\
- 		\emph{Data center}			& Centros de dados\\
- 		\emph{Design}				& Projeto\\
- 		\emph{Distributed hash table (DHT)}	& Tabela de espalhamento\\
- 		\emph{Lazy}					& Preguiçoso\\
- 		\emph{Link}					& Enlace\\
- 		\emph{Locking}				& Bloqueio\\
- 		\emph{Rack}					& Bastidor\\
- 		\emph{Read repair}			& Correção na leitura\\
- 		\emph{Round-trip latency}	& Latência de ida e volta\\
- 		\emph{Stateful/stateless}	& Com estado/sem estado\\
- 		\emph{Vector clock}         & Relógio vetor\\
+\begin{tabular}{ll} \emph{Benchmark}			& Aplicação para execução dos testes\\
+\emph{Burstiness}			& Explosões\\ \emph{Cluster}				& Aglomerado\\
+\emph{Data center}			& Centros de dados\\ \emph{Design}				& Projeto\\
+\emph{Distributed hash table (DHT)}	& Tabela de espalhamento\\ \emph{Lazy}
+& Preguiçoso\\ \emph{Link}					& Enlace\\ \emph{Locking}				& Bloqueio\\
+\emph{Rack}					& Bastidor\\ \emph{Read repair}			& Correção na leitura\\
+\emph{Round-trip latency}	& Latência de ida e volta\\ \emph{Stateful/stateless}
+& Com estado/sem estado\\ \emph{Vector clock}         & Relógio vetor\\
 \end{tabular}
 
 %% ------------------------------------------------------------------------- %%
-\section{Considerações preliminares}
-\label{sec:consideracoes_preliminares}
-A área de bancos de dados tradicionalmente trata de bancos de dados que utilizam o modelo relacional de dados, criado no início dos anos 70 \cite{Codd1970}. Essa tradição é enraizada a ponto de a área normalmente utilizar os conceitos de bancos de dados e bancos de dados relacionais como sinônimos (o mesmo valendo para SGBDs e SGBDs relacionais, e SGBDDs e SGBDDs relacionais). Mas outros modelos de dados também são usados para resolver problemas específicos de armazenamento, como o modelos de dados de grafos \cite{Angles2008} ou o semiestruturado \cite{Abiteboul1997}. Esses modelos se popularizaram no contexto de grandes aplicações web a partir da segunda metade dos anos 2000. Ao usar os termos banco de dados, SGBDs e SGBDDs, este trabalho não faz distinção sobre qual o modelo de dados utilizado. As referências aos bancos de dados, SGBDs e SGBDDs relacionais são feitas explicitamente.
+\section{Considerações preliminares} \label{sec:consideracoes_preliminares} A
+área de bancos de dados tradicionalmente trata de bancos de dados que utilizam o
+modelo relacional de dados, criado no início dos anos 70 \cite{Codd1970}. Essa
+tradição é enraizada a ponto de a área normalmente utilizar os conceitos de
+bancos de dados e bancos de dados relacionais como sinônimos (o mesmo valendo
+para SGBDs e SGBDs relacionais, e SGBDDs e SGBDDs relacionais). Mas outros
+modelos de dados também são usados para resolver problemas específicos de
+armazenamento, como o modelos de dados de grafos \cite{Angles2008} ou o
+semiestruturado \cite{Abiteboul1997}. Esses modelos se popularizaram no contexto
+de grandes aplicações web a partir da segunda metade dos anos 2000. Ao usar os
+termos banco de dados, SGBDs e SGBDDs, este trabalho não faz distinção sobre
+qual o modelo de dados utilizado. As referências aos bancos de dados, SGBDs e
+SGBDDs relacionais são feitas explicitamente.
 
-Dados distribuídos podem ser gerenciados por outros tipos de sistemas que não SGBDDs, como tabelas de espalhamento distribuídas (DHTs) e sistemas de arquivos distribuídos. Esses sistemas lidam com questões semelhantes, como replicação, por exemplo, o que faz com que muitas técnicas surgidas em um contexto sejam aplicadas em outro. Considerando que muitas vezes a distinção entre esses diferentes tipos de sistema não é clara, sempre que possível o termo sistema de armazenamento é utilizado ao longo deste trabalho para se referir a eles de forma genérica.
+Dados distribuídos podem ser gerenciados por outros tipos de sistemas que não
+SGBDDs, como tabelas de espalhamento distribuídas (DHTs) e sistemas de arquivos
+distribuídos. Esses sistemas lidam com questões semelhantes, como replicação,
+por exemplo, o que faz com que muitas técnicas surgidas em um contexto sejam
+aplicadas em outro. Considerando que muitas vezes a distinção entre esses
+diferentes tipos de sistema não é clara, sempre que possível o termo sistema de
+armazenamento é utilizado ao longo deste trabalho para se referir a eles de
+forma genérica.
 
 %% ------------------------------------------------------------------------- %%
-\section{Organização do trabalho}
-\label{sec:organizacao_trabalho}
+\section{Organização do trabalho} \label{sec:organizacao_trabalho}
 
-Este trabalho está dividido em quatro capítulos. O Capítulo~\ref{cap:consistencia_em_sistemas_geo_replicados} fala sobre os fundamentos necessários para o entendimento da motivação, dos problemas e das soluções oferecidas pela replicação de dados em sistemas geo-replicados, com ênfase na relação entre consistência, desempenho, disponibilidade e manutenibilidade. Nele são discutidos conceitos como escalabilidade, as diferentes técnicas de replicação de dados, modelos de consistência e padrões arquiteturais usados em sistemas geo-replicados. O Capítulo~\ref{cap:discussao_e_experimentos} descreve o planejamento dos experimentos. Nele são apresentados o ambiente em que os experimentos serão realizados, as diferentes latências e cargas de trabalho usadas para exercitar os modelos de consistência e a forma com que os resultados obtidos serão apresentados. O Capítulo~\ref{cap:trabalhos_relacionados} trata dos trabalhos relacionados.
+Este trabalho está dividido em quatro capítulos. O
+Capítulo~\ref{cap:consistencia_em_sistemas_geo_replicados} fala sobre os
+fundamentos necessários para o entendimento da motivação, dos problemas e das
+soluções oferecidas pela replicação de dados em sistemas geo-replicados, com
+ênfase na relação entre consistência, desempenho, disponibilidade e
+manutenibilidade. Nele são discutidos conceitos como escalabilidade, as
+diferentes técnicas de replicação de dados, modelos de consistência e padrões
+arquiteturais usados em sistemas geo-replicados. O
+Capítulo~\ref{cap:discussao_e_experimentos} descreve o planejamento dos
+experimentos. Nele são apresentados o ambiente em que os experimentos serão
+realizados, as diferentes latências e cargas de trabalho usadas para exercitar
+os modelos de consistência e a forma com que os resultados obtidos serão
+apresentados. O Capítulo~\ref{cap:trabalhos_relacionados} trata dos trabalhos
+relacionados.

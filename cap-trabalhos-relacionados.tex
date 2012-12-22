@@ -1,12 +1,48 @@
 %% ------------------------------------------------------------------------- %%
-\chapter{Trabalhos Relacionados}
-\label{cap:trabalhos_relacionados}
+\chapter{Trabalhos Relacionados} \label{cap:trabalhos_relacionados}
 
-Uma abordagem comum na literatura de sistemas distribuídos é a proposta de um novo conceito e a implementação de um sistema que use esse conceito seguida de uma análise de seu desempenho. Tanto o artigo sobre o Dynamo \cite{DeCandia2007} quanto o sobre o PNUTS \cite{Cooper2008} apresentam análises de desempenho, sendo que apenas o segundo faz uma análise baseada na carga de trabalho. Existe uma segunda publicação com experimentos com o PNUTS que analisa o consumo de banda de diferentes políticas de replicação em uma WAN \cite{Kadambi2011}.
+Uma abordagem comum na literatura de sistemas distribuídos é a proposta de um
+novo conceito e a implementação de um sistema que use esse conceito seguida de
+uma análise de seu desempenho. Tanto o artigo sobre o Dynamo \cite{DeCandia2007}
+quanto o sobre o PNUTS \cite{Cooper2008} apresentam análises de desempenho,
+sendo que apenas o segundo faz uma análise baseada na carga de trabalho. Existe
+uma segunda publicação com experimentos com o PNUTS que analisa o consumo de
+banda de diferentes políticas de replicação em uma WAN \cite{Kadambi2011}.
 
-Existem muitos trabalhos que apresentam análises de desempenho de sistemas de armazenamento que usam replicação sobre WANs. Na maior parte dos casos o objetivo desses sistemas é provar outros conceitos além da eficiência do modelo de consistência escolhido por eles. O COPS usa consistência causal+ e implementa transações \cite{Lloyd2011}. O Scatter propõe uma arquitetura ao mesmo tempo escalável e com consistência forte \cite{Glendenning2011}. O Zeno usa consistência em momento indeterminado e é tolerante a falhas bizantinas \cite{Singh2009}. O Windows Azure provê um sistema de armazenamento na nuvem com consistência forte \cite{Calder2011}. O Megastore usa Paxos para implementar consistência forte \cite{Baker2011}. Nenhum desses trabalhos apresenta comparações com outros sistemas ou com outros modelos de consistência. Como eles não usam uma aplicação para execução de testes ou ambiente comum, é difícil fazer qualquer comparação a partir desses trabalhos.
+Existem muitos trabalhos que apresentam análises de desempenho de sistemas de
+armazenamento que usam replicação sobre WANs. Na maior parte dos casos o
+objetivo desses sistemas é provar outros conceitos além da eficiência do modelo
+de consistência escolhido por eles. O COPS usa consistência causal+ e implementa
+transações \cite{Lloyd2011}. O Scatter propõe uma arquitetura ao mesmo tempo
+escalável e com consistência forte \cite{Glendenning2011}. O Zeno usa
+consistência em momento indeterminado e é tolerante a falhas bizantinas
+\cite{Singh2009}. O Windows Azure provê um sistema de armazenamento na nuvem com
+consistência forte \cite{Calder2011}. O Megastore usa Paxos para implementar
+consistência forte \cite{Baker2011}. Nenhum desses trabalhos apresenta
+comparações com outros sistemas ou com outros modelos de consistência. Como eles
+não usam uma aplicação para execução de testes ou ambiente comum, é difícil
+fazer qualquer comparação a partir desses trabalhos.
 
-Beyer et al. realizaram testes para analisar a relação entre as diferentes configurações de consistência no Cassandra e sua disponibilidade e desempenho \cite{Beyer2011}. Como esperado, eles notam que configurações que oferecem consistência mais rígida apresentam pior desempenho. 
-Renesse e Schneider apresentam resultados experimentais comparando desempenho e disponibilidade de replicação mestre-escravo e replicação em cadeia, cada uma delas usando consistência forte e consistência em momento indeterminado \cite{VanRenesse2004}. Nenhum desses dois experimentos leva em consideração questões de latência nem diferentes cargas de trabalho. Yu e Vahdat realizaram uma análise sobre a relação entre disponibilidade e níveis de consistência em sistemas replicados em WANs \cite{Yu2001}. Eles comparam a disponibilidade de um sistema usando consistência forte e consistência contínua, usando diferentes protocolos de consistência como cópia primária e votação, por exemplo. Esse trabalho não testa consistência em momento indeterminado nem consistência na linha do tempo e não observa o desempenho dos modelos de consistência analisados.
+Beyer et al. realizaram testes para analisar a relação entre as diferentes
+configurações de consistência no Cassandra e sua disponibilidade e desempenho
+\cite{Beyer2011}. Como esperado, eles notam que configurações que oferecem
+consistência mais rígida apresentam pior desempenho.  Renesse e Schneider
+apresentam resultados experimentais comparando desempenho e disponibilidade de
+replicação mestre-escravo e replicação em cadeia, cada uma delas usando
+consistência forte e consistência em momento indeterminado
+\cite{VanRenesse2004}. Nenhum desses dois experimentos leva em consideração
+questões de latência nem diferentes cargas de trabalho. Yu e Vahdat realizaram
+uma análise sobre a relação entre disponibilidade e níveis de consistência em
+sistemas replicados em WANs \cite{Yu2001}. Eles comparam a disponibilidade de um
+sistema usando consistência forte e consistência contínua, usando diferentes
+protocolos de consistência como cópia primária e votação, por exemplo. Esse
+trabalho não testa consistência em momento indeterminado nem consistência na
+linha do tempo e não observa o desempenho dos modelos de consistência
+analisados.
 
-Uma publicação com uma proposta mais próxima da deste trabalho é a comparação feita entre Cassandra, HBase, PNUTS e MySQL particionado horizontalmente usando diferentes cargas de trabalho \cite{Cooper2010}. Os resultados servem como uma comparação entre esses sistemas, mas dizem menos sobre seus modelos de consistência, dado que os sistemas apresentam arquiteturas e configurações diferentes. Além disso, os testes são feitos em uma rede local, não em uma WAN.
+Uma publicação com uma proposta mais próxima da deste trabalho é a comparação
+feita entre Cassandra, HBase, PNUTS e MySQL particionado horizontalmente usando
+diferentes cargas de trabalho \cite{Cooper2010}. Os resultados servem como uma
+comparação entre esses sistemas, mas dizem menos sobre seus modelos de
+consistência, dado que os sistemas apresentam arquiteturas e configurações
+diferentes. Além disso, os testes são feitos em uma rede local, não em uma WAN.
