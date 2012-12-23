@@ -218,6 +218,17 @@ motivo suficientemente forte para descartar totalmente o Voldemort, portanto ele
 se mantém como uma opção para os experimentos caso alguma dificuldade específica
 com o Riak seja encontrada.
 
+A implementação da consistência na linha do tempo é incompleta. É importante
+para os experimentos a diferença entre leituras e escritas. Escritas podem
+ser divididas em inserções, atualizações e remoções. Todas elas se comportam da
+mesma forma do ponto de vista da rede, por isso apenas atualizações são
+implementadas de forma completa e eficiente. As atualizações distinguem a
+localização de cada nó com relação aos centros de dados e quando
+a terceira escrita vinda de um centro de dados diferente do em que está o mestre
+acontece o migram para lá. As inserções são ineficientes, ocorrendo sempre pela mesma réplica, mesmo que em
+outro centro de dados. Isso foi feito para evitar conflitos de inserção.
+Remoções não foram implementadas.
+
 Além da implementação de consistência na linha do tempo, o riak\_kv foi alterado
 para tratar corretamente alguns parâmetros extras usados pela consistência na
 linha do tempo recebidos através da interface HTTP. Outras alterações menores
@@ -283,7 +294,7 @@ Os experimentos são basicamente conduzidos através de dois conjuntos de scripts.
 O primeiro (cmb) deles se localiza no frontend do Grid5000, e é usado para
 reserva de nós, instalação da imagem, gerenciamento do Riak, configuração
 e execução da aplicação de testes e coleta de resultados. Os scripts são
-escritos em bash.  O segundo (cmb-local) se localiza na máquina do pesquisador e
+escritos em bash. O segundo (cmb-local) se localiza na máquina do pesquisador e
 são utilizados para manipulação e análise dos dados. Esses scripts são escritos
 em bash, Ruby e R.
 
