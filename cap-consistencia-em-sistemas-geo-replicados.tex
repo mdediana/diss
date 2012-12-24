@@ -268,10 +268,10 @@ consistência forte} \label{tab:consistencia_forte_valida_1} \end{center}
 \end{table}
 
 \begin{table}[!h] \begin{center} \begin{tabular}{c|c|c} & T0     & T1       \\
-\hline R1 & W(x,a) & a = R(x) \\ \hline R2 & W(x,b) & a = R(x) \\ \hline R3 &
-& a = R(x) \\ \end{tabular} \hspace{20pt} \begin{tabular}{c|c|c} & T0     & T1
-\\ \hline R1 & W(x,a) & b = R(x) \\ \hline R2 & W(x,b) & b = R(x) \\ \hline R3 &
-& b = R(x) \\ \end{tabular} \caption{Sequências de operações válidas para
+\hline R1 & W(x,a) & a = R(x) \\ \hline R2 & W(x,b) & a = R(x) \\ \hline R3 & &
+a = R(x) \\ \end{tabular} \hspace{20pt} \begin{tabular}{c|c|c} & T0     & T1 \\
+\hline R1 & W(x,a) & b = R(x) \\ \hline R2 & W(x,b) & b = R(x) \\ \hline R3 & &
+b = R(x) \\ \end{tabular} \caption{Sequências de operações válidas para
 consistência forte} \label{tab:consistencia_forte_valida_2} \end{center}
 \end{table}
 
@@ -289,12 +289,11 @@ intercalada de múltiplas transações em um banco de dados distribuído deve ser
 equivalente à execução serial dessas transações em um banco de dados
 não-distribuído.
 
-\begin{table}[!h] \begin{center} \begin{tabular}{c|c|c|c|c} & T0     & T1
-& T2       & T3			\\ \hline R1 & W(x,a) &          &          &			\\ \hline
-R2 &        & W(x,b)   &          &			\\ \hline R3 &        &          & b =
-R(x) & a = R(x)	\\ \end{tabular} \caption{Sequência de operações válida para
-consistência sequencial} \label{tab:consistencia_sequencial_valida} \end{center}
-\end{table}
+\begin{table}[!h] \begin{center} \begin{tabular}{c|c|c|c|c} & T0     & T1 & T2
+& T3			\\ \hline R1 & W(x,a) &          &          &			\\ \hline R2 &
+& W(x,b)   &          &			\\ \hline R3 &        &          & b = R(x) & a =
+R(x)	\\ \end{tabular} \caption{Sequência de operações válida para consistência
+sequencial} \label{tab:consistencia_sequencial_valida} \end{center} \end{table}
 
 A consistência causal \cite{Ahamad1995} define que escritas que potencialmente
 possuem causas relacionadas devem ser executadas em todas as réplicas na mesma
@@ -307,18 +306,18 @@ cada escrita. A consistência causal acomoda conflitos de atualização, permitindo
 que réplicas divirjam indefinidamente, possibilitando que um cliente leia
 valores diferentes dependendo da réplica acessada.
 
-\begin{table}[!h] \begin{center} \begin{tabular}{c|c|c|c|c} & T0     & T1
-& T2       & T3			\\ \hline R1 & W(x,a) &          &          &			\\ \hline
-R2 &        & W(x,b)   & a = R(x) & b = R(x)	\\ \hline R3 &        &          &
-b = R(x) & a = R(x)	\\ \end{tabular} \caption{Sequência de operações válida para
+\begin{table}[!h] \begin{center} \begin{tabular}{c|c|c|c|c} & T0     & T1 & T2
+& T3			\\ \hline R1 & W(x,a) &          &          &			\\ \hline R2 &
+& W(x,b)   & a = R(x) & b = R(x)	\\ \hline R3 &        &          & b = R(x) &
+a = R(x)	\\ \end{tabular} \caption{Sequência de operações válida para
 consistência causal} \label{tab:consistencia_causal_valida} \end{center}
 \end{table}
 
-\begin{table}[!h] \begin{center} \begin{tabular}{c|c|c|c|c|c} & T0     & T1
-& T2       & T3       &	T4			\\ \hline R1 & W(x,a) &          &          &
-&				\\ \hline R2 &        & a = R(x) & W(x,b)   &          &				\\
-\hline R3 &        &          &          & b = R(x) & a = R(x)	\\ \end{tabular}
-\caption{Sequência de operações inválida para consistência causal}
+\begin{table}[!h] \begin{center} \begin{tabular}{c|c|c|c|c|c} & T0     & T1 & T2
+& T3       &	T4			\\ \hline R1 & W(x,a) &          &          & &				\\
+\hline R2 &        & a = R(x) & W(x,b)   &          &				\\ \hline R3 &
+&          &          & b = R(x) & a = R(x)	\\ \end{tabular} \caption{Sequência
+de operações inválida para consistência causal}
 \label{tab:consistencia_causal_invalida} \end{center} \end{table}
 
 A consistência em momento indeterminado\footnote{O termo \emph{eventual
@@ -337,12 +336,12 @@ possível surgirem conflitos entre réplicas na consistência em momento
 indeterminado, portanto um sistema que use esse modelo de consistência precisa
 implementar um mecanismo de resolução de conflitos.
 
-\begin{table}[!h] \begin{center} \begin{tabular}{c|c|c|c|c|c} & T0     & T1
-& T2       & T3       &	T4			\\ \hline R1 & W(x,a) &          &          & b
-= R(x) &	b = R(x)	\\ \hline R2 &        & W(x,b)   & a = R(x) &          &	b
-= R(x)	\\ \hline R3 &        &          & b = R(x) & a = R(x) & b = R(x)	\\
-\end{tabular} \caption{Sequência de operações válida para consistência em
-momento indeterminado} \label{tab:consistencia_em_momento_indeterminado_valida}
+\begin{table}[!h] \begin{center} \begin{tabular}{c|c|c|c|c|c} & T0     & T1 & T2
+& T3       &	T4			\\ \hline R1 & W(x,a) &          &          & b = R(x) &
+b = R(x)	\\ \hline R2 &        & W(x,b)   & a = R(x) &          &	b = R(x)	\\
+\hline R3 &        &          & b = R(x) & a = R(x) & b = R(x)	\\ \end{tabular}
+\caption{Sequência de operações válida para consistência em momento
+indeterminado} \label{tab:consistencia_em_momento_indeterminado_valida}
 \end{center} \end{table}
 
 Por último, a consistência na linha do tempo \cite{Cooper2008,Alsberg1976}

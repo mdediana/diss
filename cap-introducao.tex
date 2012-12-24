@@ -163,6 +163,27 @@ opção interessante por oferecer um modelo de programação mais simples, desde que
 seu desempenho seja comparável ao da consistência em momento indeterminado e a
 aplicação tolere níveis mais baixos de disponibilidade.
 
+%TODO: Encaixar aqui (ou nao) paragrafos retirados da antiga discussão e
+%experimentos Vários sistemas distribuídos geograficamente, como DNS, redes P2P
+%e aplicações como as disponibilizadas por Google, Amazon e Facebook usam
+%consistência em momento indeterminado para atingir alta escalabilidade. Esse
+%modelo de consistência tornou-se particularmente popular em sistemas de
+%armazenamento usados por sistemas geo-replicados após a publicação do artigo
+%sobre o Dynamo \cite{DeCandia2007}. A difusão de princípios arquiteturais como
+%o CAP popularizou ainda mais a consistência em momento indeterminado (ver
+%subseção \ref{sec:consistencia_disponibilidade_tolerancia_a_particionamento}).
+%
+%Consistência mais rígida implica em disponibilidade ou tolerância a
+%particionamento diminuídos. Como em sistemas geo-replicados não é possível
+%abrir mão de tolerância a particionamento, ao optar por consistência mais
+%rígida a única opção restante é aceitar uma menor disponibilidade. Além das
+%aplicações que necessitam de níveis mais altos de consistência, aplicações que
+%tolerem níveis mais baixos de disponibilidade também podem se beneficiar de um
+%modelo de consistência mais rígido devido a uma manutenibilidade mais alta, que
+%facilite o projeto e desenvolvimento tanto do sistema de armazenamento quanto
+%da aplicação.  A consistência na linha do tempo pode oferecer um balanço
+%interessante entre manutenibilidade, desempenho e disponibilidade nesses casos.
+
 Há diversos estudos experimentais sobre desempenho de modelos de consistência
 \cite{DeCandia2007,Cooper2008,Lloyd2011,Beyer2011}, mas não foi encontrada uma
 comparação quantitativa entre esses dois modelos mostrando como cada um se

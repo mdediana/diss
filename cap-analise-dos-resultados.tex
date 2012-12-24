@@ -1,0 +1,69 @@
+%% ------------------------------------------------------------------------- %%
+\chapter{Análise dos Resultados} \label{cap:analise_dos_resultados}
+
+%% ------------------------------------------------------------------------- %%
+\subsection{Resultados parciais} \label{sec:resultados_parciais}
+
+Até o momento foram executados alguns testes para um melhor entendimento do
+problema sendo tratado e para o estudo e a avaliação das tecnologias usadas nos
+experimentos.
+
+Primeiramente foram executados alguns experimentos no Revoada, aglomerado de 8
+nós administrado pelo IME - USP. Esses experimentos usaram o Cassandra
+\cite{Lakshman2010} como sistema de armazenamento e YCSB \cite{Cooper2010} como
+aplicação para execução dos testes, e foram feitos como testes preliminares
+sobre o efeito da latência de rede no desempenho de diferentes níveis de
+consistência. Os experimentos usaram 3 nós de Cassandra e uma instância do YCSB.
+Foram usados os níveis de consistência ONE ($W = 1$ ou $R = 1$), QUORUM ($W =
+\lceil(N+1)/2\rceil$ ou $R = \lceil(N+1)/2\rceil)$ e ALL ($W = N$ ou $R = N$) e
+latências variando de 0 a 300 ms. O YCSB não estava preparado para lidar com
+diferentes configurações de consistência do Cassandra e foi alterado para tal.
+Para uma dada latência de rede, foi observado um aumento no tempo de resposta e
+diminuição da vazão a medida em que configurações mais rígidas de consistência
+foram usadas. Para uma dada configuração de consistência, foi observado um
+aumento no tempo de resposta e diminuição da vazão a medida em que a latência de
+rede foi aumentada. A preparação e execução desses experimentos colaborou para
+um melhor entendimento de ferramentas e técnicas a serem usadas neste trabalho.
+
+Um segundo conjunto de experimentos foi realizado no Grid5000 com três
+configurações de consistência implementadas no Riak \cite{Riak}: consistência em
+momento indeterminado, consistência na linha do tempo com leituras consistentes
+e consistência na linha do tempo com leituras de qualquer versão. Os
+experimentos usaram um aglomerado de 6 nós para o Riak, e um nó para o Basho
+Bench \cite{Basho}. Os experimentos foram feitos usando latências de 0 a 150 ms.
+Foram usadas 3 configurações relativas à distribuição dos nós por centros de
+dados: todos os nós no mesmo centro de dados, dois nós em um centro de dados
+remoto e quatro nós em um centro de dados remoto (o centro de dados local é o
+centro de dados onde a aplicação de execução de testes roda). A carga de
+trabalho usada foi uniforme para distribuição das chaves e para alvos dos
+acessos. Esses experimentos funcionaram como testes da implementação de
+consistência na linha do tempo. Os resultados observados não foram os esperados,
+pois indicaram um melhor desempenho da consistência em momento indeterminado,
+seguido da consistência na linha do tempo com leituras consistentes e por último
+consistência na linha do tempo com leituras de versão qualquer. O resultado
+esperado seria que leituras de versão qualquer apresentassem desempenho melhor
+do que leituras consistentes. Isso pode ter acontecido por problemas na
+implementação ou por algum fator não previsto no funcionamento desses modelos de
+consistência. Esse fato precisa ser investigado. Além disso, como esperado, os
+experimentos mostraram a existência de conflitos na consistência em momento
+indeterminado, enquanto nenhum conflito aconteceu na consistência na linha do
+tempo. O impacto desses conflitos no desempenho não foi medido. A partir desses
+experimentos foi possível entender o comportamento do Riak no ambiente do
+Grid5000, além de servir como prova de conceito da implementação da consistência
+na linha do tempo no Riak.
+
+%% ------------------------------------------------------------------------- %%
+\subsection{Apresentação dos resultados} \label{sec:apresentacao_dos_resultados}
+
+A comparação de desempenho dos dois modelos de consistência será apresentada em
+duas tabelas, uma para os valores obtidos de tempo de resposta e outra para
+vazão. Cada linha corresponde a uma carga de trabalho, dada pela tripla
+(distribuição de operações, distribuição dos destinos dos acessos, localidade).
+Cada latência da rede define uma coluna. Cada célula da tabela apresenta 3
+valores: o desempenho da consistência em momento indeterminado, consistência na
+linha do tempo com leitura mais recente e consistência na linha do tempo com
+leitura qualquer.
+
+Outros valores e gráficos que ajudem na interpretação dos resultados serão
+apresentados, como a quantidade de conflitos no caso da consistência em momento
+indeterminado.
