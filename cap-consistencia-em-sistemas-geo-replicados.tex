@@ -289,10 +289,10 @@ intercalada de múltiplas transações em um banco de dados distribuído deve ser
 equivalente à execução serial dessas transações em um banco de dados
 não-distribuído.
 
-\begin{table}[!h] \begin{center} \begin{tabular}{c|c|c|c|c} & T0     & T1 & T2
-& T3			\\ \hline R1 & W(x,a) &          &          &			\\ \hline R2 &
-& W(x,b)   &          &			\\ \hline R3 &        &          & b = R(x) & a =
-R(x)	\\ \end{tabular} \caption{Sequência de operações válida para consistência
+\begin{table}[!h] \begin{center} \begin{tabular}{c|c|c|c|c} & T0     & T1 & T2 &
+T3			\\ \hline R1 & W(x,a) &          &          &			\\ \hline R2 & &
+W(x,b)   &          &			\\ \hline R3 &        &          & b = R(x) & a = R(x)
+\\ \end{tabular} \caption{Sequência de operações válida para consistência
 sequencial} \label{tab:consistencia_sequencial_valida} \end{center} \end{table}
 
 A consistência causal \cite{Ahamad1995} define que escritas que potencialmente
@@ -306,18 +306,18 @@ cada escrita. A consistência causal acomoda conflitos de atualização, permitindo
 que réplicas divirjam indefinidamente, possibilitando que um cliente leia
 valores diferentes dependendo da réplica acessada.
 
-\begin{table}[!h] \begin{center} \begin{tabular}{c|c|c|c|c} & T0     & T1 & T2
-& T3			\\ \hline R1 & W(x,a) &          &          &			\\ \hline R2 &
-& W(x,b)   & a = R(x) & b = R(x)	\\ \hline R3 &        &          & b = R(x) &
-a = R(x)	\\ \end{tabular} \caption{Sequência de operações válida para
+\begin{table}[!h] \begin{center} \begin{tabular}{c|c|c|c|c} & T0     & T1 & T2 &
+T3			\\ \hline R1 & W(x,a) &          &          &			\\ \hline R2 & &
+W(x,b)   & a = R(x) & b = R(x)	\\ \hline R3 &        &          & b = R(x) & a
+= R(x)	\\ \end{tabular} \caption{Sequência de operações válida para
 consistência causal} \label{tab:consistencia_causal_valida} \end{center}
 \end{table}
 
 \begin{table}[!h] \begin{center} \begin{tabular}{c|c|c|c|c|c} & T0     & T1 & T2
 & T3       &	T4			\\ \hline R1 & W(x,a) &          &          & &				\\
-\hline R2 &        & a = R(x) & W(x,b)   &          &				\\ \hline R3 &
-&          &          & b = R(x) & a = R(x)	\\ \end{tabular} \caption{Sequência
-de operações inválida para consistência causal}
+\hline R2 &        & a = R(x) & W(x,b)   &          &				\\ \hline R3 & &
+&          & b = R(x) & a = R(x)	\\ \end{tabular} \caption{Sequência de
+operações inválida para consistência causal}
 \label{tab:consistencia_causal_invalida} \end{center} \end{table}
 
 A consistência em momento indeterminado\footnote{O termo \emph{eventual
@@ -337,8 +337,8 @@ indeterminado, portanto um sistema que use esse modelo de consistência precisa
 implementar um mecanismo de resolução de conflitos.
 
 \begin{table}[!h] \begin{center} \begin{tabular}{c|c|c|c|c|c} & T0     & T1 & T2
-& T3       &	T4			\\ \hline R1 & W(x,a) &          &          & b = R(x) &
-b = R(x)	\\ \hline R2 &        & W(x,b)   & a = R(x) &          &	b = R(x)	\\
+& T3       &	T4			\\ \hline R1 & W(x,a) &          &          & b = R(x) & b
+= R(x)	\\ \hline R2 &        & W(x,b)   & a = R(x) &          &	b = R(x)	\\
 \hline R3 &        &          & b = R(x) & a = R(x) & b = R(x)	\\ \end{tabular}
 \caption{Sequência de operações válida para consistência em momento
 indeterminado} \label{tab:consistencia_em_momento_indeterminado_valida}
@@ -514,9 +514,18 @@ apenas para leituras que explicitamente tolerem valores desatualizados.
 O teorema CAP não cobre todas as trocas envolvidas no projeto de sistemas
 distribuídos de larga escala. O teorema PACELC fala sobre uma outra razão para
 um sistema relaxar a consistência, já comentada anteriormente: a obtenção de
-ganhos de desempenho \cite{Abadi2010}. Em uma rede local, a latência da rede é
-muitas vezes desprezível, mas em um sistema geograficamente distribuído as
-latências entre diferentes centros de dados são grandes. Garantir consistência
-mútua por meio de replicação pessimista nesse contexto implica que toda operação
-sempre apresentará a latência do maior enlace entre réplicas, algo muitas vezes
-inaceitável por sistemas desse porte \cite{DeCandia2007,Cooper2008}.
+ganhos de desempenho \cite{Abadi2010}. PACELC significa ``se houver
+particionamento (P), troque disponibilidade (A) por consistência (C), caso
+contrário (E -- \emph{else}), troque latência (L) por consistência (C)''. Em uma
+rede local, a latência da rede é muitas vezes desprezível, mas em um sistema
+geograficamente distribuído as latências entre diferentes centros de dados são
+grandes. Garantir consistência mútua por meio de replicação pessimista nesse
+contexto implica que toda operação sempre apresentará a latência do maior enlace
+entre réplicas, algo muitas vezes inaceitável por sistemas desse porte
+\cite{DeCandia2007,Cooper2008}.
+
+A partir da observação dos teoremas CAP e PACELC é possível criar heurísticas
+para otimização de um modelo de consistência. Por exemplo, uma heurística
+proposta em \cite{Cooper2008} que favorece tanto disponibilidade quanto
+desempenho da consistência na linha do tempo é a migração do mestre de um objeto
+para o centro de dados no qual ele é escrito mais frequentemente.

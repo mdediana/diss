@@ -14,6 +14,14 @@ técnica de avaliação \item Seleção da carga de trabalho \item Projeto dos
 experimentos \item Análise e interpretação dos dados \item Apresentação dos
 resultados \end{enumerate}
 
+Métricas são os critérios usados para a comparação de desempenho, como vazão e
+tempo de resposta (variáveis dependentes). Parâmetros são todas as
+características do sistema, do ambiente de operação e da carga de trabalho que
+podem influenciar o desempenho do sistema, como a CPU ou a latência da rede.
+Fatores são os parâmetros que são variados nos experimentos (variáveis
+independentes) e seus valores são os níveis. Os parâmetros que não são fatores
+são fixados (variáveis fixas e constantes).
+
 Os passos 1 a 7 são tratados na seção \ref{sec:definicao_da_analise} e o passo 8
 está na seção \ref{sec:projeto_dos_experimentos}. Os passos 9 e 10 encontram-se
 no capítulo \ref{cap:analise_dos_resultados}.
@@ -23,23 +31,32 @@ no capítulo \ref{cap:analise_dos_resultados}.
 
 %TODO: intro
 
+%% ------------------------------------------------------------------------- %%
 \subsection{Declaração das metas e definição do sistema}
 \label{sec:declaracao_das_metas_e_definicao_do_sistema}
 
 O objetivo desse estudo é comparar o desempenho da consistência em momento
 indeterminado com a consistência na linha do tempo em um sistema de
-armazenamento distribuído em uma WAN. Um estudo completo consideraria também
-outros atributos de qualidade como disponibilidade e manutenibilidade, mas que
-não são feitos aqui por limitações de escopo. Estudos futuros podem contemplar
-esses outros atributos de qualidade.
+armazenamento distribuído em uma WAN. Essa situação é modelada como um único
+sistema distribuído entre dois centros de dados ligados por uma WAN emulada.
+Esse modelo possibilita diferente combinações entre requisições locais rápidas
+(intra centro de dados) e requisições remotas lentas (inter centros de dados)
+dependendo do modelo de consistência usado e da sua configuração (ver
+\ref{sec:modos}).
+
+Um estudo completo consideraria atributos de qualidade além de desempenho, como
+disponibilidade e manutenibilidade, mas que não são feitos usados neste estudo
+por limitações de escopo. Estudos futuros podem contemplar esses e outros
+atributos de qualidade.
 
 Para a comparação dos modelos de consistência, uma versão modificada do Riak
 \cite{Riak} é usada (detalhes sobre a escolha e a implementação estão em
-\ref{sec:sistema_de_armazenamento}). Como o objetivo desse estudo visa comparar
+\ref{sec:sistema_de_armazenamento}). Como o objetivo deste estudo é comparar
 dois modelos de consistência, não sistemas que os implementem, os experimentos
 foram planejados e executados de forma a isolar ao máximo questões específicas
 do sistema.
 
+%% ------------------------------------------------------------------------- %%
 \subsection{Lista de serviços do sistema e seus resultados}
 \label{sec:lista_de_servicos_do_sistema_e_seus_resultados}
 
@@ -109,6 +126,7 @@ se ler valores desatualizados. A quantidade de migrações, exclusiva da
 consistência na linha do tempo, oferece uma visão da dinâmica de um sistema que
 use esse modelo de consistência.
 
+%% ------------------------------------------------------------------------- %%
 \subsection{Lista de parâmetros} \label{sec:lista_de_parametros}
 
 Os parâmetros que afetam o desempenho do sistema podem ser divididos em três
@@ -117,74 +135,142 @@ categorias: parâmetros de sistema, de rede e de carga de trabalho.
 Os principais parâmetros de sistema que podem afetar seu desempenho são:
   
 % Chequei app.config e vm/args
+%TODO: falar de ring_size no alg de particionamento
 \begin{itemize} \item CPU local e CPU remota \item Quantidade de memória local e
 remota \item Banda disponível local e remota \item Mecanismo de armazenamento --
-memória ou disco) \item Velocidade do disco (para armazenamento em disco) \item
-Quantidade de nós do sistema \item Tamanho do banco de dados \item Algoritmo de
-particionamento % qtde de partições p/ consist hashing \item Configuração de
-replicação -- $N$, $R$ e $W$ (para consistência em momento indeterminado) \item
-Limiar para migração (para consistência na linha do tempo) \item Interface de
-acesso \item Nível de log \end{itemize}
+memória ou disco \item Desempenhos de acesso sequencial de leitura e de escrita
+do disco (para disco como mecanismo de armazenamento) \item Desempenhos de
+acesso aleatório de leitura e de escrita do disco (para disco como mecanismo de
+armazenamento) \item Quantidade de nós do sistema \item Tamanho do banco de
+dados \item Algoritmo de particionamento das chaves \item Algoritmo de detecção
+de falhas \item Fator de replicação -- $N$ \item Configuração de replicação --
+$R$ e $W$ (para consistência em momento indeterminado) \item Limiar de migração
+(para consistência na linha do tempo) \item Interface de acesso \item Nível de
+log \end{itemize}
 
 Os principais parâmetros de rede que podem afetar o desempenho do sistema são:
 
 \begin{itemize} \item Topologia da rede \item Protocolos de rede \item Banda
 disponível nos elementos intermediários (switches, roteadores, etc) \item
-Latência \item Variação da latência \item Distribuição da latência \item Taxa de
-perda de pacotes \item Taxa de duplicação de pacotes \item Taxa de corrupção de
-pacotes \item Proporção de pacotes fora de ordem \item Algoritmo de
-congestionamento (para TCP) \item Relação entre banda e latência (Produto
-Banda-Latência -- BDP) (para TCP) \end{itemize}
+Latência da LAN \item Latência da WAN \item Variação da latência da WAN \item
+Taxa de perda de pacotes da WAN \item Taxa de duplicação de pacotes da WAN \item
+Taxa de corrupção de pacotes da WAN \item Proporção de pacotes fora de ordem na
+WAN \item Algoritmo de congestionamento (para TCP) \item Relação entre banda e
+latência (Produto Banda-Latência -- BDP) (para TCP) \end{itemize}
+
+Variação da latência, taxas de perda, duplicação e corrupção de pacotes e
+proporção de pacotes fora de ordem não são considerados para LAN pois ocorrem
+com menor frequência e geram pouco impacto nesse tipo de rede. Em WANs, esses
+fenômenos estão relacionados a uma maior quantidade de nós intermediários
+(incluindo roteadores e proxies) e redes heterogêneas que os pacotes atravessam.
+Em LANs, mesmo quando ocorrem, esses fenômenos causam menos impacto já que o BDP
+é mais baixo e portanto a janela de transmissão é menor. Além disso, o custo de
+retransmissões é baixo dado que a latência da rede e sua variação são pequenas.
 
 Os principais parâmetros da carga de trabalho que podem afetar o desempenho do
 sistema são:
 
 \begin{itemize} \item Distribuição de operações \item Localidade \item
-Popularidade dos objetos acessados \item Taxa de chegada de requisições
+Popularidade dos objetos acessados \item Taxa de chegada de requisições \item
+Versão requisitada nas leituras (para consistência na linha do tempo)
 \end{itemize}
 
-\subsection{Seleção de fatores a serem estudados} \label{sec:selecao_de_fatores}
-
-As variáveis independentes foram escolhidas de forma a aproximar esse trabalho
-dos ambientes de produção de sistemas web geo-replicados. Apesar disso, a lista
-de variáveis independentes não é exaustiva (ver subseção
-\ref{sec:ameacas_a_validade}) por limitações de escopo do trabalho e de
-recursos. Além disso, existem limites de generalização já que aplicações
-diferentes possuem requisitos específicos.
+A subseção seguinte discute os fatores escolhidos para os experimentos. Os
+parâmetros que não são fatores e seus valores estão na seção
+\label{sec:parametros_fixados}.
 
 %% ------------------------------------------------------------------------- %%
-\subsubsection{Modelos de consistência} \label{sec:modelos_de_consistencia}
+\subsection{Seleção de fatores a serem estudados}
+\label{sec:selecao_de_fatores_a_serem_estudados}
 
-Todas as configurações usam $N = 3$ e $W = 1$ (ver subseção
-\ref{sec:variaveis_de_controle_e_constantes}).
+Os fatores foram escolhidos de forma a aproximar esse trabalho dos ambientes de
+produção de sistemas web geo-replicados, assim fatores que influenciam o
+comportamento do sistema operando sobre WAN foram priorizados. Apesar disso,
+essa lista não é exaustiva (ver subseção \ref{sec:ameacas_a_validade}) por
+limitações de recursos e do escopo desse estudo. Além disso, existem limites de
+generalização já que aplicações diferentes possuem requisitos específicos.
 
-Os modelos de consistência usados nos experimentos são\footnote{Consistência na
-linha do tempo com leituras de versões específicas é um meio termo entre
-leituras consistentes e leituras de qualquer versão, portanto não é considerada
-nos experimentos.}:
+Os fatores apresentados nesta subseção são os inicialmente selecionados. Durante
+o projeto dos experimentos, experimentos intermediários foram realizados com o
+objetivo de diminuir a quantidade de fatores e definir seus níveis, gerando uma
+seleção composta apenas pelos fatores mais influentes para os experimentos
+finais. Os experimentos intermediários estão descritos em
+\ref{sec:experimentos_intermediarios}.
 
-\begin{itemize} \item Consistência em momento indeterminado (W=1, R=1), \item
-consistência na linha do tempo com leituras consistentes, \item consistência na
-linha do tempo com leituras de qualquer versão.  \end{itemize}
+Dois fatores que possuem um tratamento especial ao longo do experimento são
+configuração de replicação (para consistência em momento indeterminado) e versão
+requisitada nas leituras (para consistência na linha do tempo). Isso porque seus
+níveis influenciam na proporção de requisições que são atendidas local e
+remotamente, algo fundamental para este estudo. Dessa forma, esses dois fatores
+são tratados como um único, chamado modo.
 
 %% ------------------------------------------------------------------------- %%
-\subsubsection{Latência da rede} \label{sec:latencia_da_rede}
+\subsubsection{Modo} \label{sec:modo}
 
-O desempenho de um sistema é afetado pela rede sobre a qual ele opera. A
-latência da rede entre centros de dados é o principal fator que justifica
-otimizações que fazem uso de localidade. Uma WAN pode afetar o desempenho de um
-sistema não só devido à latência, mas também devido a limitações na largura da
-banda disponível, congestionamento, perda de pacotes, explosões de tráfego, etc.
-Apesar dos outros fatores, esses experimentos adotam uma simplificação e usam
-apenas a latência entre centros de dados para caracterizar uma WAN (ver subseção
-\ref{sec:ameacas_a_validade}).
+Todas as configurações usam $N = 3$, valor padrão em aplicações em produção (ver
+subseção \ref{sec:parametros_fixados}).  Os níveis dos modos são:
+
+\begin{itemize} \item ind1: Consistência em momento indeterminado com $W$ = 1 e
+$R$ = 1 \item ind2: Consistência em momento indeterminado com $W$ = 2 e $R$ = 1
+\item lt\_qqer: Consistência na linha do tempo com leituras de qualquer versão
+\item lt\_rec: Consistência na linha do tempo com leituras da versão mais
+recente \end{itemize}
+
+Os experimentos simulam dois centros de dados e $N = 3$. O algoritmo de
+particionamento garante que existe ao menos uma réplica em cada centro de dados
+(ver \ref{sec:sistema_de_armazenamento}. Assim, existem sempre duas situações
+possíveis para a localização das réplicas do ponto de vista do coordenador
+(lembrando que o coordenador já é uma réplica): uma réplica local e uma remota
+ou duas remotas. Dado isso, ind1 resulta em todas as leituras e escritas locais.
+ind2 resulta em todas as leituras locais e metade das escritas locais e a outra
+metade remotas. lt\_qqer resulta em todas as leituras locais e a quantidade de
+escritas dependente da localidade dos acessos.  Finalmente, lt\_rec resulta
+tanto em leituras quanto escritas dependentes da localidade.
+
+Os modos foram escolhidos de forma a representar situações encontradas em
+sistemas de produção e ao mesmo tempo limitar a quantidade de níveis de forma a
+tornar os experimentos viáveis devido a limitação de recursos. Assim,
+consistência na linha do tempo com leituras de versões específicas não foi
+considerada já que ela é um meio termo entre leituras consistentes e leituras de
+qualquer versão. Consistência em momento indeterminado com $W = 1$ e $R = 2$ não
+foi considerada pois sua semântica é similar a $W = 2$ e $R = 1$, mas teria seu
+desempenho prejudicado considerando que leituras predominam nas distribuições de
+operações usadas nos experimentos (ver \ref{sec:distribuicao_de_operacoes}).
+
+Esses modos implicam em trocas além de desempenho e consistência. A principal é
+durabilidade, que para ind2 é mais alta do que para os outros casos, em que
+apenas uma escrita bem sucedida é suficiente.
+
+%% ------------------------------------------------------------------------- %%
+\subsubsection{CPU local e CPU remota} \label{sec:cpu_local_e_cpu_remota}
+%% ------------------------------------------------------------------------- %%
+\subsubsection{Quantidade de memória local e remota}
+\label{sec:quantidade_de_memoria_local_e_remota}
+%% ------------------------------------------------------------------------- %%
+\subsubsection{Mecanismo de armazenamento -- memória ou disco}
+\label{mecanismo_de_armazenamento}
+%% ------------------------------------------------------------------------- %%
+\subsubsection{Desempenhos de acesso sequencial de leitura e de escrita do disco
+(para disco como mecanismo de armazenamento)}
+\label{desempenhos_de_acesso_sequencial_de_leitura_e_de_escrita_do_disco}
+%% ------------------------------------------------------------------------- %%
+\subsubsection{Desempenhos de acesso aleatório de leitura e de escrita do disco
+(para disco como mecanismo de armazenamento)}
+\label{desempenhos_de_acesso_aleatorio_de_leitura_e_de_escrita_do_disco}
+
+%% ------------------------------------------------------------------------- %%
+\subsubsection{Quantidade de nós do sistema}
+\label{sec:quantidade_de_nos_do_sistema}
+
+%% ------------------------------------------------------------------------- %%
+\subsubsection{Latência da WAN} \label{sec:latencia_da_wan}
 
 As latências de ida e volta médias usadas nos experimentos são baseadas nas
 latências entre os centros de dados dos Amazon Web Services \cite{Sovran2011}.
 Os centros de dados considerados são Califórnia (EUA -- Costa Oeste), Virginia
 (EUA -- Costa Leste), Irlanda e Singapura. A menor latência observada foi 82 ms
 entre os centros de dados dos EUA e a maior foi 277 ms entre Irlanda e
-Singapura. A partir disso, os valores usados nos experimentos são:
+Singapura. A partir disso, os níveis para latência da WAN são:
 
 \begin{itemize} \item 0 ms, \item 100 ms, \item 200 ms, \item 300 ms.
 \end{itemize}
@@ -192,8 +278,60 @@ Singapura. A partir disso, os valores usados nos experimentos são:
 O uso da latência como 0 ms é o equivalente de ter todo o sistema operando em
 uma rede local. Os resultados obtidos para esse caso devem ser usados como
 auxílio na interpretação dos resultados com latências maiores, mas não devem ser
-considerados nas análises finais dado que sistemas geo- replicados, por
+considerados nas análises finais dado que sistemas geo-replicados, por
 definição, não operam nessas condições.
+
+%% ------------------------------------------------------------------------- %%
+\subsubsection{Variação da latência da WAN}
+\label{sec:variacao_da_latencia_da_wan}
+
+A latência em uma WAN não possui valores estáveis, dado que dentre suas causas
+está a dinâmica da rede. Por exemplo, rajadas de tráfego podem encher os buffers
+de um roteador no meio do caminho entre dois nós, fazendo com que pacotes sejam
+descartados, o que se reflete como um aumento latência. Além disso, as variações
+normalmente não são aleatórias. A partir do mesmo exemplo, enquanto o roteador
+está sobrecarregado a latência vista por todos os pacotes é mais alta, quando
+ele volta a operar normalmente a latência vista por todos os pacotes passa a ser
+mais baixa. Por isso, além da variação existe uma correlação entre os valores de
+latência observados ao longo do tempo.
+
+A partir disso, dois níveis de variação foram propostos inicialmente:
+
+\begin{itemize} \item 1\% \item 50\% \end{itemize}
+
+Os níveis de correlação usados foram:
+
+\begin{itemize} \item Nenhuma correlação \item Distribuição normal \end{itemize}
+
+Após os experimentos intermediários esses valores foram fixados (ver seção
+\ref{sec:experimentos_intermediarios}).
+
+%% ------------------------------------------------------------------------- %%
+\subsubsection{Taxa de perda de pacotes da WAN}
+\label{sec:taxa_de_perda_de_pacotes_da_wan}
+
+
+%% ------------------------------------------------------------------------- %%
+\subsubsection{Taxa de perda de duplicação de pacotes da WAN}
+\label{sec:taxa_de_duplicacao_de_pacotes_da_wan}
+
+%% ------------------------------------------------------------------------- %%
+\subsubsection{Taxa de corrupção de pacotes da WAN}
+\label{sec:taxa_de_corrupcao_de_pacotes_da_wan}
+
+%% ------------------------------------------------------------------------- %%
+\subsubsection{Proporção de pacotes fora de ordem na WAN}
+\label{sec:proporcao_de_pacotes_fora_de_ordem_na_wan}
+
+%% ------------------------------------------------------------------------- %%
+\subsubsection{Algoritmo de congestionamento (para TCP)}
+\label{sec:algoritmo_de_congestionamento}
+
+%% ------------------------------------------------------------------------- %%
+\subsubsection{Relação entre banda e latência (Produto Banda-Latência -- BDP)
+(para TCP)} \label{sec:relacao_entre_banda_e_latencia}
+
+
 
 %% ------------------------------------------------------------------------- %%
 \subsubsection{Distribuição de operações} \label{sec:distribuicao_de_operacoes}
@@ -321,6 +459,7 @@ As execuções são repetidas para evitar possíveis variações nos resultados devido
 a fenômenos temporários no ambiente de testes, como um problema de rede, por
 exemplo.  \end{itemize}
 
+%% ------------------------------------------------------------------------- %%
 \subsection{Seleção da técnica de avaliação}
 \label{sec:selecao_da_tecnica_de_avaliacao}
 
@@ -335,6 +474,7 @@ a escolha de experimentação, pela qual é possível analisar o comportamento de um
 sistema de armazenamento que represente o resultado da interação de vários dos
 fatores que afetam o desempenho de um modelo de consistência.
 
+%% ------------------------------------------------------------------------- %%
 \subsection{Seleção da carga de trabalho}
 \label{sec:selecao_da_carga_de_trabalho}
 
