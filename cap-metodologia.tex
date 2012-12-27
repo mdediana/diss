@@ -3,8 +3,8 @@
 
 Esse trabalho consiste na análise do desempenho da consistência em momento
 indeterminado e da consistência na linha do tempo em sistemas operando sobre uma
-WAN. Para tal, o método proposto em \cite{Jain1991} é usado. O método consiste
-em 10 passos:
+WAN. Para essa análise, o método proposto em \cite{Jain1991} é usado. O método
+consiste em 10 passos:
 
 % Jain - pag 37
 \begin{enumerate} \item Declaração das metas e definição do sistema \item Lista
@@ -16,7 +16,7 @@ resultados \end{enumerate}
 
 Os passos 1 a 7 são tratados na seção \ref{sec:definicao_da_analise} e o passo 8
 está na seção \ref{sec:projeto_dos_experimentos}. Os passos 9 e 10 encontram-se
-no capítulo \ref{cap:ianalise_dos_resultados}.
+no capítulo \ref{cap:analise_dos_resultados}.
 
 %% ------------------------------------------------------------------------- %%
 \section{Definição da análise} \label{sec:definicao_da_analise}
@@ -26,33 +26,124 @@ no capítulo \ref{cap:ianalise_dos_resultados}.
 \subsection{Declaração das metas e definição do sistema}
 \label{sec:declaracao_das_metas_e_definicao_do_sistema}
 
-de acordo com diferentes cargas de trabalho e características de rede como
-latência, perda e duplicação de pacotes, entre outros. Por limitações de escopo,
-este trabalho não analisa a relação entre esses modelos de consistência e
-disponibilidade, manutenibilidade ou qualquer outro atributo de qualidade
-influenciado por eles.
+O objetivo desse estudo é comparar o desempenho da consistência em momento
+indeterminado com a consistência na linha do tempo em um sistema de
+armazenamento distribuído em uma WAN. Um estudo completo consideraria também
+outros atributos de qualidade como disponibilidade e manutenibilidade, mas que
+não são feitos aqui por limitações de escopo. Estudos futuros podem contemplar
+esses outros atributos de qualidade.
+
+Para a comparação dos modelos de consistência, uma versão modificada do Riak
+\cite{Riak} é usada (detalhes sobre a escolha e a implementação estão em
+\ref{sec:sistema_de_armazenamento}). Como o objetivo desse estudo visa comparar
+dois modelos de consistência, não sistemas que os implementem, os experimentos
+foram planejados e executados de forma a isolar ao máximo questões específicas
+do sistema.
 
 \subsection{Lista de serviços do sistema e seus resultados}
 \label{sec:lista_de_servicos_do_sistema_e_seus_resultados}
 
+O sistema de armazenamento usado é uma tabela de espalhamento distribuída.
+Assim, o principal serviço oferecido pelo sistema são operações CRUD sobre pares
+chave-valor. Outro serviço fundamental é a replicação dos objetos armazenados.
+
+Para consistência em momento indeterminado, a replicação é parametrizada a
+partir dos valores N, R e W (seção \ref{sec:replicacao_otimista}). Toda
+requisição dos clientes chega a um nó qualquer do sistema. Caso esse nó seja
+responsável pela chave ele é o coordenador. Caso ele não seja responsável, ele
+encaminha a requisição para o coordenador. A partir disso, uma requisição pode
+apresentar os seguintes resultados:
+
+\begin{itemize} \item Bem sucedida: No caso de leitura, caso ao menos R réplicas
+retornem uma resposta com sucesso para o coordenador, no caso de inserção,
+atualização ou remoção caso ao menos W réplicas confirmem a escrita para o
+coordenador.  \item Falha: Caso menos de R ou W réplicas retornem uma resposta
+com sucesso para o coordenador dentro de um determinado intervalo de tempo
+(timeout).  \item Timeout: Caso o cliente desista de esperar uma resposta em um
+tempo menor do que o do coordenador.  \end{itemize}
+
+Para consistência na linha do tempo, a replicação é parametrizada apenas pelo
+valor N. Toda requisição chega a um nó qualquer do sistema. Caso seja uma
+escrita e esse nó seja o mestre para a chave, ele atende a requisição. Caso ele
+não seja o mestre para a chave, ele direciona a requisição para o mestre. Caso
+seja uma leitura e esse nó seja o mestre para a chave, ele atende a requisição.
+Caso ele não seja o mestre para a chave e a o parâmetro para a versão seja
+``versão qualquer'', ele redireciona a chave para um nó responsável por ela.
+Caso a versão seja ``versão mais recente'', ele redireciona a requisição para o
+mestre da chave. A partir disso, uma requisição pode apresentar os seguintes
+resultados:
+
+\begin{itemize} \item Bem sucedida: No caso de leitura de ``qualquer versão'',
+caso ao menos uma réplica retorne uma resposta com sucesso para o coordenador.
+No caso de leitura de ``versão mais recente'', inserção, atualização ou remoção,
+caso o mestre retorne uma resposta com sucesso para o coordenador.  \item Falha:
+No caso de leitura de ``qualquer versão'', caso nenhuma réplica retorne uma
+resposta com sucesso para o coordenador dentro de um determinado intervalo de
+tempo. No caso de leitura de ``versão mais recente'', inserção, atualização ou
+remoção, caso o mestre não retorne uma resposta com sucesso para o coordenador
+dentro de um determinado intervalo de tempo.  \item Timeout: Caso o cliente
+desista de esperar uma resposta em um tempo menor do que o do coordenador.
+\end{itemize}
+
+O Riak disponibiliza configuração para definir se a leitura de uma chave
+inexistente deve ser tratada como erro ou sucesso.
+
 %% ------------------------------------------------------------------------- %%
 \subsection{Seleção de métricas} \label{sec:selecao_de_metricas}
 
-As duas principais variáveis dependentes a serem observadas e usadas como base
-de comparação do desempenho dos modelos de consistência são vazão (medida em
-operações/s) e tempo de resposta das requisições (medido em ms). Quanto maior a
-vazão e menor o tempo de resposta, melhor o desempenho de um modelo de
-consistência. Para uma dada carga de trabalho e latência de rede, a relação da
-vazão e do tempo de resposta entre os modelos de consistência resulta no ganho
+A principal métrica a ser observada e usada como base de comparação do
+desempenho dos modelos de consistência é o tempo de resposta das requisições
+(medido em s). Quanto maior o tempo de resposta, melhor o desempenho de um
+modelo de consistência. Para uma dada carga de trabalho e condição de rede, a
+relação do tempo de resposta entre os modelos de consistência resulta no ganho
 (ou perda) percentual de desempenho ao se optar por um ou outro modelo.
 
-Os modelos de consistência e configurações que permitem conflitos entre réplicas
-podem sofrer uma perda de desempenho devido à execução de algoritmos de detecção
-e recuperação de conflitos. Por isso também serão medidos os conflitos expostos
-para os clientes e as reparações de réplicas, ambas apresentadas como
-porcentagens relativas ao total de requisições.
+Além do tempo de resposta, outras métricas a serem observadas são vazão (em
+operações/s), quantidade de conflitos (porcentagem com relação ao total de
+operações do experimento) e migrações (porcentagem com relação ao total de
+operações do experimento). Vazão não é considerada uma meta principal pois os
+clientes apresentam uma taxa de requisição relativamente baixa nos experimentos,
+de forma a diminuir ao máximo possíveis influências de carga do sistema. A
+quantidade de conflitos é interessante para se ter uma noção da probabilidade de
+se ler valores desatualizados. A quantidade de migrações, exclusiva da
+consistência na linha do tempo, oferece uma visão da dinâmica de um sistema que
+use esse modelo de consistência.
 
 \subsection{Lista de parâmetros} \label{sec:lista_de_parametros}
+
+Os parâmetros que afetam o desempenho do sistema podem ser divididos em três
+categorias: parâmetros de sistema, de rede e de carga de trabalho.
+
+Os principais parâmetros de sistema que podem afetar seu desempenho são:
+  
+% Chequei app.config e vm/args
+\begin{itemize} \item CPU local e CPU remota \item Quantidade de memória local e
+remota \item Banda disponível local e remota \item Mecanismo de armazenamento --
+memória ou disco) \item Velocidade do disco (para armazenamento em disco) \item
+Quantidade de nós do sistema \item Tamanho do banco de dados \item Algoritmo de
+particionamento % qtde de partições p/ consist hashing \item Configuração de
+replicação -- $N$, $R$ e $W$ (para consistência em momento indeterminado) \item
+Limiar para migração (para consistência na linha do tempo) \item Interface de
+acesso \item Nível de log \end{itemize}
+
+Os principais parâmetros de rede que podem afetar o desempenho do sistema são:
+
+\begin{itemize} \item Topologia da rede \item Protocolos de rede \item Banda
+disponível nos elementos intermediários (switches, roteadores, etc) \item
+Latência \item Variação da latência \item Distribuição da latência \item Taxa de
+perda de pacotes \item Taxa de duplicação de pacotes \item Taxa de corrupção de
+pacotes \item Proporção de pacotes fora de ordem \item Algoritmo de
+congestionamento (para TCP) \item Relação entre banda e latência (Produto
+Banda-Latência -- BDP) (para TCP) \end{itemize}
+
+Os principais parâmetros da carga de trabalho que podem afetar o desempenho do
+sistema são:
+
+\begin{itemize} \item Distribuição de operações \item Localidade \item
+Popularidade dos objetos acessados \item Taxa de chegada de requisições
+\end{itemize}
+
+\subsection{Seleção de fatores a serem estudados} \label{sec:selecao_de_fatores}
 
 As variáveis independentes foram escolhidas de forma a aproximar esse trabalho
 dos ambientes de produção de sistemas web geo-replicados. Apesar disso, a lista
@@ -229,8 +320,6 @@ antes de serem consideradas bem sucedidas.
 As execuções são repetidas para evitar possíveis variações nos resultados devido
 a fenômenos temporários no ambiente de testes, como um problema de rede, por
 exemplo.  \end{itemize}
-
-\subsection{Seleção de fatores a serem estudados} \label{sec:selecao_de_fatores}
 
 \subsection{Seleção da técnica de avaliação}
 \label{sec:selecao_da_tecnica_de_avaliacao}
