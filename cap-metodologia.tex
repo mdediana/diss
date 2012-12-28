@@ -194,15 +194,26 @@ Os fatores apresentados nesta subseção são os inicialmente selecionados. Durante
 o projeto dos experimentos, experimentos intermediários foram realizados com o
 objetivo de diminuir a quantidade de fatores e definir seus níveis, gerando uma
 seleção composta apenas pelos fatores mais influentes para os experimentos
-finais. Os experimentos intermediários estão descritos em
-\ref{sec:experimentos_intermediarios}.
+finais. Muitos fatores apresentam apenas dois níveis iniciais pois a maioria dos
+experimentos intermediários não usa mais do que isso. Os experimentos intermediários estão descritos na seção
+\ref{sec:experimentos_intermediarios} e os fatores definitivos na seção
+\ref{sec:fatores_definitivos}.
 
+As configurações relativas a hardware (CPU, memória, etc) estavam limitadas às
+oferecidas pelo Grid5000. Todos os nós de um dado aglomerado do Grid5000 possuem
+a mesma configuração de hardware. Com isso, decidiu-se restringir os
+experimentos a um único aglomerado, de forma a remover discrepâncias de
+hardware dentro de cada experimento. Dado isso, alguns experimentos
+intermediários foram feitos para a decisão do aglomerado a ser usado. Dessa
+forma, os itens referentes a CPU, memória, disco e banda disponível foram
+agrupados em um único fator, chamado aglomerado (subseção \ref{sec:aglomerado}).
+ 
 Dois fatores que possuem um tratamento especial ao longo do experimento são
 configuração de replicação (para consistência em momento indeterminado) e versão
 requisitada nas leituras (para consistência na linha do tempo). Isso porque seus
 níveis influenciam na proporção de requisições que são atendidas local e
 remotamente, algo fundamental para este estudo. Dessa forma, esses dois fatores
-são tratados como um único, chamado modo.
+são tratados como um único, chamado modo (subseção \ref{sec:modo}).
 
 %% ------------------------------------------------------------------------- %%
 \subsubsection{Modo} \label{sec:modo}
@@ -242,26 +253,44 @@ durabilidade, que para ind2 é mais alta do que para os outros casos, em que
 apenas uma escrita bem sucedida é suficiente.
 
 %% ------------------------------------------------------------------------- %%
-\subsubsection{CPU local e CPU remota} \label{sec:cpu_local_e_cpu_remota}
-%% ------------------------------------------------------------------------- %%
-\subsubsection{Quantidade de memória local e remota}
-\label{sec:quantidade_de_memoria_local_e_remota}
-%% ------------------------------------------------------------------------- %%
-\subsubsection{Mecanismo de armazenamento -- memória ou disco}
-\label{mecanismo_de_armazenamento}
-%% ------------------------------------------------------------------------- %%
-\subsubsection{Desempenhos de acesso sequencial de leitura e de escrita do disco
-(para disco como mecanismo de armazenamento)}
-\label{desempenhos_de_acesso_sequencial_de_leitura_e_de_escrita_do_disco}
-%% ------------------------------------------------------------------------- %%
-\subsubsection{Desempenhos de acesso aleatório de leitura e de escrita do disco
-(para disco como mecanismo de armazenamento)}
-\label{desempenhos_de_acesso_aleatorio_de_leitura_e_de_escrita_do_disco}
+\subsubsection{Aglomerado} \label{sec:aglomerado}
+
+Os aglomerados do Grid5000 considerados foram paradent, parapide, sol e suno. A
+descrição do hardware e a quantidade de nós de cada um deles se encontra na
+Tabela \ref{tab:aglomerados_do_grid5000}.
+
+\begin{table}[!h]
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|}
+\hline Aglomerado & CPU & Memória & Disco & Quantidade de nós \\
+\hline parapide & & & & \\
+\hline paradent & & & & \\
+\hline
+\end{tabular}
+\caption{Aglomerados do Grid5000}
+\label{tab:aglomerados_do_grid5000}
+\end{center}
+\end{table}
 
 %% ------------------------------------------------------------------------- %%
 \subsubsection{Quantidade de nós do sistema}
 \label{sec:quantidade_de_nos_do_sistema}
 
+A decisão de usar um único aglomerado implicou em um tamanho máximo do sistema,
+que ficou restrito a quantidade de nós do aglomerado escolhido (ver
+Tabela \ref{tab:aglomerados_do_grid5000}.
+A forma como se opera no Grid5000 também impõe restrições. Uma delas são regras
+que restringem o uso diário. Outra é a concorrência por recursos entre os
+usuários, quanto menor a quantidade de nós reservada, maiores as chances de se
+fazer uma reserva bem sucedida. Uma terceira restrição é devida ao fato de a
+quantidade de partições do anel do espalhamento consistente precisar ser uma
+potência de 2. Com isso, uma maneira simples de distribui as partições
+igualmente entre todos os nós é que a sua quantidade também fosse uma potência
+de 2.
+
+A partir disso, os níveis inicialmente selecionados foram:
+
+\begin{itemize} \item 8 \item 16 \end{itemize}
 %% ------------------------------------------------------------------------- %%
 \subsubsection{Latência da WAN} \label{sec:latencia_da_wan}
 
@@ -270,9 +299,11 @@ latências entre os centros de dados dos Amazon Web Services \cite{Sovran2011}.
 Os centros de dados considerados são Califórnia (EUA -- Costa Oeste), Virginia
 (EUA -- Costa Leste), Irlanda e Singapura. A menor latência observada foi 82 ms
 entre os centros de dados dos EUA e a maior foi 277 ms entre Irlanda e
-Singapura. A partir disso, os níveis para latência da WAN são:
+Singapura.
 
-\begin{itemize} \item 0 ms, \item 100 ms, \item 200 ms, \item 300 ms.
+A partir disso, os níveis selecionados foram:
+
+\begin{itemize} \item 100 ms \item 300 ms
 \end{itemize}
 
 O uso da latência como 0 ms é o equivalente de ter todo o sistema operando em
@@ -295,43 +326,101 @@ ele volta a operar normalmente a latência vista por todos os pacotes passa a ser
 mais baixa. Por isso, além da variação existe uma correlação entre os valores de
 latência observados ao longo do tempo.
 
-A partir disso, dois níveis de variação foram propostos inicialmente:
+A partir disso, os níveis de variação da latência selecionados foram:
 
-\begin{itemize} \item 1\% \item 50\% \end{itemize}
+\begin{itemize} \item 1\% (Pouca variação) \item 50\% (Muita variação) \end{itemize}
 
-Os níveis de correlação usados foram:
+Os níveis de correlação selecionados foram:
 
 \begin{itemize} \item Nenhuma correlação \item Distribuição normal \end{itemize}
 
-Após os experimentos intermediários esses valores foram fixados (ver seção
-\ref{sec:experimentos_intermediarios}).
+%TODO: citar post do amp sobre variação de latência
 
 %% ------------------------------------------------------------------------- %%
 \subsubsection{Taxa de perda de pacotes da WAN}
 \label{sec:taxa_de_perda_de_pacotes_da_wan}
 
+A perda de pacotes é uma das principais causas por atrasos e gargalos em
+um sistema usando TCP, dado que ao registrar a perda de um pacote a janela de
+transmissão da conexão é reiniciada, diminuindo drasticamente a banda.
+Considera-se que Perdas acima de x\% tornam a comunicação praticamente
+impossível.
+
+A partir disso, os níveis selecionados foram:
+
+\begin{itemize} \item 0.05\% (Pouca perda) \item 1\% (Muita perda) \end{itemize}
+
+%TODO: ref sobre perdas
 
 %% ------------------------------------------------------------------------- %%
-\subsubsection{Taxa de perda de duplicação de pacotes da WAN}
+\subsubsection{Taxa de duplicação de pacotes da WAN}
 \label{sec:taxa_de_duplicacao_de_pacotes_da_wan}
+
+Pacotes duplicados afetam a comunicação TCP principalmente por gerarem
+tráfico desnecessariamente.
+
+A partir disso, os níveis selecionados foram:
+
+\begin{itemize} \item 0.05\% \item 5\% \end{itemize}
+
+%TODO: checar problemas de duplicação
 
 %% ------------------------------------------------------------------------- %%
 \subsubsection{Taxa de corrupção de pacotes da WAN}
 \label{sec:taxa_de_corrupcao_de_pacotes_da_wan}
 
+Pacotes corrompidos afetam a comunicação TCP por gerarem retransmissões.
+
+A partir disso, os níveis selecionados foram:
+
+\begin{itemize} \item 0.05\% \item 0.5\% \end{itemize}
+
+%TODO: checar problemas de corrupção
+
 %% ------------------------------------------------------------------------- %%
 \subsubsection{Proporção de pacotes fora de ordem na WAN}
 \label{sec:proporcao_de_pacotes_fora_de_ordem_na_wan}
+
+Pacotes fora de ordem afetam a comunicação TCP principalmente por ocuparem
+buffers em elementos de rede intermediários e finais no aguardo dos pacotes
+anteriores a eles.
+
+A partir disso, os níveis selecionados foram:
+
+\begin{itemize} \item 0.05\% \item 5\% \end{itemize}
+
+%TODO: checar problemas de pacotes fora de ordem
 
 %% ------------------------------------------------------------------------- %%
 \subsubsection{Algoritmo de congestionamento (para TCP)}
 \label{sec:algoritmo_de_congestionamento}
 
+O desempenho da comunicação TCP é dependente do algoritmo de congestionamento
+usado. Esse tipo de algoritmo é responsável pelo dimensionamento da janela de
+transmissão. Em referências sobre otimização da pilha TCP para WANs é comum ver
+dois algoritmos citados.
+
+A partir disso, os níveis selecionados foram:
+
+\begin{itemize} \item cubic \item htcp \end{itemize}
+
+%TODO: checar como algoritmo de congestionamento realmente opera
+%TODO: refs dos algoritmos
+
 %% ------------------------------------------------------------------------- %%
 \subsubsection{Relação entre banda e latência (Produto Banda-Latência -- BDP)
 (para TCP)} \label{sec:relacao_entre_banda_e_latencia}
 
+A quantidade de pacotes em trânsito em uma conexão TCP é dada pelo Produto
+Banda-Latência. Dessa forma, fixada uma largura de banda, quanto maior a
+latência da rede, maior a quantidade de pacotes em trânsito. Um gargalo comum
+nesse caso é o tamanho dos buffers de envio e recepção. Referências sobre
+otimização da pilha TCP para WANs sugerem que o tamanho ideal para esses buffers
+é o dobro do BDP.
 
+A partir disso, os níveis selecionados para a razão entre buffers e BDP foram:
+
+\begin{itemize} \item 2 \item 4 \end{itemize}
 
 %% ------------------------------------------------------------------------- %%
 \subsubsection{Distribuição de operações} \label{sec:distribuicao_de_operacoes}
@@ -346,11 +435,19 @@ execução de seus algoritmos de resolução de conflitos. Por outro lado, um
 sistema que usa consistência na linha do tempo não apresenta esse problema dado
 que conflitos entre réplicas não são possíveis.
 
-As distribuições de operações usadas nos experimentos são:
+A consistência na linha do tempo pode ser muito prejudicada em cargas com um
+maior número de escritas. Isso porque as escritas se tornam
+indisponíveis em caso de falha. Assim, esse estudo considera situações em que
+ela é competitiva quando comparada com a consistência em momento indeterminado.
 
-\begin{itemize} \item Uniforme: 50\% de leituras e 50\% de escritas, \item
-Leitura intensiva: 90\% de leituras, \item Escrita intensiva: 90\% de escritas.
-\end{itemize}
+Ao fazer uma atualização em um objeto na consistência em momento indeterminado,
+é necessário o envio do relógio-vetor. Por isso, espera-se que antes de qualquer
+atualização haja uma leitura. Esse fato restringe a quantidade de escritas a um
+máximo de 50\% da carga de trabalho.
+
+A partir disso, os níveis das relações leitura/escrita selecionados foram:
+
+\begin{itemize} \item 2:1 \item 10:1 \end{itemize}
 
 %% ------------------------------------------------------------------------- %%
 \subsubsection{Distribuição de alvos dos acessos}
@@ -366,8 +463,8 @@ em que a réplica mestre pode se tornar um gargalo nas escritas.
 As distribuições de alvos dos acessos usadas nos experimentos são:
 
 \begin{itemize} \item Uniforme: Todos os objetos são acessados em média a mesma
-quantidade de vezes, \item Concentrada: 10\% dos objetos recebem 90\% dos
-acessos e os outros 90\% dos objetos recebem 10\% dos acessos.  \end{itemize}
+quantidade de vezes, \item Concentrada: Os acessos obedecem a uma distribuição
+Pareto.  \end{itemize}
 
 A distribuição normal não é usada por simplicidade. Pelo teorema do limite
 central, a medida em que o tamanho de uma amostra tende a infinito, a
@@ -384,13 +481,13 @@ semana, foi observado que em média 85\% das escritas a determinado objeto vinham
 do mesmo centro de dados. Isso acontece por exemplo em uma rede social, em que
 os usuários costumam acessar a aplicação a partir da mesma localização
 geográfica e possuem a maior parte de seus contatos na mesma localização
-geográfica (usuários brasileiros tendem a acessar o sistema do Brasil e a
-maioria de seus contatos é brasileira, por exemplo). Nesse caso, se os objetos
+geográfica -- usuários brasileiros tendem a acessar o sistema do Brasil e a
+maioria de seus contatos é brasileira, por exemplo. Nesse caso, se os objetos
 são particionados no sistema a partir da localização geográfica dos acessos mais
 recentes é possível economizar um número considerável de requisições entre
 centros de dados. A implementação do PNUTS usa esse fato para implementar uma
 otimização de desempenho, movendo a réplica mestre para o centro de dados do
-qual vieram os últimos 3 acessos ao objeto. Essa otimização também será
+qual vieram as últimas 3 escritas do objeto. Essa otimização também será
 implementada no sistema de armazenamento usado nos experimentos.
 
 Os perfis de acesso com relação à localidade usados nos experimentos são:
@@ -399,6 +496,57 @@ Os perfis de acesso com relação à localidade usados nos experimentos são:
 igualmente entre centros de dados, \item Concentrada: 90\% dos acessos para cada
 objeto originado em um centro de dados e os 10\% restantes originados em outros
 centros de dados.  \end{itemize}
+
+%% ------------------------------------------------------------------------- %%
+\subsection{Seleção da técnica de avaliação}
+\label{sec:selecao_da_tecnica_de_avaliacao}
+
+Existem três técnicas comumente usadas na análise de desempenho de sistemas:
+simulação, modelagem analítica e medição \cite{Jain1991}. É muito difícil
+criar simuladores ou modelos que levem em consideração a interação entre todos
+os fatores que afetam o desempenho de um modelo de consistência: as diferentes
+cargas de trabalho (incluindo questões de localidade), as características da
+rede, os algoritmos de resolução de conflitos, etc. Assim, a adoção de simulação
+ou modelagem analítica sacrificaria o realismo e a precisão deste trabalho. Daí
+a escolha de medição, pela qual é possível analisar o comportamento de um
+sistema de armazenamento que represente o resultado da interação de vários dos
+fatores que afetam o desempenho de um modelo de consistência.
+
+%% ------------------------------------------------------------------------- %%
+\subsection{Seleção da carga de trabalho}
+\label{sec:selecao_da_carga_de_trabalho}
+
+Considerando que o tipo de estudo é medição, a carga de trabalho é constituída
+por requisições de leitura e escrita enviadas para o sistema de armazenamento a
+partir de instâncias da aplicação de testes (mais detalhes estão na seção
+\ref{sec:aplicacao_de_testes}.
+
+%% ------------------------------------------------------------------------- %%
+\section{Projeto dos experimentos} \label{sec:projeto_dos_experimentos}
+
+%TODO: Simulação x emulação
+Esse estudo consiste em rodar o sistema dividido entre dois centros de dados
+simulados. Os centros de dados são ligados por uma WAN emulada. A carga de
+trabalho é executada por uma aplicação de testes simulando clientes localizados
+em cada um dos centros de dados. Cada experimento consiste em uma configuração
+de rede (latência, perda de pacotes, etc) e uma carga de trabalho (relação
+leitura/escrita, localidade, etc).
+
+A definição dos experimentos é feita de acordo com as variáveis a serem
+trabalhadas. As variáveis dependentes, que medem a influência sobre o fenômeno
+investigado, são descritas na subseção \ref{sec:variaveis_dependentes}. As
+variáveis independentes, que são as variáveis modificadas para criar os
+diferentes cenários dos experimentos, são descritas na subseção
+\ref{sec:variaveis_independentes}. As variáveis de controle e as constantes são
+os valores fixos, convencionados ou naturais usados nos experimentos e são
+descritas na subseção \ref{sec:variaveis_de_controle_e_constantes}. Além das
+variáveis, também são apresentadas nesta seção as ameaças à validade dos
+experimentos na subseção \ref{sec:ameacas_a_validade}, os resultados parciais
+obtidos até o momento na subseção \ref{sec:resultados_parciais} e o formato a
+ser usado na apresentação dos resultados dos experimentos na subseção
+\ref{sec:apresentacao_dos_resultados}.
+
+%TODO: Conteúdo das subseções
 
 %% ------------------------------------------------------------------------- %%
 \subsubsection{Variáveis de controle e constantes}
@@ -458,52 +606,6 @@ antes de serem consideradas bem sucedidas.
 As execuções são repetidas para evitar possíveis variações nos resultados devido
 a fenômenos temporários no ambiente de testes, como um problema de rede, por
 exemplo.  \end{itemize}
-
-%% ------------------------------------------------------------------------- %%
-\subsection{Seleção da técnica de avaliação}
-\label{sec:selecao_da_tecnica_de_avaliacao}
-
-Existem três técnicas comumente usadas na análise de desempenho de sistemas:
-simulação, modelagem analítica e experimentação \cite{Jain1991}. É muito difícil
-criar simuladores ou modelos que levem em consideração a interação entre todos
-os fatores que afetam o desempenho de um modelo de consistência: as diferentes
-cargas de trabalho (incluindo questões de localidade), as características da
-rede, os algoritmos de resolução de conflitos, etc. Assim, a adoção de simulação
-ou modelagem analítica sacrificaria o realismo e a precisão deste trabalho. Daí
-a escolha de experimentação, pela qual é possível analisar o comportamento de um
-sistema de armazenamento que represente o resultado da interação de vários dos
-fatores que afetam o desempenho de um modelo de consistência.
-
-%% ------------------------------------------------------------------------- %%
-\subsection{Seleção da carga de trabalho}
-\label{sec:selecao_da_carga_de_trabalho}
-
-%% ------------------------------------------------------------------------- %%
-\section{Projeto dos experimentos} \label{sec:projeto_dos_experimentos}
-
-%TODO: Simulação x emulação
-Esse estudo consiste em rodar o sistema dividido entre dois centros de dados
-simulados. Os centros de dados são ligados por uma WAN emulada. A carga de
-trabalho é executada por uma aplicação de testes simulando clientes localizados
-em cada um dos centros de dados. Cada experimento consiste em uma configuração
-de rede (latência, perda de pacotes, etc) e uma carga de trabalho (relação
-leitura/escrita, localidade, etc).
-
-A definição dos experimentos é feita de acordo com as variáveis a serem
-trabalhadas. As variáveis dependentes, que medem a influência sobre o fenômeno
-investigado, são descritas na subseção \ref{sec:variaveis_dependentes}. As
-variáveis independentes, que são as variáveis modificadas para criar os
-diferentes cenários dos experimentos, são descritas na subseção
-\ref{sec:variaveis_independentes}. As variáveis de controle e as constantes são
-os valores fixos, convencionados ou naturais usados nos experimentos e são
-descritas na subseção \ref{sec:variaveis_de_controle_e_constantes}. Além das
-variáveis, também são apresentadas nesta seção as ameaças à validade dos
-experimentos na subseção \ref{sec:ameacas_a_validade}, os resultados parciais
-obtidos até o momento na subseção \ref{sec:resultados_parciais} e o formato a
-ser usado na apresentação dos resultados dos experimentos na subseção
-\ref{sec:apresentacao_dos_resultados}.
-
-%TODO: Conteúdo das subseções
 
 %% ------------------------------------------------------------------------- %%
 \subsection{Aspectos técnicos} \label{sec:aspectos_tecnicos}
