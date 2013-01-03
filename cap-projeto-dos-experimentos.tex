@@ -1,0 +1,425 @@
+%% ------------------------------------------------------------------------- %%
+\chapter{Projeto dos experimentos} \label{cap:projeto_dos_experimentos}
+
+%TODO: Simulação x emulação
+Este estudo consiste em rodar o sistema de armazenamento dividido entre dois
+centros de dados simulados. Os centros de dados são ligados por uma WAN emulada.
+A carga de trabalho é executada por uma aplicação de testes simulando clientes
+localizados em cada um dos centros de dados. Cada experimento consiste em um
+modo do sistema, uma configuração de rede (latência, perda de pacotes, etc) e
+uma carga de trabalho (relação leitura/escrita, localidade, etc).
+
+%TODO: Conteúdo das subseções
+
+
+%% ------------------------------------------------------------------------- %%
+\section{Aspectos técnicos} \label{sec:aspectos_tecnicos}
+
+O desempenho de um sistema é resultado das suas características (incluindo
+arquitetura), do ambiente em que ele opera e da carga de trabalho apresentada. O
+ambiente dos experimentos é definido pela plataforma escolhida para executá-los,
+descrita na subseção \ref{sec:ambiente}. A forma como a WAN é emulada é descrita
+na subseção \ref{sec:rede}. O sistema de armazenamento usado como objeto de
+testes, no qual são implementados os modelos de consistência, é descrito na
+subseção \ref{sec:sistema_de_armazenamento}.  A carga sobre o sistema é definida
+pela aplicação de execução dos testes, descrita na subseção
+\ref{sec:aplicacao_de_execucao_dos_testes}. O sistema de armazenamento, a
+aplicação de testes e ferramentas de monitoração e análise de desempenho compõem
+a imagem, descrita na seção \ref{sec:imagem}. Por fim, a descrição da
+infraestrutura de gerenciamento dos experimentos se encontra na seção
+\ref{sec:infraestrutura_dos_experimentos}.
+
+%% ------------------------------------------------------------------------- %%
+\subsection{Ambiente} \label{sec:ambiente}
+
+Os experimentos foram executados no
+Grid5000\footnote{\url{http://www.grid5000.fr/}}, uma plataforma para criação,
+execução e monitoramento de experimentos de sistemas paralelos e distribuídos. A
+plataforma possui mais de 5000 cores distribuídos em 9 sítios na França e um no
+Brasil.
+
+Outras plataformas como o OpenCirrus\footnote{\url{http://opencirrus.org/}} e
+PlanetLab\footnote{\url{http://www.planet-lab.org/}} também foram consideradas,
+mas foram descartadas por uma questão de conveniência, já que o autor deste
+trabalho utilizou o Grid5000 em dois estágios de mestrado de respectivamente
+quatro meses e um mês pelo INRIA na França. A experiência no ambiente adquirida
+nesse período pode ser reutilizada neste trabalho, tornando o projeto e a
+execução dos experimentos mais produtivos. O Amazon Web Services (AWS)
+\footnote{\url{http://aws.amazon.com/}} também foi considerado, mas foi
+descartado por não ser possível ter controle sobre as características de rede
+entre os centros de dados, o que dificultaria a a interpretação dos resultados e
+a reprodutibilidade dos experimentos.
+
+A operação no Grid5000 se dá através do acesso ssh ao frontend de cada sítio.
+Nele o usuário encontra seu diretório home, onde ele pode armazenar seus scripts
+e dados dos experimentos, além de usar as ferramentas do Grid5000.
+
+Dentre as ferramentas mais importantes estão as de reserva e gerenciamento de
+máquinas. O Grid5000 é uma infraestrutura compartilhada por diversos
+pesquisadores. Portanto, ele oferece um conjunto de ferramentas
+(OAR\footnote{\url{http://oar.imag.fr/}}) e regras para que um pesquisador
+reserve nós exclusivamente para ele por um determinado período de tempo.  Além
+de nós, é possível reservar IPs para compor sub-redes, recurso utilizado nos
+experimentos (ver \ref{sec:rede}). Outra ferramenta bastante utilizada é o
+kadeploy\footnote{\url{http://kadeploy.imag.fr/}}, responsável pela implantação
+de imagens nos nós reservados pelo usuário.
+
+%TODO: Falar do HW
+
+%% ------------------------------------------------------------------------- %%
+\subsection{Rede} \label{sec:rede}
+
+Os sítios do Grid5000 são conectados por redes de alta velocidade. Suas redes
+apresentam latências da ordem de dezenas de nanosegundos entre nós de um mesmo
+aglomerado e da ordem de 20 ms entre sítios, e portanto não caracterizam uma
+WAN. De qualquer forma, mesmo que caracterizassem, é importante para este estudo
+ter controle sobre esses valores para poder testar os sistema em diferentes
+configurações e possibilitar sua reprodutibilidade.
+
+Assim, os experimentos implementam uma latência artificial para simular uma WAN
+entre os centros de dados usando a ferramenta traffic control (tc). Essa
+ferramenta possibilita a manipulação das filas de saída de pacotes de uma dada
+interface de rede do sistema operacional. Mais especificamente para emulação de
+WANs, é possível usar o
+netem\footnote{\url{http://www.linuxfoundation.org/collaborate/workgroups/networking/}},
+que provê funcionalidade para emulação de latência de rede incluindo variação da
+latência, perda de pacotes, pacotes duplicados, corrompidos e/ou fora de ordem.
+Existem outras ferramentas como o
+dummynet\footnote{\url{http://info.iet.unipi.it/~luigi/dummynet/}} e o
+NISTNet\footnote{\url{http://snad.ncsl.nist.gov/itg/nistnet/}}, mas elas foram
+desconsideradas dado que o netem já vem integrado ao tc e satisfaz os requisitos
+funcionais deste estudo.
+
+\paragraph{Simulação de centros de dados}
+\label{par:simulacao_de_centros_de_dados}
+
+Os nós que compõem o sistema são divididos em dois conjuntos CD1 e CD2, cada um
+representando um centro de dados. Além dos nós, existem duas sub-redes SR1 e
+SR2. IPs de SR1 e SR2 são alocados para cada cada nó de CD1 e CD2,
+respectivamente. Ao final, cada nó possui dois IPs, o seu IP da rede do Grid5000
+e um IP de uma das sub-redes.
+
+Todos os nós no Grid5000 possuem um nome registrado no DNS que aponta para o seu
+IP da rede do Grid5000. Nos experimentos dois arquivos /etc/hosts são criados,
+um por centro de dados. O objetivo desses arquivos é resolver os nomes dos nós
+de cada centro de dados para o IP de sua sub-rede. Cada um desses arquivos é
+colocado em todos os nós de cada centro de dados. A partir dessa configuração,
+os nós do CD1 resolvem os nomes dos nós do CD2 para os IPs de SR2 e vice-versa.
+Como o /etc/hosts tem prioridade sobre o DNS na resolução de nomes, todas as
+requisições que saem de um centro de dados para o outro usam o IP daquela
+sub-rede, enquanto as requisições para o mesmo centro de dados usam o IP da rede
+do Grid5000.
+
+A partir dessa configuraçãp é possível adicionar um filtro baseado em sub-redes
+ao tc de modo que as características de WAN são aplicadas às requisições que
+saem para o outro centro de dados, enquanto as requisições para a mesma sub-rede
+saem inalteradas.
+
+%TODO: dummynet: Marta Carbone and Luigi Rizzo, Dummynet Revisited, ACM SIGCOMM
+%Computer Communication Review, 40(2) pg.12-20, March 2010
+
+%% ------------------------------------------------------------------------- %%
+\subsection{Sistema de armazenamento} \label{sec:sistema_de_armazenamento}
+
+Uma abordagem para a comparação dos modelos de consistência é o uso de um
+sistema de armazenamento já existente que implemente os dois modelos de
+consistência, mas tal sistema não foi encontrado. A partir disso, uma segunda
+abordagem possível é o uso de sistemas diferentes, cada um implementando um
+modelo de consistência. Apesar de existirem experimentos que usam essa abordagem
+\cite{Cooper2008,Stonebraker2007,Pavlo2009}, dois problemas foram identificados.
+O primeiro é que o desempenho de cada sistema pode ser afetado por fatores
+particulares do sistema que não o modelo de consistência, como a tecnologia
+utilizada, protocolo de acesso, detalhes de configuração, entre outros. O
+segundo é apesar de existirem sistemas de armazenamento de software livre /
+código aberto que implementem consistência em momento indeterminado, não foram
+encontrados sistemas que implementem consistência na linha do tempo.
+
+A partir disso, os experimentos usam um único sistema, isolando assim o modelo
+de consistência como único fator de influência no seu desempenho. Uma opção para
+tal é implementar um sistema de armazenamento distribuído específico para os
+experimentos. O problema dessa abordagem é que esse tipo de sistema é bastante
+complexo, já que precisa prover funcionalidades como controle de entrada e saída
+dos nós, algoritmos de particionamento, etc. Desenvolver todas essas
+funcionalidades inviabilizaria este trabalho devido ao alto custo em tempo para
+implementação.
+
+Para evitar a implementação completa de um sistema de armazenamento, algumas
+opções de software livre / código aberto foram analisadas. A seleção das opções
+foi feita considerando modelos de consistência, estabilidade da solução e
+simplicidade de desenvolvimento. Como não foram encontrados sistemas de
+armazenamento de software livre / código aberto que implementem consistência na
+linha do tempo, as soluções avaliadas foram aquelas que implementam consistência
+em momento indeterminado. Os sistemas encontrados foram Dynomite
+\cite{Dynomite}, Cassandra \cite{Lakshman2010}, Voldemort \cite{Voldemort} e
+Riak \cite{Riak}. Todos eles usam basicamente a mesma arquitetura do Dynamo,
+provendo gerenciamento de entrada e saída de nós no aglomerado, relógios vetor
+para identificação e resolução de conflitos entre diferentes réplicas dos
+objetos \cite{Lamport1978} e espalhamento consistente para o particionamento dos
+objetos \cite{Karger1997a}.
+
+O Dynomite foi descartado pois o projeto foi abandonado pela comunidade em um
+estado ainda instável. O Cassandra por outro lado possui estabilidade e uma
+comunidade bastante ativa, mas é mais complexo que os outros sistemas dado que
+também implementa características de SGBDs orientados a colunas
+\cite{Chang2006}. Dos dois sistemas restantes, o Riak foi escolhido por ser
+implementado em Erlang, linguagem focada no desenvolvimento de sistemas
+distribuídos, apresentando assim uma maior facilidade para o desenvolvimento do
+modelo de consistência na linha do tempo. Um indício dessa facilidade é que o
+riak\_kv, o módulo do Riak usado na implementação do novo modelo de
+consistência, apresenta aproximadamente 20 mil linhas de código contra
+aproximadamente 85 mil do Voldemort. Além disso, existe uma aplicação para
+execução de testes usando Riak bastante completa (ver subseção
+\ref{sec:aplicacao_de_execucao_dos_testes}). O Voldemort também possui aplicação
+semelhante, mas ela oferece menos opções de configuração.
+
+A implementação da consistência na linha do tempo é incompleta. É importante
+para os experimentos a diferença entre leituras e escritas. Escritas podem ser
+inserções, atualizações e remoções. Todas elas se comportam da mesma forma do
+ponto de vista de tráfego local x remoto, por isso apenas atualizações são
+implementadas de forma completa e eficiente. As atualizações distinguem a
+localização de cada nó com relação aos centros de dados. Importante para a
+análise do desempenho com relação à localidade, foi implementada a heurística do
+PNUTS em que a réplica mestre migra para o centro de dados de onde vieram as
+três últimas escritas. As inserções são ineficientes, ocorrendo sempre pela
+mesma réplica, mesmo que em outro centro de dados. Isso foi feito para evitar
+conflitos de inserção. Remoções não foram implementadas.
+
+Além da implementação de consistência na linha do tempo, o riak\_kv foi alterado
+para tratar corretamente os parâmetros extras necessários para a consistência na
+linha do tempo recebidos através da interface HTTP. Outras alterações menores
+dizem respeito a implementação de estatísticas sobre migrações.
+
+Além do riak\_kv, outro módulo alterado foi o riak\_core. Quando o Riak recebe
+uma requisição, ele descobre qual o nó responsável por tratá-la através do
+algoritmo de espalhamento consistente, que se baseia no valor da chave do objeto
+para tal. Originalmente, o Riak é pensado para ser implantado em um único centro
+de dados, portanto o algoritmo não leva em consideração os centros de dados no
+momento de decidir para qual das réplicas a requisição deve seguir. O Riak
+Enterprise, uma versão paga do Riak, disponibiliza essa funcionalidade, mas esta
+pesquisa precisava da versão de código aberto para ser viável. Dessa forma,
+algumas modificações foram necessárias no riak\_core, módulo responsável pelo
+roteamento das requisições, para que ele priorizasse nós do mesmo centro de
+dados em que a requisição chegou. A implementação é muito simples e pouco
+versátil, funcionando apenas para o cenário do estudo (dois centros de dados) e
+baseada nos nomes dos nós para saber em que centro de dados cada um deles se
+encontra.
+
+%% ------------------------------------------------------------------------- %%
+\subsection{Aplicação de execução dos testes}
+\label{sec:aplicacao_de_execucao_dos_testes}
+
+A aplicação de execução de testes usada é o Basho Bench \cite{Basho}, específica
+para o Riak. Ela provê configurações para quantidade de clientes, distribuições
+de acesso, proporção entre operações de leitura e escrita, entre outras. A
+aplicação foi modificada, pois mais de uma instância dela é executada
+simultaneamente nos experimentos, e portanto a geração dos acessos que
+consideram localidade precisa ser coordenada entre elas. Além disso, foi
+necessária a implementação de um script para a consolidação dos dados dos
+obtidos pelas diversas instâncias do Basho Bench.
+
+Outra aplicação de execução de testes considerada foi o YCSB \cite{Cooper2010}.
+Apesar de possuir mais flexibilidade que o Basho Bench nas suas configurações,
+ela não está preparada para acessar o Riak, acesso esse que precisaria ser
+implementado. Além disso, ela também não oferece todas as funcionalidades
+necessárias para os experimentos, que precisariam ser implementadas.
+
+Nos experimentos, cada instância da aplicação de execução dos testes é dedicada
+a um centro de dados. Essa configuração facilita a interpretação dos dados e
+evita possíveis gargalos.
+
+%% ------------------------------------------------------------------------- %%
+\subsection{Imagem} \label{sec:imagem}
+
+A imagem usada nesse estudo é um Debian Squeeze baseado em uma imagem
+pré-configurada disponibilizada pelo Grid5000. Além do conteúdo, essa imagem
+possui o Riak e o Basho Bench modificados e algumas ferramentas de monitoração e
+análise de desempenho como
+sysstat\footnote{\url{http://sebastien.godard.pagesperso-orange.fr/}},
+bwm-ng\footnote{\url{http://www.gropp.org/?id=projects&sub=bwm-ng}} e
+iperf\footnote{\url{http://iperf.sourceforge.net/}}. Existe uma única imagem, a
+distinção entre nós executando instâncias do Riak ou do Basho Bench é feita
+através dos scripts que gerenciam os experimentos
+(\ref{sec:infraestrutura_dos_experimentos}).
+
+%TODO: kernel (lsb_release -a / uname -a)
+
+%% ------------------------------------------------------------------------- %%
+\subsection{Infraestrutura de execução e análise dos experimentos}
+\label{sec:infraestrutura_de_execução_e_analise_dos_experimentos}
+
+Os experimentos são conduzidos através de dois conjuntos de scripts.  O primeiro
+deles (cmb) se localiza no frontend do Grid5000 e é usado para reserva de nós,
+instalação da imagem, gerenciamento do Riak, configuração e execução da
+aplicação de testes e coleta de resultados. Os scripts são escritos em bash. O
+segundo (cmb-local) se localiza na máquina do pesquisador e são utilizados para
+manipulação e análise dos dados. Esses scripts são escritos em bash, Ruby e R.
+
+%% ------------------------------------------------------------------------- %%
+\section{Parâmetros fixados} \label{sec:parametros_fixados}
+
+Os parâmetros levantados na lista inicial definida na seção
+\ref{sec:lista_de_parametros} que não foram considerados fatores tiveram seus
+valores fixados. Além deles, alguns fatores inicialmente considerados também
+foram fixados após os experimentos intermediários (ver seção
+\ref{experimentos_intermediarios}).
+
+Os parâmetros imediatamente fixados são:
+
+\begin{itemize} \item Quantidade de centros de dados: 2. Com esse valor os
+experimentos ficaram mais simples de executar e analisar devido a simetria do
+sistema.
+
+\item Quantidade de nós por centro de dados: Cada centro de dados tem o mesmo
+tamanho (definido em função do tamanho do sistema) para garantir a simetria do
+sistema.
+
+\item Algoritmo de particionamento das chaves: O Riak já disponibiliza uma
+implementação de espalhamento consistente. A única configuração feita é a
+quantidade de partições utilizadas, que deve ser uma potência de 2 e a
+documenação do Riak recomenda ao menos 10 por nó. Dessa forma o valor usado foi
+512, que no maior tamanho do sistema considerado (16) garante as duas condições.
+
+\item Algoritmo de detecção de falhas: Os experimentos sempre consideram
+funcionamento correto dos nós, experimentos que apresentaram falha de algum nó
+foram descartados e executados novamente.
+
+\item Fator de replicação ($N$): 3. Esse é um valor que resulta em um balanço
+razoável entre desempenho, disponibilidade e durabilidade em aplicações reais
+\cite{DeCandia2007}.
+
+\item Limiar de migração (para consistência na linha do tempo): 3. Valor usado
+pelo PNUTS.
+
+\item Interface de acesso: HTTP.
+
+\item Nível de log: WARN. Alguns experimentos exploratórios mostraram perda de
+desempenho quando o  nível de log estava em INFO. 
+
+\item Topologia da rede: Os experimentos estavam limitados a topologia da rede
+do aglomerado utilizado, consistindo apenas pelos 47 nós ligados a um switch.
+
+%TODO: aqui ou outro lugar
+%https://www.grid5000.fr/mediawiki/index.php/Sophia:Network#Sol_Cluster_.28Sun_X2200_M2.29
+
+\item Banda disponível nos elementos intermediários (switches, roteadores, etc):
+Limitada à oferecida pelo switch do aglomerado utilizado. Estudos exploratórios
+mostraram que mesmo nos experimentos que mais demandavam banda não encontraram
+gargalos devido a ela.
+
+
+\item Latência da LAN: Limitada pelo aglomerado usado.
+
+%TODO: qual é a latência?
+
+%% ------------------------------------------------------------------------- %%
+\section{Experimentos intermediários} \label{experimentos_intermediarios}
+
+Dois tipos de experimentos intermediários foram realizados. O primeiro foram
+testes para explorar o sistema e o ambiente e encontrar configurações viáveis
+para os expermentos finais. O segundo foram experimentos seguindo uma
+metodologia mais formal, usados na triagem dos fatores, identificando aqueles
+que mais influenciam nos resultados finais.
+
+%% ------------------------------------------------------------------------- %%
+\subsection{Testes exploratórios} \label{testes_exploratorios}
+
+Notou-se em alguns testes exploratórios iniciais diferenças consideráveis no
+desempenho do Riak em aglomerados diferentes. Considerando que os experimentos
+são limitados por E/S (e não por CPU) e que aparentemente não havia gargalos de
+rede, decidiu-se verificar o desempenho dos discos em cada aglomerado.
+
+O principal resultado desses testes diz respeito ao uso de disco como mecanismo
+de armazenamento do Riak. Como esperado, notou-se uma grande diferença no
+desempenho dos discos de diferentes aglomerados, dado que alguns eram SATA e
+outros SAS. Para medição do desempenho, os testes usaram o hdparm para acesso
+sequencial e o
+seeker\footnote{url{http://www.linuxinsight.com/how\_fast\_is\_your\_disk.html}}
+para acesso aleatório. Os resultados podem ser vistos na Tabela
+\ref{tab:comparacao_de_discos_entre_aglomerados}.
+
+\begin{table}[!h] \begin{center} \begin{tabular}{|c|c|c|c|c|} \hline Aglomerado
+& Tipo & Tamanho & Acesso sequencial (MB/s) & Acesso aleatório (seeks/s) &
+Acesso aleatório (tempo de resposta em ms) \\ \hline sol & & & 59,8 & 78 & 12,7
+\\ \hline suno & & & 242,7 & 131 & 7,6 \\ \hline griffon & & & 73,9 & 56 & 17,6
+\\ \hline parapluie & & & 103,9 & 77 & 13,0 \\ \hline \end{tabular}
+\caption{Comparação de desempenho dos discos entre aglomerados}
+\label{tab:comparacao_de_desempenho_dos_discos_entre_aglomerados} \end{center}
+\end{table}
+
+Dado isso, existem duas opções para a execução dos experimentos, considerando
+que a memória disponível é suficiente para manter todos os dados em memória:
+
+%- Dados em disco (no início dos testes): O cenário é mais real, mas mais
+%difícil de analisar pois os efeitos do disco e da memória sobre o desempenho do
+%sistema se misturam. Além disso, o efeito do preenchimento do cache é um
+%complicador extra, dado que durante um teste uma dada chave acessada mais de
+%uma vez será servida do disco a primeira vez e da memória nas seguintes.
+
+%- Dados em cache: Disco (para escrita) e rede são os único elemento que
+%influenciam no desempenho do sistema, tornando a observação dos efeitos de rede
+%mais precisa. O caso sem latência de rede funciona como um baseline do sistema.
+%Nesse cenário faria mais sentido usar o Riak na configuração em memória,
+%eliminando assim definitivamente o efeito do disco.
+
+%Realizar os experimentos com banco de dados em memória deve gerar resultados
+%mais precisos e fáceis de ser interpretados por descartar a influência de
+%desempenho do disco. A princípio os resultados podem parecer menos realistas e
+%aplicáveis, mas na prática eles são tão limitados quanto o uso de disco, já que
+%nesse segundo caso os resultados são influenciados pelo tipo de disco - um
+%exemplo pode ser visto na comparação de suno com prapluie, em que o primeiro
+%possui discos com taxas de acesso acima do 1Gb/s da rede. Além disso, efeitos
+%de caching de disco tornam os resultados ainda mais particulares e difíceis de
+%ser generalizados. Dessa forma, ao se usar banco de dados em memória elimina-se
+%os efeitos das interações entre rede, disco e caching e a análise pode ser
+%focada apenas na rede.
+
+%Um estudo poderia ser feito para identificar se os resultados podem ser
+%generalizados para sistemas usando SSD, já que estes começam a se tornar opções
+%disponíveis
+%(http://aws.typepad.com/aws/2012/07/new-high-io-ec2-instance-type-hi14xlarge.html).
+
+Ao notar essa diferença, decidiu-se usar memória como mecanismo de armazenamento
+durante os experimentos, eliminado assim a influência do desempenho dos discos.
+Essa decisão também eliminou a necessidade de se observar e/ou controlar o
+comportamento do cache de disco.
+
+%TODO: comentar que banda de suno é maior que a rede?
+
+%% ------------------------------------------------------------------------- %%
+\section{Fatores definitivos} \label{sec:fatores_definitivos}
+
+%TODO: paragrafo para latência da rede
+O uso da latência como 0 ms é o equivalente de ter todo o sistema operando em
+uma rede local. Os resultados obtidos para esse caso devem ser usados como
+auxílio na interpretação dos resultados com latências maiores, mas não devem ser
+considerados nas análises finais dado que sistemas geo-replicados, por
+definição, não operam nessas condições.
+
+%% ------------------------------------------------------------------------- %%
+\section{Ameaças à validade} \label{sec:ameacas_a_validade}
+
+O controle da latência para caracterizar uma WAN é uma simplificação. Existem
+outros fatores em uma WAN que afetam o desempenho de um sistema executando nela,
+como limitações na largura da banda disponível, congestionamento, perda de
+pacotes e explosões de tráfego. Os resultados obtidos podem ser diferentes em
+uma WAN real, sujeita a esses fatores.
+
+O Riak usa uma arquitetura muito semelhante à descrita no artigo sobre o Dynamo.
+Com isso, os modelos de consistência usados nos experimentos podem apresentar
+outros resultados em sistemas que usem outras arquiteturas, embora a
+implementação de cada modelo de consistência é bastante isolada dos outros
+componentes da arquitetura.
+
+Por limitação de tempo e recursos algumas variáveis que podem alterar os
+resultados desse trabalho foram desconsideradas ou fixadas. Esse é o caso de
+todas as variáveis de controle e constantes, que poderiam ser trabalhadas como
+variáveis independentes. Com isso, os resultados dos experimentos podem ser
+diferentes caso sejam usados, por exemplo, um fator de replicação ou uma
+quantidade de centros de dados diferentes. Em particular, testes de
+escalabilidade serão realizados para entender a influência do tamanho do sistema
+nos resultados.
+
+Os experimentos consideram que todos os nós sempre operam sem falhas. Os
+resultados de experimentos com o sistema operando em algum modo de falha (desde
+a falha de um nó até de um centro de dados inteiro) devem ser diferentes dos
+obtidos nesse estudo.
