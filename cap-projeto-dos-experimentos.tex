@@ -245,7 +245,7 @@ através dos scripts que gerenciam os experimentos
 
 %% ------------------------------------------------------------------------- %%
 \subsection{Infraestrutura de execução e análise dos experimentos}
-\label{sec:infraestrutura_de_execução_e_analise_dos_experimentos}
+\label{sec:infraestrutura_de_execucao_e_analise_dos_experimentos}
 
 Os experimentos são conduzidos através de dois conjuntos de scripts.  O primeiro
 deles (cmb) se localiza no frontend do Grid5000 e é usado para reserva de nós,
@@ -259,11 +259,11 @@ manipulação e análise dos dados. Esses scripts são escritos em bash, Ruby e R.
 
 Os parâmetros levantados na lista inicial definida na seção
 \ref{sec:lista_de_parametros} que não foram considerados fatores tiveram seus
-valores fixados. Além deles, alguns fatores inicialmente considerados também
-foram fixados após os experimentos intermediários (ver seção
-\ref{experimentos_intermediarios}).
+valores fixados. Além deles, alguns fatores inicialmente considerados passaram a
+parâmetros fixados após os experimentos intermediários (ver seção
+\ref{sec:fatores_fixados_experimentalmente}).
 
-Os parâmetros imediatamente fixados são:
+Os parâmetros arbitrariamente fixados são:
 
 \begin{itemize} \item Quantidade de centros de dados: 2. Com esse valor os
 experimentos ficaram mais simples de executar e analisar devido a simetria do
@@ -306,88 +306,182 @@ Limitada à oferecida pelo switch do aglomerado utilizado. Estudos exploratórios
 mostraram que mesmo nos experimentos que mais demandavam banda não encontraram
 gargalos devido a ela.
 
-
-\item Latência da LAN: Limitada pelo aglomerado usado.
+\item Latência da LAN: Limitada pelo aglomerado usado.  \end{itemize}
 
 %TODO: qual é a latência?
 
 %% ------------------------------------------------------------------------- %%
-\section{Experimentos intermediários} \label{experimentos_intermediarios}
+\section{Fatores fixados experimentalmente}
+\label{sec:fatores_fixados_experimentalmente}
 
-Dois tipos de experimentos intermediários foram realizados. O primeiro foram
-testes para explorar o sistema e o ambiente e encontrar configurações viáveis
-para os expermentos finais. O segundo foram experimentos seguindo uma
-metodologia mais formal, usados na triagem dos fatores, identificando aqueles
-que mais influenciam nos resultados finais.
+Quatro estudos experimentais foram executados para fixar os fatores. Com exceção
+de um estudo, todos usaram projetos de experimentos fatoriais, cujo conceito
+está explicado na subseção \ref{sec:projeto_de_experimentos_fatoriais} O
+mecanismo de armazenamento não usou experimentos fatoriais e está na subseção.
+Os outros três estudos usaram experimentos fatoriais e foram feitos para definir
+a influência dos fatores relacionados a tamanho do sistema, rede e carga de
+trabalho.
+
+Uma nota importante para os experimentos descritos nesta seção diz respeito ao
+uso de percentis dos tempos de resposta das requisições ao invés das média. As
+requisições deste estudo são divididas entre locais, da ordem de poucos
+milisegundos, e remotas, da ordem de centenas de milisegundos. Dessa forma, as
+requisições remotas dominam a média já que são em geral duas ordens de grandeza
+maiores que as locais. Por isso os estudos fazem análises distintas para cada
+tipo de requisição, usando percentis: percentis baixos representam requisiçõesl
+ocais e percentis altos representam requisições remotas. Também é feita a
+distinção entre escritas e leituras dada a diferença de natureza dessas
+operações..
+
+% ------------------------------------------------------------------------- %%
+\subsection{Projeto de experimentos fatoriais}
+\label{sec:projeto_de_experimentos_fatoriais}
+
+%TODO: talvez citar o outro livro de performance
+Existem dois tipos principais de projetos de experimentos fatoriais: completos e
+2\textsuperscript{k} \cite{Jain1991}.
+
+Um projeto de experimento fatorial completo é constituído por todas as
+combinações possíveis de todos os níveis de todos os fatores. Assim, a
+quantidade total de experimentos é dada por:
+
+$n = \prod_{i=1}^k{n_i}$,
+
+onde k é o número de fatores e $n_i$ é a quantidade de níveis do
+i$^{\textrm{\'esimo}}$ fator.
+
+Esse tipo de projeto de experimento tem a vantagem de identificar com precisão a
+influência de todos os fatores e suas interações no resultado. Mas quanto maior
+a quantidade de fatores e de níveis em um estudo experimental, maior a
+quantidade de recursos necessários para sua execução-- tempo e energia, por
+exemplo. Normalmente os fatores não influenciam igualmente os resultados. Pelo
+contrário, é comum ter alguns poucos fatores responsáveis pela maioria dos
+resultados.
+
+Assim, é comum utilizar projetos de experimentos fatoriais 2\textsuperscript{k}
+para fazer a triagem dos fatores, identificando quais são os mais influentes.
+Feito isso, executa-se os experimentos finais a partir de um projeto de
+experimento fatorial completo apenas com esses fatores mais influentes.
+
+Em um projeto de experimentos fatoriais 2\textsuperscript{k}, escolhe-se apenas
+dois níveis para cada fator inicialmente selecionado, normalmente os níveis
+mínimo e máximo. A seguir, executa-se os experimentos para todas as
+2\textsuperscript{k} combinações possíveis entre os fatores.
+
+O desempenho pode ser expresso por um modelo de regressão não-linear da forma:
+
+$y = q_0 + q_Ax_A + q_Bx_B + q_Cx_C + ... + q_{AB}x_Ax_B + q_{AC}x_Ax_C +
+q_{BC}x_Bx_C... + q_{ABC}x_Ax_Bx_C + ...$,
+
+onde $y$ é o desempenho medido, $q_0$, $q_A$, $q_B$, etc são os coeficentes do
+modelo, $x_A$, $x_B$, $x_C$, etc representam respectivamente os níveis dos
+fatores A, B, C, etc. Os termos compostos pela multiplicação de dois ou mais
+fatores representam as interações entre os fatores em questão. Fatores e as
+interações entre fatores são chamados efeitos.
+
+Feito o modelo, define-se uma relação entre os níveis de cada fator como sendo 1
+ou -1. Por exemplo, para a relação leitura/escrita, pode-se definir que 2:1 vale
+1 e a 10:1 vale -1. Assim, fazendo a substituição dos níveis e do desempenho
+medido para cada experimento, tem-se um sistema de 2\textsuperscript{k} equações
+e 2\textsuperscript{k} variáveis (os coeficientes).
+
+Com os coeficientes pode-se calcular a variação total de y ou soma total dos
+quadrados a partir da equação:
+
+$STQ = SQA + SQB + SQC + ... + SQAB + SQAC + SQBC + ... + SQABC + ...$,
+
+onde cada $SQX$ é dado por:
+
+$SQX = 2^kq_X$
+
+Cada $SQX$ é a porção da variação total explicada pelo efeito X. A partir disso
+é possível finalmente calcular a fração da variação explicada pelo efeito X por:
+
+$FSQX = SQX / STQ$
+
+Comparando todos os $FSQX$s é possível descobrir quais os efeitos (e
+consequentemente quais fatores) mais influenciam os resultados dos experimentos.
 
 %% ------------------------------------------------------------------------- %%
-\subsection{Testes exploratórios} \label{testes_exploratorios}
+\subsection{Mecanismo de armazenamento} \label{sec:mecanismo_de_armazenamento}
 
-Notou-se em alguns testes exploratórios iniciais diferenças consideráveis no
-desempenho do Riak em aglomerados diferentes. Considerando que os experimentos
-são limitados por E/S (e não por CPU) e que aparentemente não havia gargalos de
-rede, decidiu-se verificar o desempenho dos discos em cada aglomerado.
+Esse é o único fator que não usou experimentos fatoriais para ser fixado -- na
+época em que foi feito o pesquisador ainda não conhecia o projeto desse tipo de
+experimento. Apesar disso, os resultados obtidos são suficientes para apoiar a
+decisão de fixar esse fator.
 
-O principal resultado desses testes diz respeito ao uso de disco como mecanismo
-de armazenamento do Riak. Como esperado, notou-se uma grande diferença no
-desempenho dos discos de diferentes aglomerados, dado que alguns eram SATA e
-outros SAS. Para medição do desempenho, os testes usaram o hdparm para acesso
-sequencial e o
+Os experimentos feitos para o mecanismo de armazenamento mostraram diferenças
+consideráveis no desempenho do Riak em aglomerados diferentes. Considerando que
+os experimentos são limitados por E/S (e não por CPU) e que não havia gargalo de
+rede, decidiu-se verificar o desempenho dos discos em cada aglomerado. Pela
+especificação do hardware dos aglomerados é possível notar que os discos são de
+tipos diferentes. Assim, como esperado, essa diferença no desempenho dos discos
+apareceu nos resultados. Para medição do desempenho, os experimentos usaram o
+hdparm para acesso sequencial e o
 seeker\footnote{url{http://www.linuxinsight.com/how\_fast\_is\_your\_disk.html}}
 para acesso aleatório. Os resultados podem ser vistos na Tabela
 \ref{tab:comparacao_de_discos_entre_aglomerados}.
 
-\begin{table}[!h] \begin{center} \begin{tabular}{|c|c|c|c|c|} \hline Aglomerado
-& Tipo & Tamanho & Acesso sequencial (MB/s) & Acesso aleatório (seeks/s) &
-Acesso aleatório (tempo de resposta em ms) \\ \hline sol & & & 59,8 & 78 & 12,7
-\\ \hline suno & & & 242,7 & 131 & 7,6 \\ \hline griffon & & & 73,9 & 56 & 17,6
-\\ \hline parapluie & & & 103,9 & 77 & 13,0 \\ \hline \end{tabular}
+\begin{table}[!h] \begin{center} \begin{tabular}{|c|c|c|c|c|c|} \hline
+Aglomerado & Tipo & Tamanho & Acesso sequencial (MB/s) & Acesso aleatório
+(seeks/s) & Acesso aleatório (tempo de resposta em ms) \\ \hline sol & & & 59,8
+& 78 & 12,7 \\ \hline suno & & & 242,7 & 131 & 7,6 \\ \hline griffon & & & 73,9
+& 56 & 17,6 \\ \hline parapluie & & & 103,9 & 77 & 13,0 \\ \hline \end{tabular}
 \caption{Comparação de desempenho dos discos entre aglomerados}
 \label{tab:comparacao_de_desempenho_dos_discos_entre_aglomerados} \end{center}
 \end{table}
 
-Dado isso, existem duas opções para a execução dos experimentos, considerando
-que a memória disponível é suficiente para manter todos os dados em memória:
+Além  do tipo de disco, um outro fator a considerar era o cache de disco. Em
+sistemas Linux, todo a memória livre é automaticamente usada como cache de
+disco. Dado isso, existiam três opções para a execução dos experimentos com
+relação ao mecanismo de armazenamento, considerando que um tamanho do banco de
+dados podia ser escolhido de forma a manter todos os dados em memória:
 
-%- Dados em disco (no início dos testes): O cenário é mais real, mas mais
-%difícil de analisar pois os efeitos do disco e da memória sobre o desempenho do
-%sistema se misturam. Além disso, o efeito do preenchimento do cache é um
-%complicador extra, dado que durante um teste uma dada chave acessada mais de
-%uma vez será servida do disco a primeira vez e da memória nas seguintes.
+\begin{enumerate} \item Dados em disco e cache limpo no início dos testes: O
+cenário seria mais real, mas mais difícil de analisar pois os efeitos do disco e
+da memória sobre o desempenho do sistema se misturariam. Além disso, o efeito do
+preenchimento do cache seria um complicador extra, dado que durante um teste uma
+dada chave acessada mais de uma vez seria servida do disco a primeira vez e da
+memória nas seguintes.
 
-%- Dados em cache: Disco (para escrita) e rede são os único elemento que
-%influenciam no desempenho do sistema, tornando a observação dos efeitos de rede
-%mais precisa. O caso sem latência de rede funciona como um baseline do sistema.
-%Nesse cenário faria mais sentido usar o Riak na configuração em memória,
-%eliminando assim definitivamente o efeito do disco.
+\item Dados em cache no início dos testes: O disco seria predominantemente usado
+apenas para escritas e as leituras seriam servidas a partir do cache.
 
-%Realizar os experimentos com banco de dados em memória deve gerar resultados
-%mais precisos e fáceis de ser interpretados por descartar a influência de
-%desempenho do disco. A princípio os resultados podem parecer menos realistas e
-%aplicáveis, mas na prática eles são tão limitados quanto o uso de disco, já que
-%nesse segundo caso os resultados são influenciados pelo tipo de disco - um
-%exemplo pode ser visto na comparação de suno com prapluie, em que o primeiro
-%possui discos com taxas de acesso acima do 1Gb/s da rede. Além disso, efeitos
-%de caching de disco tornam os resultados ainda mais particulares e difíceis de
-%ser generalizados. Dessa forma, ao se usar banco de dados em memória elimina-se
-%os efeitos das interações entre rede, disco e caching e a análise pode ser
-%focada apenas na rede.
+\item Dados em memória: O Riak pode ser configurado para funcionar como um banco
+de dados em memória, eliminando definitivamente o efeito do disco.
+\end{enumerate}
 
-%Um estudo poderia ser feito para identificar se os resultados podem ser
-%generalizados para sistemas usando SSD, já que estes começam a se tornar opções
-%disponíveis
-%(http://aws.typepad.com/aws/2012/07/new-high-io-ec2-instance-type-hi14xlarge.html).
-
-Ao notar essa diferença, decidiu-se usar memória como mecanismo de armazenamento
-durante os experimentos, eliminado assim a influência do desempenho dos discos.
-Essa decisão também eliminou a necessidade de se observar e/ou controlar o
-comportamento do cache de disco.
-
-%TODO: comentar que banda de suno é maior que a rede?
+A terceira opção foi a escolhida. Realizar os experimentos com banco de dados em
+memória deve gerar resultados mais precisos e fáceis de ser interpretados por
+descartar a influência de desempenho do disco. A princípio os resultados podem
+parecer menos realistas e aplicáveis, mas na prática eles são tão limitados
+quanto o uso de disco, já que nesse caso os resultados são influenciados pelo
+tipo de disco e pela relação entre o tamanho do banco de dados e a memória
+livre. Um exemplo pode ser visto na comparação de suno com parapluie, em que o
+primeiro possui discos com taxas de acesso acima do 1Gb/s da rede -- o gargalo
+em caso seria a rede, em outro o disco. Além disso, efeitos do cache de disco
+tornariam os resultados ainda mais particulares e difíceis de ser generalizados.
+Dessa forma, ao se usar banco de dados em memória elimina-se os efeitos das
+interações entre rede, disco e cache de disco e a análise pode ser focada apenas
+na rede.
 
 %% ------------------------------------------------------------------------- %%
-\section{Fatores definitivos} \label{sec:fatores_definitivos}
+\subsection{Fatores de tamanho do sistema}
+\label{sec:fatores_de_tamanho_do_sistema}
 
+Os experimentos fatoriais para tamanho do sistema tinham por objetivo definir a
+influência da quantidade de nós do sistema e da quantidade de objetos.
+
+incluíram dois fatores não considerados inicialmente na lista inicial:
+quantidade de instâncias da aplicação de testes e quantidade de threads em cada
+instância da aplicação de testes. Esses dois fatores não haviam sido
+considerados inicialmente pois o passo de levantamento dos parâmetros acontece
+antes da seleção da técnica de avaliação. Assim, eles só foram considerados após
+medição ser definida como técnica de avaliação para esse estudo e portanto
+precisaria de uma aplicação de execução dos testes.
+
+
+%% ------------------------------------------------------------------------- %%
 %TODO: paragrafo para latência da rede
 O uso da latência como 0 ms é o equivalente de ter todo o sistema operando em
 uma rede local. Os resultados obtidos para esse caso devem ser usados como

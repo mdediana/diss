@@ -20,7 +20,8 @@ características do sistema, do ambiente de operação e da carga de trabalho que
 podem influenciar o desempenho do sistema, como a CPU ou a latência da rede.
 Fatores são os parâmetros que são variados nos experimentos (variáveis
 independentes) e seus valores são os níveis. Os parâmetros que não são fatores
-são fixados (variáveis fixas e constantes).
+são fixados (variáveis fixas e constantes). Efeito é a influência que um fator
+ou interação entre fatores exerce sobre o desempenho do sistema.
 
 Os passos 1 a 7 são tratados neste capítulo. O passo 8 está no capítulo
 \ref{cap:projeto_dos_experimentos} e os passos 9 e 10 estão no capítulo
@@ -150,9 +151,9 @@ remota \item Banda disponível local e remota \item Mecanismo de armazenamento --
 memória ou disco \item Desempenhos de acesso sequencial de leitura e de escrita
 do disco (para disco como mecanismo de armazenamento) \item Desempenhos de
 acesso aleatório de leitura e de escrita do disco (para disco como mecanismo de
-armazenamento) \item Quantidade de nós do sistema \item Tamanho do banco de
-dados \item Quantidade de centros de dados \item Quantidade de nós por centro de
-dados
+armazenamento) \item Quantidade de nós do sistema \item Quantidade de objetos
+armazenados \item Tamanho dos objetos armazenados \item Quantidade de centros de
+dados \item Quantidade de nós por centro de dados
 
 \item Algoritmo de particionamento das chaves \item Algoritmo de detecção de
 falhas \item Fator de replicação ($N$) \item Configuração de replicação -- $R$ e
@@ -294,6 +295,20 @@ potência de 2.
 A partir disso, os níveis inicialmente selecionados foram:
 
 \begin{itemize} \item 8 \item 16 \end{itemize}
+
+%% ------------------------------------------------------------------------- %%
+\subsection{Quantidade de objetos armazenados}
+\label{sec:quantidade_de_objetos_armazenados}
+
+A quantidade de objetos armazenados pode influenciar na quantidade de dados no
+cache de disco (caso seja esse o mecanismo de armazenamento utilizado). Além
+disso, esse fator também pode influenciar a quantidade de conflitos, já que
+quanto menos objetos existirem no banco de dados, maior a chance de um dado
+objeto receber uma requisição.
+
+A partir disso, os níveis inicialmente selecionados foram:
+
+\begin{itemize} \item 64000 \item 512000 \end{itemize}
 
 %% ------------------------------------------------------------------------- %%
 \subsection{Latência da WAN} \label{sec:latencia_da_wan}
@@ -518,5 +533,5 @@ que afetam o desempenho de um modelo de consistência.
 
 Considerando que o tipo de estudo é medição, a carga de trabalho é constituída
 por requisições de leitura e escrita enviadas para o sistema de armazenamento a
-partir de instâncias da aplicação de testes (mais detalhes estão na seção
-\ref{sec:aplicacao_de_testes}.
+partir de instâncias da aplicação de execução dos testes (mais detalhes estão na
+seção \ref{sec:aplicacao_de_execucao_dos_testes}.
