@@ -308,7 +308,23 @@ objeto receber uma requisição.
 
 A partir disso, os níveis inicialmente selecionados foram:
 
-\begin{itemize} \item 64000 \item 512000 \end{itemize}
+\begin{itemize} \item 64000 \item 256000 \end{itemize}
+
+%% ------------------------------------------------------------------------- %%
+\subsection{Tamanho dos objetos armazenados}
+\label{sec:tamanho_dos_objetos_armazenados}
+
+O tamanho dos objetos armazenados pode influenciar na quantidade de dados no
+cache de disco (caso seja esse o mecanismo de armazenamento utilizado). No caso
+de armazenamento em memórioa, eles podem causar fragmentação de memória, o que
+também afeta o desempenho. Além
+disso, esse fator pode influenciar no desempenho da rede, dado que objetos
+muito grandes podem precisar ser divididos em mais de um pacote TCP e objetos
+muito pequenos resultam em uma carga paga relativamente menor.
+
+A partir disso, os níveis inicialmente selecionados foram:
+
+\begin{itemize} \item 100 \item 10000 \end{itemize}
 
 %% ------------------------------------------------------------------------- %%
 \subsection{Latência da WAN} \label{sec:latencia_da_wan}
@@ -329,11 +345,11 @@ A partir disso, os níveis selecionados foram:
 
 A latência em uma WAN não é constante, dado que dentre suas causas está a
 dinâmica da rede. Por exemplo, rajadas de tráfego podem encher os buffers de um
-roteador no meio do caminho entre dois nós, fazendo com que pacotes sejam
-descartados, o que se manifesta como um aumento de latência. Além disso, as
+roteador no caminho entre dois nós, fazendo com que pacotes sejam
+descartados, o que se manifesta para o transmissor como um aumento de latência. Além disso, as
 variações normalmente não são aleatórias. A partir do mesmo exemplo, enquanto o
 roteador está sobrecarregado a latência vista pelo enviador é mais alta, quando
-ele volta a operar normalmente a latência vista pelo enviador passa a ser mais
+ele volta a operar normalmente a latência vista pelo transmissor passa a ser mais
 baixa. Por isso, além da variação existe uma correlação entre os valores de
 latência observados ao longo do tempo.
 
@@ -341,10 +357,6 @@ A partir disso, os níveis de variação da latência selecionados foram:
 
 \begin{itemize} \item 1\% (Pouca variação) \item 50\% (Muita variação)
 \end{itemize}
-
-Os níveis de correlação selecionados foram:
-
-\begin{itemize} \item Nenhuma correlação \item Distribuição normal \end{itemize}
 
 %TODO: citar post do amp sobre variação de latência
 
