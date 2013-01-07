@@ -4,13 +4,13 @@
 %TODO: Simulação x emulação
 Este estudo consiste em rodar o sistema de armazenamento dividido entre dois
 centros de dados simulados. Os centros de dados são ligados por uma WAN emulada.
-A carga de trabalho é executada por uma aplicação de testes simulando clientes
-localizados em cada um dos centros de dados. Cada experimento consiste em um
-modo do sistema, uma configuração de rede (latência, perda de pacotes, etc) e
-uma carga de trabalho (relação leitura/escrita, localidade, etc).
+A carga de trabalho é executada por uma aplicação de execução de testes
+simulando clientes localizados em cada um dos centros de dados. Cada experimento
+consiste em um modo do sistema, uma configuração de rede (latência, perda de
+pacotes, etc) e uma carga de trabalho (relação leitura/escrita, localidade,
+etc).
 
 %TODO: Conteúdo das seções
-
 
 %% ------------------------------------------------------------------------- %%
 \section{Aspectos técnicos} \label{sec:aspectos_tecnicos}
@@ -24,10 +24,10 @@ testes, no qual são implementados os modelos de consistência, é descrito na
 subseção \ref{sec:sistema_de_armazenamento}.  A carga sobre o sistema é definida
 pela aplicação de execução dos testes, descrita na subseção
 \ref{sec:aplicacao_de_execucao_dos_testes}. O sistema de armazenamento, a
-aplicação de testes e ferramentas de monitoração e análise de desempenho compõem
-a imagem, descrita na seção \ref{sec:imagem}. Por fim, a descrição da
-infraestrutura de gerenciamento dos experimentos se encontra na seção
-\ref{sec:infraestrutura_dos_experimentos}.
+aplicação de execução dos testes e ferramentas de monitoração e análise de
+desempenho compõem a imagem, descrita na seção \ref{sec:imagem}. Por fim, a
+descrição da infraestrutura de gerenciamento dos experimentos se encontra na
+seção \ref{sec:infraestrutura_dos_experimentos}.
 
 %% ------------------------------------------------------------------------- %%
 \subsection{Ambiente} \label{sec:ambiente}
@@ -94,7 +94,7 @@ Existem recomendações sobre otimizações para sistemas Linux quando esses devem
 se comunicar usando WANs, dado que a configuração padrão possui foco em LANs.
 Durante os experimentos, toda vez em que os parâmetros da WAN eram alterados, um
 script para ajuste da pilha TCP era usado. A principal otimização desse script
-era ajustar os tamanhos dos buffers de envio e recepção ao BDP (para mais
+era ajustar os tamanhos dos buffers de transmissão e recepção ao BDP (para mais
 detalhes, ver seção \ref{sec:fatores_de_rede}).
 
 \paragraph{Simulação de centros de dados}
@@ -255,20 +255,21 @@ através dos scripts que gerenciam os experimentos (subseção
 Os experimentos são conduzidos através de dois conjuntos de scripts.  O primeiro
 deles (cmb) se localiza no frontend do Grid5000 e é usado para reserva de nós,
 instalação da imagem, gerenciamento do Riak, configuração e execução da
-aplicação de testes e coleta de resultados. Os scripts são escritos em bash. O
-segundo (cmb-local) se localiza na máquina do pesquisador e são utilizados para
-manipulação e análise dos dados. Esses scripts são escritos em bash, Ruby e R.
+aplicação de execução de testes e coleta de resultados. Os scripts são escritos
+em bash. O segundo (cmb-local) se localiza na máquina do pesquisador e são
+utilizados para manipulação e análise dos dados. Esses scripts são escritos em
+bash, Ruby e R.
 
 %% ------------------------------------------------------------------------- %%
 \section{Parâmetros fixados} \label{sec:parametros_fixados}
 
 Os parâmetros levantados na lista inicial definida na seção
-\ref{sec:lista_de_parametros} que não foram considerados fatores tiveram seus
-valores fixados. Além deles, alguns fatores inicialmente considerados passaram a
-parâmetros fixados após os experimentos intermediários (ver seção
-\ref{sec:fatores_fixados_experimentalmente}).
+\ref{sec:lista_de_parametros} que não foram considerados fatores
+consequentemente tiveram seus valores fixados. Além deles, alguns fatores
+inicialmente considerados passaram a parâmetros fixados após os experimentos
+intermediários (ver seção \ref{sec:fatores_fixados_experimentalmente}).
 
-Os parâmetros fixados sem suporte experimental foram:
+Os parâmetros fixados sem justificativa através de um experimento foram:
 
 \paragraph{Quantidade de centros de dados} Valor: 2. Com esse valor os
 experimentos ficaram mais simples de executar e analisar devido a simetria do
@@ -318,8 +319,8 @@ encontraram gargalos devido a ela.
 %TODO: qual é a latência?
 
 %% ------------------------------------------------------------------------- %%
-\section{Fatores fixados experimentalmente}
-\label{sec:fatores_fixados_experimentalmente}
+\section{Definição dos níveis e fatores desconsiderados}
+\label{sec:definicao_dos_niveis_e_fatores_desconsiderados}
 
 Quatro estudos experimentais foram executados para fixar os fatores. Com exceção
 de um estudo, todos usaram projetos de experimentos fatoriais, cujo conceito
@@ -331,22 +332,26 @@ de objetos e seus tamanhos, rede e carga de trabalho.
 %TODO: Conteúdo das seções
 
 Em alguns dos estudos foi possível notar que determinado fator afeta o
-desempenho significativamente, mas mesmo assim ele foi fixado. Isso aconteceu
-pois os experimentos finais não devem usar muitos fatores, fato comentado em
-\cite{Jain1991} e sugerido para o pesquisdaro por Jean-Marc Vincent, pesquisador
-visitante no IME com experiência em análise de desempenho experimental. Dado
-isso, deu-se prioridade para fatores relacionados à rede e à carga de trabalho,
-foco desta pesquisa. Fatores influentes que fixados foram incluídos na lista des
-ameaças à validade (seção \ref{sec:ameacas_a_validade}).
+desempenho significativamente, mas mesmo assim ele foi desconsiderado. Isso
+aconteceu pois os experimentos finais não devem usar muitos fatores, fato
+comentado em \cite{Jain1991} e sugerido para o pesquisdaro por Jean-Marc
+Vincent, pesquisador visitante no IME com experiência em análise de desempenho
+experimental. Dado isso, deu-se prioridade para fatores relacionados à rede e à
+carga de trabalho, foco desta pesquisa. Fatores influentes que foram
+desconsideradoss foram incluídos na lista de ameaças à validade (seção
+\ref{sec:ameacas_a_validade}).
 
-Mas existem situações em que fixar um fator que aparece como influente não
-necessariamente implica em grande ameaça à validade. Experimentos fatoriais
-mostram a influência relativa de cada fator e cada interação entre fatores.
-Nesse tipo de análise, o total de todas as influências relativas deve ser sempre
-100\%. Por isso, mesmo que todos os fatores influenciem pouco o resultado, um ou
-mais vão aparecer nos experimentos fatoriais com influência alta. Assim, também
-foram calculados os CVs para cada resultado de forma a estimar qual a
-importância daquele conjunto de fatores e interações como um todo.
+Mas existem situações em que desconsiderar um fator que aparece como influente
+não necessariamente implica em ameaça à validade. Experimentos fatoriais mostram
+a influência relativa de cada fator e cada interação entre fatores.  Nesse tipo
+de análise, o total de todas as influências relativas deve ser sempre 100\%. Por
+isso, mesmo que todos os fatores afetem pouco o resultado, um ou mais vão
+aparecer nos experimentos fatoriais com influência alta. Assim, também foram
+calculados os coeficientes de variabilidade\footnote{O coeficiente de variação é
+a divisão do desvio padrão pela média e é uma maneira de representar a
+variabilidade dos dados desconsiderando sua ordem de grandeza} (CVs) para cada
+resultado de forma a estimar qual a importância daquele conjunto de fatores e
+interações como um todo.
 
 Os experimentos descritos nesta seção usam percentis dos tempos de resposta das
 requisições ao invés de médias. As requisições deste estudo são divididas entre
@@ -431,10 +436,10 @@ consequentemente quais fatores) mais influenciam os resultados dos experimentos.
 \subsection{Mecanismo de armazenamento e aglomerado}
 \label{sec:mecanismo_de_armazenamento_e_aglomerado}
 
-Esse é o único fator que não usou experimentos fatoriais para ser fixado -- na
-época em que foi feito o pesquisador ainda não conhecia o projeto desse tipo de
-experimento. Apesar disso, os resultados obtidos são suficientes para apoiar a
-decisão de fixar esse fator.
+Esse é o único fator que não usou experimentos fatoriais para ser desconsiderado
+-- na época em que foi realizado o pesquisador ainda não conhecia o projeto
+desse tipo de experimento. Apesar disso, os resultados obtidos são suficientes
+para apoiar a decisão de desconsiderar esse fator.
 
 Os aglomerados do Grid5000 considerados foram paradent, parapide, sol e suno. A
 descrição do hardware e a quantidade de nós de cada um deles se encontra na
@@ -472,15 +477,15 @@ disco. Dado isso, existiam três opções para a execução dos experimentos com
 relação ao mecanismo de armazenamento, considerando que um tamanho do banco de
 dados podia ser escolhido de forma a manter todos os dados em memória:
 
-\begin{enumerate} \item Dados em disco e cache limpo no início dos testes: O
-cenário seria mais real, mas mais difícil de analisar pois os efeitos do disco e
-da memória sobre o desempenho do sistema se misturariam. Além disso, o efeito do
-preenchimento do cache seria um complicador extra, dado que durante um teste uma
-dada chave acessada mais de uma vez seria servida do disco a primeira vez e da
-memória nas seguintes.
+\begin{enumerate} \item Dados em disco e cache limpo no início dos experimentos:
+O cenário seria mais real, mas mais difícil de analisar pois os efeitos do disco
+e da memória sobre o desempenho do sistema se misturariam. Além disso, o efeito
+do preenchimento do cache seria um complicador extra, dado que durante um teste
+uma dada chave acessada mais de uma vez seria servida do disco a primeira vez e
+da memória nas seguintes.
 
-\item Dados em cache no início dos testes: O disco seria predominantemente usado
-apenas para escritas e as leituras seriam servidas a partir do cache.
+\item Dados em cache no início dos experimentos: O disco seria predominantemente
+usado apenas para escritas e as leituras seriam servidas a partir do cache.
 
 \item Dados em memória: O Riak pode ser configurado para funcionar como um banco
 de dados em memória, eliminando definitivamente o efeito do disco.
@@ -506,17 +511,19 @@ na rede.
 
 Além da quantidade de nós do sistema, estes experimentos fatoriais incluíram
 dois fatores não considerados na lista de fatores inicial: quantidade de
-instâncias da aplicação de testes e quantidade de threads em cada instância da
-aplicação de testes. Esses dois fatores não haviam sido considerados
-inicialmente pois o passo de levantamento dos parâmetros acontece antes da
-seleção da técnica de avaliação. Assim, eles só foram considerados após medição
-ser definida como técnica de avaliação para este estudo, o que fez surgir a
-necessidade de dimensionar não só sistema mas também a aplicação de execução dos
-testes.
+instâncias da aplicação de execução de testes e quantidade de threads em cada
+instância da aplicação de execução de testes. Esses dois fatores não haviam sido
+considerados inicialmente pois o passo de levantamento dos parâmetros acontece
+antes da seleção da técnica de avaliação. Assim, eles só foram considerados após
+medição ser definida como técnica de avaliação para este estudo, o que fez
+surgir a necessidade de dimensionar não só sistema mas também a aplicação de
+execução dos testes.
 
-Os níveis inicialmente selecionados foram:
+Os níveis inicialmente selecionados para esse estudo foram:
 
-\begin{itemize} \item 8 \item 16 \end{itemize}
+\begin{itemize} \item Quantidade de nós do sistema: 8 e 16 \item Quantidade de
+instâncias da aplicação de execução de testes: 2 e 4 \item Quantidade de threads
+em cada instância da aplicação de execução de testes: 32 e 64 \end{itemize}
 
 Este estudo usou modo lt\_rec, localidade de 50\% e latência de rede de 100ms.
 Esses valores foram escolhidos pois através deles obtém-se uma quantidade
@@ -538,29 +545,33 @@ Na maioria dos casos, o tamanho do sistema tem a maior influência nos resultados
 e a quantidade de instâncias da aplicação de execução de testes e a quantidade
 de threads não são desprezíveis, ainda mais ao se considerar as interações entre
 elas. Como comentado no início desta seção, mesmo sendo influentes, alguns
-fatores foram fixados para manter a quantidade de fatores finais baixa. Esse foi
-o caso dos três fatores desse estudo. Nesse caso, a opção foi por manter o maior
-tamanho de sistema possível, evitando gargalos de rede ao máximoe não
-sobrecarregando o sistema.  Por isso, a opção foi por um sistema com 16 nós
-(maior valor), 4 instâncias da aplicação de testes (maior valor) e a 32 threads
-em cada uma (menor valor).  Esses valores resultam na configuração ``mais
-leve'', fato confirmado através da observação dos FDAs.
+fatores foram desconsiderados para manter a quantidade de fatores finais baixa.
+Esse foi o caso dos três fatores desse estudo. Nesse caso, a opção foi por
+manter o maior tamanho de sistema possível, evitando gargalos de rede ao máximo
+e não sobrecarregando o sistema. Por isso, a opção foi pelos valores que
+resultam na configuração ``mais leve'', fato confirmado através da observação
+dos gráficos das FDAs. Dessa forma, os valores fixados foram:
+
+\begin{itemize} \item Quantidade de nós do sistema: 16 (maior valor) \item
+Quantidade de instâncias da aplicação de execução de testes: 4 (maior valor)
+\item Quantidade de threads em cada instância da aplicação de execução de
+testes: 32 (menor valor) \end{itemize}
 
 Uma outra opção a esses valores seria o uso de 32 nós do sistema e 8 instâncias
-da aplicação de testes, resultando em um total de 40 nós. Isso não foi feito por
-questões operacionais. Ao definir que o sistema usaria memória como mecanismo de
-armazenamento, a escolha do aglomerado passou a ser menos relevante, dado que
-todos os aglomerados oferecem nós com capacidade de processamento (CPU)
-razoável, ao menos 4GB de memória e placas de rede de 1Gb/s.  O aglomerado sol
-foi escolhido predominantemente por questões operacionais -- ele é um dos
-maiores aglomerados disponíveis no Grid5000 (47 nós) e tem baixa concorrência
-com outros pesquisadores pela reserva de nós. Mas mesmo assim, é muito comum
-alguns poucos nós já estarem reservados por outros pesquisadores, além de alguns
-nós apresentarem falhas no momento da implantação da imagem. Esse último
-problema levou o pesquisador a sempre reservar alguns nós além dos necessários
-para garantir a quantidade mínima de nós para executar os experimentos. Dessa
-forma, experimentos que precisassem de 40 nós seriam mais difíceis de ser
-executados.
+da aplicação de execução de testes, resultando em um total de 40 nós. Isso não
+foi feito por questões operacionais. Ao definir que o sistema usaria memória
+como mecanismo de armazenamento, a escolha do aglomerado passou a ser menos
+relevante, dado que todos os aglomerados oferecem nós com capacidade de
+processamento (CPU) razoável, ao menos 4GB de memória e placas de rede de 1Gb/s.
+O aglomerado sol foi escolhido predominantemente por questões operacionais --
+ele é um dos maiores aglomerados disponíveis no Grid5000 (47 nós) e tem baixa
+concorrência com outros pesquisadores pela reserva de nós. Mas mesmo assim, é
+muito comum alguns poucos nós já estarem reservados por outros pesquisadores,
+além de alguns nós apresentarem falhas no momento da implantação da imagem. Esse
+último problema levou o pesquisador a sempre reservar alguns nós além dos
+necessários para garantir a quantidade mínima de nós para executar os
+experimentos. Dessa forma, experimentos que precisassem de 40 nós seriam mais
+difíceis de ser executados.
 
 %% ------------------------------------------------------------------------- %%
 \subsection{Quantidade de objetos armazenados e tamanho dos objetos armazenados}
@@ -571,14 +582,10 @@ consideraram o atraso de rede como fator. O atraso de rede foi usado como uma
 simplificação da WAN, dessa forma foi possível comparar a importância relativa
 entre esses fatores e a rede.
 
-Os níveis inicialmente selecionados para quantidade de objetos armazenados
-foram:
+Os níveis inicialmente selecionados foram:
 
-\begin{itemize} \item 64000 \item 256000 \end{itemize}
-
-Os níveis inicialmente selecionados para tamanho dos objetos armazenados foram:
-
-\begin{itemize} \item 100 \item 10000 \end{itemize}
+\begin{itemize} \item Quantidade de objetos armazenados: 64000 e 256000 \item
+Tamanho dos objetos armazenados: 100 e 10000 \end{itemize}
 
 Este estudo usou modo lt\_rec e localidade de 50\%.  Esses valores foram
 escolhidos pois através deles obtém-se uma quantidade balanceada de leituras e
@@ -600,19 +607,21 @@ representa a latência.}
 sistema. Como o tempo de aquecimento depende da quantidade de objetos
 armazenados, quanto menor essa quantidade mais rápido os experimentos são
 executados. Por outro lado, optou-se por um número não tão baixo de forma a
-evitar um excesso de conflitos. O valor escolhido foi 128000 objetos, o que
-resulta em uma média de 8000 objetos por nó (os experimentos usam 16 nós), baixo
-para um sistema de produção mas suficiente para este estudo.
+evitar um excesso de conflitos.
 
 O tamanho dos objetos não afeta o desempenho das requisições remotas. E apesar
 desse fator aparecer com 100\% de influência nas requisições locais, o CV dessas
 requisições foi de 19\% para leituras e 16\% para escritas.  Além disso, o foco
 desta pesquisa está no comportamento do sistema na WAN, onde as requisições são
-duas ordens de grandeza maiores. Dada a necessidade de eliminar fatores do
-experimento, decidiu-se fixar o tamanho dos objetos. O valor escolhido foi 500
-bytes. Essa escolha está baseada em um estudo dos sistemas de caching
-distribuído no Facebook que relata que 90\% dos valores de praticamente todos os
-sistemas está abaixo de 500 bytes.
+duas ordens de grandeza maiores. O valor para tamanho dos objetos armazenados
+foi escolhido baseado em estudo dos sistemas de caching distribuído no Facebook
+que relata que 90\% dos valores de praticamente todos os sistemas está abaixo
+desse valor.
+
+Assim, os valores fixados foram:
+
+\begin{itemize} \item Quantidade de objetos armazenados: 128000 \item Tamanho
+dos objetos armazenados: 500 \end{itemize}
 
 %TODO: comentar conflitos, resultados são estranhos confl : 5 44 44 1 2 5 1   |
 %CV =  0.6548619 TODO: citar Workload Analysis of a Large-Scale Key-Value Store
@@ -627,28 +636,28 @@ experimentos com iperf mostraram ganhos de desempenho para buffers até quatro
 vezes maiores que o BDP. Esse é um tipo de cenário que coloca bastante pressão
 nos buffers.
 
-Os níveis inicialmente selecionados para a proporção entre tamanho dos buffers e
-BDP foram:
+Os níveis inicialmente selecionados  e BDP foram:
 
-\begin{itemize} \item 2 \item 4 \end{itemize}
+\begin{itemize} \item Proporção entre tamanho dos buffers: 2 e 4 \end{itemize}
 
 Este estudo usou modo lt\_rec e localidade de 50\%. Esses valores foram
 escolhidos pois através deles obtém-se uma quantidade balanceada de leituras e
 escritas locais e remotas. Para a rede, o estudo usou latências de 100ms e
 300ms, variação de latência de 50\% e taxas de pacotes fora do ordem de 0\% e
 5\%. A alta variabilidade e os pacotes fora de ordem criam um cenário que
-pressiona os buffers de envio e recepção. O resultado do estudo pode ser visto
-na Tabela \ref{tab:estudo_para_tamanho_dos_buffers_de_envio_e_recepcao}.
+pressiona os buffers de transmissão e recepção. O resultado do estudo pode ser
+visto na Tabela
+\ref{tab:estudo_para_tamanho_dos_buffers_de_transmissao_e_recepcao}.
 
 \begin{table}[!h] \begin{center} \begin{tabular}{|c|c|c|c|c|c|c|c|c|} \hline
 Operação & Percentil & L & O & B & LO & LB & OB & LOB\\ \hline leitura & 10 & 92
 & 0 & 3 & 0 & 0 & 2 & 3\\ \hline leitura & 90 & 98 & 0 & 1 & 0 & 0 & 0 & 0\\
 \hline escrita & 10 & 87 & 11 & 0 & 1 & 1 & 0 & 0\\ \hline escrita & 90 & 99 & 0
 & 0 & 0 & 0 & 0 & 0\\ \hline \end{tabular} \caption{Estudo para tamanho dos
-buffers de envio e recepção. L representa a latência, R representa a taxa de
-pacotes fora de ordem e B representa o tamanho dos buffers.}
-\label{tab:estudo_para_tamanho_dos_buffers_de_envio_e_recepcao}.  \end{center}
-\end{table}
+buffers de transmissão e recepção. L representa a latência, R representa a taxa
+de pacotes fora de ordem e B representa o tamanho dos buffers.}
+\label{tab:estudo_para_tamanho_dos_buffers_de_transmissao_e_recepcao}.
+\end{center} \end{table}
 
 Como o tamanho dos buffers não afetou o desempenho, a opção foi por
 configurá-los como o dobro do BDP, seguindo as recomendações.
@@ -659,32 +668,19 @@ fizeram com que nós do Riak falhassem por problemas de comunicação. Como nenhuma
 referência indicando que a taxa de pacotes corrompidos é um fator fundamental em
 WANs, a opção foi ignorar esse fator.
 
-Os níveis inicialmente selecionados para latência da WAN foram:
+Os níveis inicialmente selecionados foram:
 
-\begin{itemize} \item 100 ms \item 300 ms \end{itemize}
+\begin{itemize} \item Latência da WAN (ms): 100 e 300 
 
-Os níveis inicialmente selecionados para variação da latência da WAN foram:
+\item Variação da latência da WAN (\%): 1 (pouca variação) e 50 (muita variação)
 
-\begin{itemize} \item 1\% (Pouca variação) \item 50\% (Muita variação)
-\end{itemize}
+\item Taxa de perda de pacotes da WAN (\%): 0,05 (pouca perda) e 1 (muita perda) 
 
-Os níveis inicialmente selecionados para taxa de perda de pacotes da WAN foram:
+\item Taxa de duplicação de pacotes da WAN (\%): 0,05 e 5
 
-\begin{itemize} \item 0.05\% (Pouca perda) \item 1\% (Muita perda) \end{itemize}
+\item Proporção de pacotes fora de ordem na WAN (\%): 0,05 e 5
 
-Os níveis inicialmente selecionados para taxa de duplicação de pacotes da WAN
-foram:
-
-\begin{itemize} \item 0.05\% \item 5\% \end{itemize}
-
-Os níveis inicialmente selecionados para proporção de pacotes fora de ordem na
-WAN foram:
-
-\begin{itemize} \item 0.05\% \item 5\% \end{itemize}
-
-Os níveis inicialmente selecionados para algoritmo de congestionamento foram:
-
-\begin{itemize} \item cubic \item htcp \end{itemize}
+\item Algoritmo de congestionamento: cubic e htcp \end{itemize}
 
 O resultado do estudo pode ser visto na Tabela
 \ref{tab:estudo_para_fatores_de_rede} (devido ao grande números de colunas da
@@ -704,17 +700,13 @@ pacotes fora de ordem e C representa o algoritmo de congestionamento.}
 
 É possivel perceber que a latência, a variação da latência, a taxa de perdas e
 as interações entre elas são os fatores que mais afetam o desempenho do sistema.
-Assim, os níveis escolhidos para esses três fatores nos experimentos são:
+Assim, os níveis escolhidos para esses três fatores nos experimentos foram:
 
-\begin{itemize} \item Latência: 0, 100, 200, 300
+\begin{itemize} \item Latência da WAN (ms): 0, 100, 200 e 300
 
-\item Variação da latência: 50\%. Apesar de afetar o desempenho, a variação foi
-fixada dado que grandes variações de latência em WANs são comuns. Além disso,
-dos 3 fatores, esse é o que menos influencia, mesmo com os experimentos usando
-variações bem diferentes (1\% e 50\%).
+\item Taxa de perda de pacotes da WAN (\%): 0 (nenhuma perda), 0,05 (pouca
+perda) e 1 (muita perda) 
 
-\item Taxa de perdas: 0, 0,05\% e 1\%. O primeiro valor representa a situação
-ideal, o segundo uma taxa relativamente baixa e o terceito uma taxa alta.
 \end{itemize}
 
 Níveis nulos de latência, variação da latência e taxa de perdas equivalem a ter
@@ -723,9 +715,25 @@ casos devem ser usados como auxílio na interpretação dos resultados, mas não
 devem ser considerados na análise final dado que sistemas geo-replicados, por
 definição, não operam nessas condições.
 
-As taxas de duplicação e de pacotes fora de ordem foram fixadas em 0. O
-algoritmo de congestionamento foi fixado como ``cubic'', pois esse é o padrão no
-Linux utilizado nos experimentos.
+Os valores fixados dos fatores desconsiderados foram:
+
+\begin{itemize}
+
+\item Variação da latência da WAN (\%): 50 (muita variação)
+
+\item Taxa de perda de pacotes da WAN (\%): 0 
+
+\item Taxa de duplicação de pacotes da WAN (\%): 0
+
+\item Proporção de pacotes fora de ordem na WAN (\%): 0
+
+\item Algoritmo de congestionamento: cubic \end{itemize}
+
+Apesar de afetar o desempenho, a variação foi fixada dado que grandes variações
+de latência em WANs são comuns. Além disso, dos 3 fatores, esse é o que menos
+influencia, mesmo com os experimentos usando variações bem diferentes (1\% e
+50\%). O algoritmo de congestionamento foi fixado como ``cubic'', pois esse é o
+padrão no Linux utilizado nos experimentos.
 
 Apesar de a taxa de pacotes fora de ordem ser fixada, a ocorrência de alguns
 pacotes fora de ordem é possível dada a variação da latência. O emulador de WAN
@@ -753,30 +761,24 @@ Ao fazer uma atualização em um objeto na consistência em momento indeterminado,
 atualização haja uma leitura. Esse fato restringe a quantidade de escritas a um
 máximo de 50\% da carga de trabalho.
 
-A partir disso, os níveis inicialmente selecionados para distribuição de
-operações foram:
+A partir disso, os níveis inicialmente selecionados foram:
 
-\begin{itemize} \item 2:1 \item 10:1 \end{itemize}
+\begin{itemize} \item Distribuição de operações: 2:1 e 10:1
 
-Os níveis inicialmente selecionados para popularidade dos objetos acessados
-foram:
+\item Popularidade dos objetos acessados:uniforme (todos os objetos são
+acessados em média a mesma quantidade de vezes) e concentrada (os acessos
+obedecem a uma distribuição Pareto)
 
-\begin{itemize} \item Uniforme: Todos os objetos são acessados em média a mesma
-quantidade de vezes, \item Concentrada: Os acessos obedecem a uma distribuição
-Pareto.  \end{itemize}
+\item Localidade: 0,5 (origem dos acessos para cada objeto distribuídos
+igualmente entre centros de dados) e 0,9 (90\% dos acessos para cada objeto
+originado em um centro de dados e os 10\% restantes originados no outro centro
+de dados. \end{itemize}
 
-A distribuição normal não foi usada por simplicidade. Pelo teorema do limite
-central, a medida em que o tamanho de uma amostra tende a infinito, a
-distribuição normal e a uniforme se aproximam. Dado que a aplicação de execução
-de testes já implementa a distribuição uniforme, não há a necessidade de
-implementar a distribuição normal.
-
-Os níveis inicialmente selecionados para localidade foram:
-
-\begin{itemize} \item Uniforme: origem dos acessos para cada objeto distribuídos
-igualmente entre centros de dados, \item Concentrada: 90\% dos acessos para cada
-objeto originado em um centro de dados e os 10\% restantes originados em outros
-centros de dados.  \end{itemize}
+A distribuição normal não foi usada para popularidade por simplicidade. Pelo
+teorema do limite central, a medida em que o tamanho de uma amostra tende a
+infinito, a distribuição normal e a uniforme se aproximam. Dado que a aplicação
+de execução de testes já implementa a distribuição uniforme, não há a
+necessidade de implementar a distribuição normal.
 
 Como os modos possuem comportamentos diferentes para requisições locais e
 remotas, os experimentos foram executados para cada modo. O resultado para
@@ -808,35 +810,49 @@ relação leitura/escrita, X representa a localidade, P representa a popularidade
 e L representa a latência de rede.}
 \label{tab:estudo_para_fatores_de_carga_de_trabalho}.  \end{center} \end{table}
 
+Como esperado, localidade e latência impactam os modos em geral. Uma observação
+é o fato de incusive ind1 ser afetada por latência. Isso provavelmente vem do
+fato de mecanismos de replicação e correção de leitura serem afetados. Assim, os
+níveis são:
+
+\begin{itemize}
+
+\item Localidade: 0,5 (origem dos acessos para cada objeto distribuídos
+igualmente entre centros de dados) e 0,9 (90\% dos acessos para cada objeto
+originado em um centro de dados e os 10\% restantes originados no outro centro
+de dados. \end{itemize}
+
 Apesar de alguns modos aparentemente sofrerem impacto considerável da relação
 leitura/escrita, há indícios de que esse impacto na verdade é consequência da
 relação entre requisições locais e remotas. O modo ind1 tem tanto leituras
 quanto escritas locais e a relação leitura/escrita e suas interações com outros
 fatores impacta pouco esse modo. No modo lt\_rec tanto leituras quanto escritas
 são locais ou remotas dependendo da localidade e a relação leitura/escrita não
-impacta esse modo. O modo ind2 tem todas as leituras locais e todas as escritas
-remotas. Assim, ao mudar a relação leitura/escrita está mudando a relação entre
-requisições locais e remotas. Como esperado, esse modo é impactado pela relação
-leitura/escrita.  O mesmo vale para lt\_qqer que tem todas as leituras locais e
-escritas dependendo da localidade. Esse modo também sofre impacto da relação
-leitura/escrita.
+impacta esse modo. O modo ind2 tem todas as leituras locais e metade das
+escritas remotas. Assim, se a relação leitura/escrita muda a relação entre
+requisições locais e remotas muda proporcionalmente. Como esperado, esse modo é
+impactado pela relação leitura/escrita.  O mesmo vale para lt\_qqer que tem
+todas as leituras locais e escritas dependendo da localidade. Esse modo também
+sofre impacto da relação leitura/escrita.
 
 Caso o mecanismo de armazenamento fosse disco ao invés de memória, a relação
 leitura/escrita provavelmente sofreria impacto de fato. Isso porque escritas
 implicariam no tempo de disco enquanto leituras poderiam ser mais rápidas no
 geral pelo fato de uma parte delas serem servidas a partir do cache de disco.
 Mas como não é esse o caso, a diferença relevante é a relação entre requisições
-locais e remotas. Dessa forma, a opção foi fixar o fator em 2:1.
-
-Como esperado, localidade e latência impactam os modos em geral. Uma observação
-é o fato de incusive ind1 ser afetada por latência. Isso provavelmente vem do
-fato de mecanismos de replicação e correção de leitura serem afetados. Dado
-isso, os níveis para localidade usados são 0,5 e 0,9.
+locais e remotas.
 
 Percebe-se em todos os casos impacto praticamente nulo de popularidade. Talvez
 em uma situação em que o sistema recebesse uma carga maior, como no caso de um
-teste de stress, esse fator passaria a ser relevante. Como não é o caso, ele foi
-fixado no nível ``uniforme''.
+teste de stress, esse fator passasse a ser relevante. Como não é o caso, ele foi
+desconsiderado e fixado no valor que simplifica o entendimento dos resultados.
+
+Os valores fixados dos fatores desconsiderados foram:
+
+\begin{itemize} \item Distribuição de operações: 2:1
+
+\item Popularidade dos objetos acessados: uniforme (todos os objetos são
+acessados em média a mesma quantidade de vezes) \end{itemize}
 
 %% ------------------------------------------------------------------------- %%
 \section{Ameaças à validade} \label{sec:ameacas_a_validade}

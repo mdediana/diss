@@ -153,7 +153,7 @@ Os principais parâmetros de sistema que podem afetar seu desempenho são:
 % Chequei app.config e vm/args
 %TODO: falar de ring_size no alg de particionamento
 \begin{itemize} \item CPU local e CPU remota \item Quantidade de memória local e
-remota \item Banda disponível local e remota \item Mecanismo de armazenamento --
+remota \item Largura de banda local e remota \item Mecanismo de armazenamento --
 memória ou disco \item Desempenhos de acesso sequencial de leitura e de escrita
 do disco (para disco como mecanismo de armazenamento) \item Desempenhos de
 acesso aleatório de leitura e de escrita do disco (para disco como mecanismo de
@@ -310,20 +310,20 @@ tráfego podem encher os buffers de um roteador no caminho entre dois nós,
 fazendo com que pacotes sejam descartados, o que se manifesta para o transmissor
 como um aumento de latência. Além disso, as variações normalmente não são
 aleatórias. A partir do mesmo exemplo, enquanto o roteador está sobrecarregado a
-latência vista pelo enviador é mais alta, quando ele volta a operar normalmente
-a latência vista pelo transmissor passa a ser mais baixa. Por isso, além da
-variação existe uma correlação entre os valores de latência observados ao longo
-do tempo.
+latência vista pelo transmissor é mais alta, quando ele volta a operar
+normalmente a latência vista pelo transmissor passa a ser mais baixa. Por isso,
+além da variação existe uma correlação entre os valores de latência observados
+ao longo do tempo.
 %TODO: citar post do amp sobre variação de latência
 
 \paragraph{Taxa de perda de pacotes da WAN}A perda de pacotes é uma das
 principais causas por atrasos e gargalos em um sistema usando TCP, dado que ao
 registrar a perda de um pacote a janela de transmissão da conexão é reiniciada,
-o que se manifesta como diminuição da banda. Além disso, o mecanismo padrão de
-retransmissão do TCP aumenta exponencialmente o tempo entre tentativas, portanto
-quanto maior o número de pacotes perdidos, mais tempo demora para os pacotes
-serem reenviados.  Considera-se que perdas acima de x\% tornam a comunicação
-praticamente impossível.
+o que se manifesta como diminuição da largura de banda. Além disso, o mecanismo
+padrão de retransmissão do TCP aumenta exponencialmente o tempo entre
+tentativas, portanto quanto maior o número de pacotes perdidos, mais tempo
+demora para os pacotes serem reenviados.  Considera-se que perdas acima de x\%
+tornam a comunicação praticamente impossível.
 %TODO: ref sobre perdas
 
 \paragraph{Taxa de duplicação de pacotes da WAN}Pacotes duplicados afetam a
@@ -348,13 +348,13 @@ otimização da pilha TCP para WANs é comum ver dois algoritmos citados.
 %TODO: checar como algoritmo de congestionamento realmente opera TODO: refs dos
 %algoritmos
 
-\paragraph{Relação entre banda e latência (Produto Banda-Latência -- BDP) }A
-quantidade de dados em trânsito em uma conexão TCP é dada pelo Produto
+\paragraph{Relação entre largura de banda e latência (Produto Banda-Latência --
+BDP) }A quantidade de dados em trânsito em uma conexão TCP é dada pelo Produto
 Banda-Latência. Dessa forma, dada uma largura de banda, quanto maior a latência
 da rede, maior a quantidade de pacotes em trânsito. Um gargalo comum nesse caso
-é o tamanho dos buffers de envio e recepção. Referências sobre otimização da
-pilha TCP para WANs sugerem que o tamanho ideal para esses buffers é o dobro do
-BDP.
+é o tamanho dos buffers de transmissão e recepção. Referências sobre otimização
+da pilha TCP para WANs sugerem que o tamanho ideal para esses buffers é o dobro
+do BDP.
 
 \paragraph{Distribuição de operações}Diferentes distribuições de escrita/leitura
 resultam em diferentes desempenhos.  Por exemplo, a consistência na linha do
