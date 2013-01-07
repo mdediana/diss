@@ -3,8 +3,8 @@
 
 Este trabalho consiste na comparação do desempenho da consistência em momento
 indeterminado e da consistência na linha do tempo em um sistema de armazenamento
-distribuído operando sobre uma WAN. Para essa análise, o método proposto em
-\cite{Jain1991} é usado. O método consiste em 10 passos:
+distribuído operando sobre uma WAN. Para essa análise, o método proposto por
+Jain em \cite{Jain1991} é usado. O método consiste em 10 passos:
 
 % Jain - pag 37
 \begin{enumerate} \item Declaração das metas e definição do sistema \item Lista
@@ -19,9 +19,12 @@ tempo de resposta (variáveis dependentes). Parâmetros são todas as
 características do sistema, do ambiente de operação e da carga de trabalho que
 podem influenciar o desempenho do sistema, como a CPU ou a latência da rede.
 Fatores são os parâmetros que são variados nos experimentos (variáveis
-independentes) e seus valores são os níveis. Os parâmetros que não são fatores
-são fixados (variáveis fixas e constantes). Efeito é a influência que um fator
-ou interação entre fatores exerce sobre o desempenho do sistema.
+independentes). Além dos fatores, a interação entre fatores também pode afetar o
+desempenho. A ordem de uma interação entre fatores é a quantidade de fatores
+envolvidos na interação (por exemplo, uma interação de segunda ordem é a
+interação entre dois fatores). Os valores dos fatores nos experimentos são os
+níveis. Os parâmetros que não são fatores possuem um único valor em todos os
+experimentos (variáveis fixas e constantes).
 
 Os passos 1 a 7 são tratados neste capítulo. O passo 8 está no capítulo
 \ref{cap:projeto_dos_experimentos} e os passos 9 e 10 estão no capítulo
@@ -33,34 +36,38 @@ Os passos 1 a 7 são tratados neste capítulo. O passo 8 está no capítulo
 
 O objetivo deste estudo é comparar o desempenho da consistência em momento
 indeterminado com o da consistência na linha do tempo em um sistema de
-armazenamento distribuído em uma WAN. Essa situação é modelada como um único
-sistema distribuído entre dois centros de dados ligados por uma WAN emulada.
-Esse modelo possibilita diferente combinações entre requisições locais com baixo
-tempo de resposta (intra centro de dados) e requisições remotas com tempos de
-resposta mais altos (inter centros de dados) dependendo do modelo de
-consistência usado e da sua configuração (ver \ref{sec:modos}).
+armazenamento distribuído geo-replicado. Essa situação é modelada como um único
+sistema distribuído entre dois centros de dados ligados por uma WAN. Nesse
+cenário, uma requisição local é aquela atendida no mesmo centro de dados em que
+chega e possui baixo tempo de resposta (da ordem de poucos milissegundos). Já
+uma requisição remota é aquela que chega em um centro de dados e é encaminhada
+para ser atendida em outro e normalmente possui tempo de resposta alto (da ordem
+de dezenas ou centenas de milissegundos). O modelo usado neste estudo
+possibilita diferentes combinações entre requisições locais e remotas dependendo
+do modelo de consistência usado e da sua configuração (ver \ref{sec:modo}).
 
 % Definição do TCP, no summary do TCP em Stevens.
-Para entender a dinâmica do sistema distribuído é necessário entender as
+Para entender a dinâmica do sistema geo-replicado é necessário entender as
 características da rede sobre a qual ele opera. Esse estudo considera um sistema
-operando sobre TCP/IP. O protocolo IP provê os mecanismos de endereçamento e
-roteamento. O protocolo TCP provê conexão ponto-a-ponto confiável, reconhecendo
-os dados recebidos, re-enviando caso o reconhecimento não seja recebido dentro
-de um determinado período de tempo, reordenando pacotes recebidos fora de ordem,
+operando sobre TCP/IP, pilha de protocolos comumente utilizada nesses sistemas.
+O protocolo IP provê os mecanismos de endereçamento e roteamento. O protocolo
+TCP provê conexão ponto-a-ponto confiável, reconhecendo os dados recebidos,
+enviando-os novamente caso o reconhecimento não seja recebido dentro de um
+determinado período de tempo, reordenando pacotes recebidos fora de ordem,
 descartando pacotes duplicados, verificando pacotes corrompidos e provendo
 controle de fluxo.
 
-Um estudo completo consideraria atributos de qualidade além de desempenho, como
-disponibilidade e manutenibilidade, mas que não são feitos usados neste estudo
-por limitações de escopo. Estudos futuros podem contemplar esses e outros
-atributos de qualidade.
+Um estudo completo consideraria atributos de qualidade do sistema além de
+desempenho, como disponibilidade e manutenibilidade, mas que não são
+considerados neste estudo por limitações de escopo e recursos. Estudos futuros
+podem contemplar esses e outros atributos de qualidade.
 
-Para a comparação dos modelos de consistência, uma versão modificada do Riak
-\cite{Riak} é usada (detalhes sobre a escolha e a implementação estão na seção
-\ref{sec:sistema_de_armazenamento}). Como o objetivo deste estudo é comparar
-dois modelos de consistência, não sistemas que os implementem, os experimentos
-foram planejados e executados de forma a isolar tanto quanto possível questões
-específicas do sistema.
+O sistema usado como alvo do estudo é uma versão modificada do Riak, uma tabela
+de espalhamento distribuída \cite{Riak} (detalhes sobre a escolha e a
+implementação estão na seção \ref{sec:sistema_de_armazenamento}). Como o
+objetivo deste estudo é comparar os dois modelos de consistência e não sistemas
+que os implementem, os experimentos foram planejados e executados de forma a
+isolar tanto quanto possível questões específicas do sistema.
 
 %% ------------------------------------------------------------------------- %%
 \section{Lista de serviços do sistema e seus resultados}
@@ -68,73 +75,72 @@ específicas do sistema.
 
 O sistema de armazenamento usado é uma tabela de espalhamento distribuída.
 Assim, o principal serviço oferecido pelo sistema são operações CRUD sobre pares
-chave-valor. Outro serviço fundamental para este estudo é a replicação dos
+chave-valor. O segundo serviço fundamental para este estudo é a replicação dos
 objetos armazenados.
 
 Para consistência em momento indeterminado, a replicação é parametrizada a
-partir dos valores N, R e W (seção \ref{sec:replicacao_otimista}). Toda
-requisição dos clientes chega a um nó qualquer do sistema. Caso esse nó seja
-responsável pela chave ele é o coordenador. Caso ele não seja responsável, ele
-encaminha a requisição para o coordenador. A partir disso, uma requisição pode
-apresentar os seguintes resultados:
-
-\begin{itemize} \item Bem sucedida: No caso de leitura, caso ao menos R réplicas
-retornem uma resposta com sucesso para o coordenador, no caso de inserção,
-atualização ou remoção caso ao menos W réplicas confirmem a escrita para o
-coordenador.  \item Falha: Caso menos de R ou W réplicas retornem uma resposta
-com sucesso para o coordenador dentro de um determinado intervalo de tempo
-(timeout).  \item Timeout: Caso o cliente desista de esperar uma resposta em um
-tempo menor do que o do coordenador.  \end{itemize}
-
-Para consistência na linha do tempo, a replicação é parametrizada apenas pelo
-valor N. Toda requisição dos clientes chega a um nó qualquer do sistema. Caso
-seja uma escrita e esse nó seja o mestre para a chave, ele atende a requisição.
-Caso ele não seja o mestre para a chave, ele direciona a requisição para o
-mestre. Caso seja uma leitura e esse nó seja o mestre para a chave, ele atende a
-requisição.  Caso ele não seja o mestre para a chave e a o parâmetro para a
-versão seja ``versão qualquer'', ele redireciona a requisição para um nó
-responsável pela chave.  Caso a versão seja ``versão mais recente'', ele
-redireciona a requisição para o mestre da chave. A partir disso, uma requisição
+partir dos valores N, R e W (seção \ref{sec:replicacao_otimista}). Requisições
+dos clientes podem chegar a qualquer nó do sistema. Caso a requisição seja uma
+leitura, esse nó é o coordenador e envia requisições de leitura para os nós que
+contêm réplicas do objeto requerido. Caso a requisição seja uma escrita e esse
+nó seja responsável por alguma das réplicas, ele é o coordenador e atende a
+requisição, caso contrário ele encaminha a requisição para um dos nós que contém
+uma réplica do objeto, que será o coordenador. A partir disso, uma requisição
 pode apresentar os seguintes resultados:
 
-\begin{itemize} \item Bem sucedida: No caso de leitura de ``qualquer versão'',
-caso ao menos uma réplica retorne uma resposta com sucesso para o coordenador.
-No caso de leitura de ``versão mais recente'', inserção, atualização ou remoção,
-caso o mestre retorne uma resposta com sucesso para o coordenador.  \item Falha:
-No caso de leitura de ``qualquer versão'', caso nenhuma réplica retorne uma
-resposta com sucesso para o coordenador dentro de um determinado intervalo de
-tempo. No caso de leitura de ``versão mais recente'', inserção, atualização ou
-remoção, caso o mestre não retorne uma resposta com sucesso para o coordenador
-dentro de um determinado intervalo de tempo.  \item Timeout: Caso o cliente
-desista de esperar uma resposta em um tempo menor do que o do coordenador.
-\end{itemize}
+\begin{itemize} \item Bem sucedida: Se ao menos R réplicas responderem para o
+coordenador caso a requisição seja uma leitura, ou se ao menos W réplicas
+confirmarem para o coordenador que o objeto foi armazenado, modificado ou
+removido caso a requisição seja uma escrita.  \item Falha: Se menos do que R
+réplicas para leitura ou W réplicas para escrita responderem para o coordenador
+dentro de um determinado intervalo de tempo (timeout de servidor).  \item
+Timeout: Se o cliente desistir de esperar uma resposta após um determinado
+período de tempo (timeout de cliente).  \end{itemize}
 
-O Riak disponibiliza configuração para definir se a leitura de uma chave
-inexistente deve ser tratada como erro ou sucesso.
+Para consistência na linha do tempo, a replicação é parametrizada apenas pelo
+valor N. Requisições dos clientes podem chegar a qualquer nó do sistema.  Caso a
+requisição seja uma leitura de ``qualquer versão'', esse nó é o coordenador e
+envia requisições de leitura para os nós que contêm réplicas do objeto requerido
+e assim que recebe a primeira resposta retorna para o cliente. Caso a requisição
+seja uma leitura da ``versão mais recente'' e o nó seja o mestre para o objeto
+requerido, ele é o coordenador e atende a requisição, caso contrário ele
+encaminha a requisição para o mestre que será o coordenador. O sistema se
+comporta da mesma maneira que leituras de ``versão mais recente'' para
+escritas.A partir disso, uma requisição pode apresentar os seguintes resultados:
+
+\begin{itemize} \item Bem sucedida: Se ao menos uma réplica responder para o
+coordenador no caso de leitura de ``qualquer versão'', se o mestre responder no
+caso de leitura de ``versão mais recente'' ou se o mestre confirmar que o objeto
+foi armazenado, modificado ou removido no caso de escrita.  \item Falha: Se
+nenhuma réplica responder para o coordenador dentro de um determinado intervalo
+de tempo no caso de leitura de ``qualquer versão''. Se o mestre não responder
+dentro de um determinado intervalo de tempo (timeout de servidor) no caso de
+escrita ou leitura de ``versão mais recente''.  \item Timeout: Se o cliente
+desistir de esperar uma resposta após um determinado período de tempo (timeout
+de cliente).  \end{itemize}
 
 %% ------------------------------------------------------------------------- %%
 \section{Seleção de métricas} \label{sec:selecao_de_metricas}
 
-A principal métrica a observada e usada como base de comparação do desempenho
-dos modelos de consistência é o tempo de resposta das requisições (medido em s).
-Quanto menor o tempo de resposta, melhor o desempenho de um modelo de
-consistência. Para uma dada carga de trabalho e condição de rede, a relação do
-tempo de resposta entre os modelos de consistência resulta no ganho (ou perda)
-percentual de desempenho ao se optar por um ou outro modelo.
+A principal métrica usada como base de comparação do desempenho dos modelos de
+consistência é o tempo de resposta das requisições (medido em s).  Quanto menor
+o tempo de resposta, melhor o desempenho de um modelo de consistência. Como
+existem requisições locais e remotas com tempos de resposta bem diferentes, essa
+métrica não deve ser analisada como uma média, mas sim através de percentis.
 
-Além do tempo de resposta, outras métricas a serem observadas são vazão (em
-operações/s), quantidade de conflitos e migrações (ambas dadas pela porcentagem
+Além do tempo de resposta, outras métricas observadas foram vazão (em
+operações/s), quantidade de migrações e conflitos (ambas dadas pela porcentagem
 com relação ao total de operações do experimento). Vazão não é considerada uma
-meta principal pois os clientes apresentam uma taxa de requisição relativamente
-baixa nos experimentos, de forma a diminuir possíveis influências de sobrecarga
-do sistema. A quantidade de conflitos é interessante para se ter uma noção da
-probabilidade de se ler valores desatualizados. Uma diferença entre conflitos
-nos dois tipos de consistência é que na linha do tempo eles são causados apenas
-por atualizações que ainda não chegaram a todas as réplicas, portanto serão
-automaticamente resolvidos. Já na consistência em momento indeterminado, eles
-podem ser mais graves, dado que esse modelo permite atualizações divergentes. A
-quantidade de migrações, exclusiva da consistência na linha do tempo, oferece
-uma visão da dinâmica de um sistema que use esse modelo de consistência.
+meta principal pois os clientes apresentam uma taxa de requisição fixada nos
+experimentos, de forma a diminuir possíveis influências de sobrecarga do
+sistema. A quantidade de migrações, exclusiva da consistência na linha do tempo,
+oferece uma visão da dinâmica de um sistema que use esse modelo de consistência.
+A quantidade de conflitos proporciona uma noção da frequência com que cliente
+leem valores desatualizados. Uma diferença entre conflitos nos dois tipos de
+consistência é que na linha do tempo eles são causados apenas por atualizações
+que ainda não chegaram a todas as réplicas, portanto serão automaticamente
+resolvidos. Já na consistência em momento indeterminado, eles podem ser mais
+graves, dado que esse modelo permite atualizações divergentes.
 
 %% ------------------------------------------------------------------------- %%
 \section{Lista de parâmetros} \label{sec:lista_de_parametros}
@@ -163,15 +169,15 @@ consistência na linha do tempo) \item Interface de acesso \item Nível de log
 
 Os principais parâmetros de rede que podem afetar o desempenho do sistema são:
 
-\begin{itemize} \item Topologia da rede \item Banda disponível nos elementos
-intermediários (switches, roteadores, etc) \item Latência da LAN \item Latência
-da WAN \item Variação da latência da WAN \item Taxa de perda de pacotes da WAN
-\item Taxa de duplicação de pacotes da WAN \item Taxa de corrupção de pacotes da
-WAN \item Proporção de pacotes fora de ordem na WAN \item Algoritmo de
-congestionamento \item Relação entre banda e latência (Produto Banda-Latência --
-BDP) \end{itemize}
+\begin{itemize} \item Topologia da rede \item Largura de banda dos elementos de
+rede intermediários (switches, roteadores, etc) \item Latência da LAN \item
+Latência da WAN \item Variação da latência da WAN \item Taxa de perda de pacotes
+da WAN \item Taxa de duplicação de pacotes da WAN \item Taxa de corrupção de
+pacotes da WAN \item Proporção de pacotes fora de ordem na WAN \item Algoritmo
+de congestionamento \item Relação entre largura de banda e latência (Produto
+Banda-Latência, \emph{Bandwidth Delay Product} -- BDP) \end{itemize}
 
-Variação da latência, taxas de perda, duplicação e corrupção de pacotes e
+Variação da latência, taxas de perda, de duplicação e de corrupção de pacotes e
 proporção de pacotes fora de ordem não são considerados para LAN pois ocorrem
 com menor frequência e geram pouco impacto nesse tipo de rede. Em WANs, esses
 fenômenos estão relacionados a uma maior quantidade de nós intermediários
@@ -196,40 +202,29 @@ parâmetros que não são fatores e seus valores estão na seção
 Os fatores foram escolhidos de forma a aproximar este estudo dos ambientes de
 produção de sistemas web geo-replicados, assim fatores que influenciam o
 comportamento do sistema operando sobre WAN foram priorizados. Apesar disso,
-essa lista não é exaustiva (ver subseção \ref{sec:ameacas_a_validade}) por
-limitações de recursos e do escopo deste estudo. Além disso, existem limites de
-generalização já que aplicações diferentes possuem requisitos específicos.
+essa lista não é exaustiva por limitações de recursos e do escopo deste estudo
+(ver as ameaças à validade na subseção \ref{sec:ameacas_a_validade}).
 
-Os fatores apresentados nesta subseção são os inicialmente selecionados. Durante
-o projeto dos experimentos, experimentos intermediários foram realizados com o
-objetivo de diminuir a quantidade de fatores a considerar e definir seus níveis,
-gerando uma seleção composta apenas pelos fatores mais influentes para os
-experimentos finais. Muitos fatores apresentam apenas dois níveis iniciais pois
-a maioria dos experimentos intermediários não usa mais do que isso. Os
-experimentos intermediários estão descritos na seção
-\ref{sec:experimentos_intermediarios} e os fatores definitivos na seção
-\ref{sec:fatores_definitivos}.
-
-As configurações relativas a hardware (CPU, memória, etc) estavam limitadas às
-oferecidas pelo Grid5000 (ver seção \section{sec:ambiente}). Todos os nós de um
-dado aglomerado do Grid5000 possuem a mesma configuração de hardware. Com isso,
-decidiu-se restringir os experimentos a um único aglomerado, de forma a remover
-discrepâncias de hardware dentro de cada experimento. Dado isso, alguns
-experimentos intermediários foram feitos para a decisão do aglomerado a ser
-usado. Dessa forma, os itens referentes a CPU, memória, disco e banda foram
-agrupados em um único fator, chamado aglomerado (subseção \ref{sec:aglomerado}).
+Para estudos desse tipo, é comum os experimentos serem realizados em duas
+etapas. A primeira, que faz parte do projeto dos experimentos, usa mais fatores
+e poucos níveis, e tem por objetivo encontrar os fatores mais influentes e fixar
+os restantes como parâmetros. A segunda usa os fatores mais influentes com mais
+níveis. Os fatores apresentados nesta seção são os inicialmente selecionados. A
+descrição do projeto dos experimentos, dos fatores e seus níveis encontra-se no
+capítulo \ref{cap:projeto_dos_experimentos}.
  
 Dois fatores que possuem um tratamento especial ao longo do experimento são
 configuração de replicação (para consistência em momento indeterminado) e versão
 requisitada nas leituras (para consistência na linha do tempo). Isso porque seus
-níveis influenciam na proporção de requisições que são atendidas local e
-remotamente, fundamental para este estudo. Dessa forma, esses dois fatores são
-tratados como um único, chamado modo (subseção \ref{sec:modo}).
+níveis influenciam na proporção de requisições locais e remotas, fundamental
+para este estudo. Por isso, esses dois fatores são tratados como um único,
+chamado modo (subseção \ref{sec:modo}). Os fatores restantes estão descritos na
+seção \ref{sec:fatores_iniciais}.
 
 %% ------------------------------------------------------------------------- %%
 \subsection{Modo} \label{sec:modo}
 
-Todas as configurações usam $N = 3$, valor padrão em aplicações em produção (ver
+Todas as configurações usam $N = 3$, comumente adotado em aplicações web (ver
 subseção \ref{sec:parametros_fixados}). Os níveis dos modos são:
 
 \begin{itemize} \item ind1: Consistência em momento indeterminado com $W$ = 1 e
@@ -240,290 +235,159 @@ recente \end{itemize}
 
 Os experimentos simulam dois centros de dados e $N = 3$. O algoritmo de
 particionamento garante que existe ao menos uma réplica em cada centro de dados
-(ver \ref{sec:sistema_de_armazenamento}. Assim, existem sempre duas situações
-possíveis para a localização das réplicas do ponto de vista do coordenador
-(lembrando que o coordenador é uma das réplica): uma réplica local e uma remota
-ou duas remotas. Dado isso, ind1 resulta em todas as leituras e escritas locais.
-ind2 resulta em todas as leituras locais e metade das escritas locais e a outra
-metade remotas. lt\_qqer resulta em todas as leituras locais e a quantidade de
-escritas dependente da localidade dos acessos. Finalmente, lt\_rec resulta tanto
-em leituras quanto escritas dependentes da localidade.
+(ver \ref{sec:sistema_de_armazenamento}). Assim, existem sempre duas situações
+possíveis com relação à localização das réplicas do ponto de vista do
+coordenador: uma local e duas remota ou duas locais e uma remota. Dado isso,
+ind1 resulta em todas as leituras e escritas locais.  ind2 resulta em todas as
+leituras locais e metade das escritas locais e a outra metade remotas. lt\_qqer
+resulta em todas as leituras locais e a quantidade de escritas dependente da
+localidade dos acessos. Finalmente, lt\_rec resulta tanto em leituras quanto
+escritas dependentes da localidade.
 
 Os modos foram escolhidos de forma a representar situações encontradas em
 sistemas de produção e ao mesmo tempo limitar a quantidade de níveis de forma a
 tornar os experimentos viáveis devido a limitação de recursos. Assim,
 consistência na linha do tempo com leituras de versões específicas não foi
-considerada já que ela é um meio termo entre leituras consistentes e leituras de
-qualquer versão. Consistência em momento indeterminado com $W = 1$ e $R = 2$ não
-foi considerada pois sua semântica é similar a $W = 2$ e $R = 1$, mas teria seu
-desempenho prejudicado considerando que leituras predominam nas distribuições de
-operações usadas nos experimentos (ver subseção
+considerada já que ela é um meio termo entre leituras de versão mais recente e
+leituras de qualquer versão. Consistência em momento indeterminado com $W = 1$ e
+$R = 2$ não foi considerada pois sua semântica é similar a $W = 2$ e $R = 1$,
+mas teria seu desempenho prejudicado considerando que leituras predominam nas
+distribuições de operações usadas nos experimentos (ver subseção
 \ref{sec:distribuicao_de_operacoes}).
 
 Esses modos implicam em trocas além de desempenho e consistência. A principal é
-durabilidade, que para ind2 é mais alta do que para os outros casos, em que
-apenas uma escrita bem sucedida é suficiente.
+durabilidade, que para ind2 é mais alta do que para os outros casos, em que a
+confirmação de escrita de uma única réplica é suficiente.
 
 %% ------------------------------------------------------------------------- %%
-\subsection{Aglomerado} \label{sec:aglomerado}
+\subsection{Fatores iniciais} \label{sec:fatores_iniciais}
 
-Os aglomerados do Grid5000 considerados foram paradent, parapide, sol e suno. A
-descrição do hardware e a quantidade de nós de cada um deles se encontra na
-Tabela \ref{tab:aglomerados_do_grid5000}.
+Os fatores inicialmente selecionados foram:
 
-\begin{table}[!h] \begin{center} \begin{tabular}{|c|c|c|c|c|} \hline Aglomerado
-& CPU & Memória & Disco & Quantidade de nós \\ \hline parapide & & & & \\ \hline
-paradent & & & & \\ \hline \end{tabular} \caption{Aglomerados do Grid5000}
-\label{tab:aglomerados_do_grid5000} \end{center} \end{table}
+\paragraph{Aglomerado}As configurações relativas a hardware (CPU, memória, etc)
+estavam limitadas às oferecidas pelo Grid5000 (ver seção \ref{sec:ambiente}).
+Cada aglomerado do Grid5000 possui todos os nós com mesma configuração de
+hardware. Com isso, decidiu-se restringir os experimentos a um único aglomerado,
+de forma a eliminar possíveis influências de heterogeneidade de hardware. Assim,
+um estudo foi feito na primeira etapa dos experimentos para a decisão do
+aglomerado a ser usado.
 
-%% ------------------------------------------------------------------------- %%
-\subsection{Quantidade de nós do sistema}
-\label{sec:quantidade_de_nos_do_sistema}
+\paragraph{Quantidade de nós do sistema}A decisão de usar um único aglomerado
+implicou em um tamanho máximo do sistema restrito a quantidade de nós do
+aglomerado escolhido.  A forma como se opera no Grid5000 impôs algumas
+restrições operacionais. Uma delas são regras que restringem o uso diário da
+infraestrutura. Outra é a concorrência por recursos entre os usuários, quanto
+menor a quantidade de nós reservada, maiores as chances de se conseguir uma
+reserva. Além dessas, uma terceira restrição é devida ao fato de a quantidade de
+partições do anel do espalhamento consistente precisar ser uma potência de 2.
+Com isso, uma maneira simples para distribuir as partições igualmente entre os
+nós é assumir uma quantidade de nós que também fosse potência de 2.
 
-A decisão de usar um único aglomerado implicou em um tamanho máximo do sistema
-restrito a quantidade de nós do aglomerado escolhido (ver Tabela
-\ref{tab:aglomerados_do_grid5000}.  A forma como se opera no Grid5000 impôs
-algumas restrições operacionais. Uma delas são regras que restringem o uso
-diário da infraestrutura. Outra é a concorrência por recursos entre os usuários,
-quanto menor a quantidade de nós reservada, maiores as chances de se conseguir
-uma reserva. Além dessas, uma terceira restrição é devida ao fato de a
-quantidade de partições do anel do espalhamento consistente precisar ser uma
-potência de 2. Com isso, uma maneira simples para distribuir as partições
-igualmente entre os nós é assumir uma quantidade de nós que também fosse
-potência de 2.
+\paragraph{Quantidade de objetos armazenados}A quantidade de objetos armazenados
+pode influenciar na quantidade de dados no cache de disco (caso seja esse o
+mecanismo de armazenamento utilizado). Além disso, esse fator também pode
+influenciar a quantidade de conflitos, já que quanto menos objetos existirem no
+banco de dados, maior a chance de um dado objeto receber uma requisição.
 
-A partir disso, os níveis inicialmente selecionados foram:
+\paragraph{Tamanho dos objetos armazenados}O tamanho dos objetos armazenados
+pode influenciar na quantidade de dados no cache de disco (caso seja esse o
+mecanismo de armazenamento utilizado). No caso de armazenamento em memória, eles
+podem causar fragmentação de memória, o que também afeta o desempenho. Além
+disso, esse fator pode influenciar no desempenho da rede, dado que objetos muito
+grandes podem precisar ser divididos em mais de um pacote TCP e objetos muito
+pequenos resultam em uma carga paga relativamente menor.
 
-\begin{itemize} \item 8 \item 16 \end{itemize}
+\paragraph{Latência da WAN}As latências de ida e volta médias usadas nos
+experimentos são baseadas nas latências entre os centros de dados dos Amazon Web
+Services \cite{Sovran2011}.  Os centros de dados considerados são Califórnia
+(EUA -- Costa Oeste), Virginia (EUA -- Costa Leste), Irlanda e Singapura. A
+menor latência observada foi 82 ms entre os centros de dados dos EUA e a maior
+foi 277 ms entre Irlanda e Singapura.
 
-%% ------------------------------------------------------------------------- %%
-\subsection{Quantidade de objetos armazenados}
-\label{sec:quantidade_de_objetos_armazenados}
-
-A quantidade de objetos armazenados pode influenciar na quantidade de dados no
-cache de disco (caso seja esse o mecanismo de armazenamento utilizado). Além
-disso, esse fator também pode influenciar a quantidade de conflitos, já que
-quanto menos objetos existirem no banco de dados, maior a chance de um dado
-objeto receber uma requisição.
-
-A partir disso, os níveis inicialmente selecionados foram:
-
-\begin{itemize} \item 64000 \item 256000 \end{itemize}
-
-%% ------------------------------------------------------------------------- %%
-\subsection{Tamanho dos objetos armazenados}
-\label{sec:tamanho_dos_objetos_armazenados}
-
-O tamanho dos objetos armazenados pode influenciar na quantidade de dados no
-cache de disco (caso seja esse o mecanismo de armazenamento utilizado). No caso
-de armazenamento em memórioa, eles podem causar fragmentação de memória, o que
-também afeta o desempenho. Além
-disso, esse fator pode influenciar no desempenho da rede, dado que objetos
-muito grandes podem precisar ser divididos em mais de um pacote TCP e objetos
-muito pequenos resultam em uma carga paga relativamente menor.
-
-A partir disso, os níveis inicialmente selecionados foram:
-
-\begin{itemize} \item 100 \item 10000 \end{itemize}
-
-%% ------------------------------------------------------------------------- %%
-\subsection{Latência da WAN} \label{sec:latencia_da_wan}
-
-As latências de ida e volta médias usadas nos experimentos são baseadas nas
-latências entre os centros de dados dos Amazon Web Services \cite{Sovran2011}.
-Os centros de dados considerados são Califórnia (EUA -- Costa Oeste), Virginia
-(EUA -- Costa Leste), Irlanda e Singapura. A menor latência observada foi 82 ms
-entre os centros de dados dos EUA e a maior foi 277 ms entre Irlanda e
-Singapura.
-
-A partir disso, os níveis selecionados foram:
-
-\begin{itemize} \item 100 ms \item 300 ms \end{itemize}
-
-%% ------------------------------------------------------------------------- %%
-\subsection{Variação da latência da WAN} \label{sec:variacao_da_latencia_da_wan}
-
-A latência em uma WAN não é constante, dado que dentre suas causas está a
-dinâmica da rede. Por exemplo, rajadas de tráfego podem encher os buffers de um
-roteador no caminho entre dois nós, fazendo com que pacotes sejam
-descartados, o que se manifesta para o transmissor como um aumento de latência. Além disso, as
-variações normalmente não são aleatórias. A partir do mesmo exemplo, enquanto o
-roteador está sobrecarregado a latência vista pelo enviador é mais alta, quando
-ele volta a operar normalmente a latência vista pelo transmissor passa a ser mais
-baixa. Por isso, além da variação existe uma correlação entre os valores de
-latência observados ao longo do tempo.
-
-A partir disso, os níveis de variação da latência selecionados foram:
-
-\begin{itemize} \item 1\% (Pouca variação) \item 50\% (Muita variação)
-\end{itemize}
-
+\paragraph{Variação da latência da WAN}A latência em uma WAN não é constante,
+dado que dentre suas causas está a dinâmica da rede. Por exemplo, rajadas de
+tráfego podem encher os buffers de um roteador no caminho entre dois nós,
+fazendo com que pacotes sejam descartados, o que se manifesta para o transmissor
+como um aumento de latência. Além disso, as variações normalmente não são
+aleatórias. A partir do mesmo exemplo, enquanto o roteador está sobrecarregado a
+latência vista pelo enviador é mais alta, quando ele volta a operar normalmente
+a latência vista pelo transmissor passa a ser mais baixa. Por isso, além da
+variação existe uma correlação entre os valores de latência observados ao longo
+do tempo.
 %TODO: citar post do amp sobre variação de latência
 
-%% ------------------------------------------------------------------------- %%
-\subsection{Taxa de perda de pacotes da WAN}
-\label{sec:taxa_de_perda_de_pacotes_da_wan}
-
-A perda de pacotes é uma das principais causas por atrasos e gargalos em um
-sistema usando TCP, dado que ao registrar a perda de um pacote a janela de
-transmissão da conexão é reiniciada, o que se manifesta como diminuição da
-banda. Além disso, o mecanismo padrão de retransmissão do TCP aumenta
-exponencialmente o tempo entre tentativas, portanto quanto maior o número de
-pacotes perdidos, mais tempo demora para os pacotes serem reenviados.
-Considera-se que perdas acima de x\% tornam a comunicação praticamente
-impossível.
-
-A partir disso, os níveis selecionados foram:
-
-\begin{itemize} \item 0.05\% (Pouca perda) \item 1\% (Muita perda) \end{itemize}
-
+\paragraph{Taxa de perda de pacotes da WAN}A perda de pacotes é uma das
+principais causas por atrasos e gargalos em um sistema usando TCP, dado que ao
+registrar a perda de um pacote a janela de transmissão da conexão é reiniciada,
+o que se manifesta como diminuição da banda. Além disso, o mecanismo padrão de
+retransmissão do TCP aumenta exponencialmente o tempo entre tentativas, portanto
+quanto maior o número de pacotes perdidos, mais tempo demora para os pacotes
+serem reenviados.  Considera-se que perdas acima de x\% tornam a comunicação
+praticamente impossível.
 %TODO: ref sobre perdas
 
-%% ------------------------------------------------------------------------- %%
-\subsection{Taxa de duplicação de pacotes da WAN}
-\label{sec:taxa_de_duplicacao_de_pacotes_da_wan}
-
-Pacotes duplicados afetam a comunicação TCP principalmente por gerarem tráfico
-desnecessariamente. Fora isso, geram pouco impacto já que o tratamento dado pelo
-TCP é o descarte dos pacotes duplicados no receptor.
-
-A partir disso, os níveis selecionados foram:
-
-\begin{itemize} \item 0.05\% \item 5\% \end{itemize}
-
+\paragraph{Taxa de duplicação de pacotes da WAN}Pacotes duplicados afetam a
+comunicação TCP principalmente por gerarem tráfico desnecessariamente. Fora
+isso, geram pouco impacto já que o tratamento dado pelo TCP é o descarte dos
+pacotes duplicados no receptor.
 %TODO: checar problemas de duplicação
 
-%% ------------------------------------------------------------------------- %%
-\subsection{Taxa de corrupção de pacotes da WAN}
-\label{sec:taxa_de_corrupcao_de_pacotes_da_wan}
-
-Pacotes corrompidos afetam a comunicação TCP por gerarem retransmissões.
-
-A partir disso, os níveis selecionados foram:
-
-\begin{itemize} \item 0.05\% \item 0.5\% \end{itemize}
-
+\paragraph{Taxa de pacotes corrompidos da WAN}Pacotes corrompidos afetam a
+comunicação TCP por gerarem retransmissões.
 %TODO: checar problemas de corrupção
 
-%% ------------------------------------------------------------------------- %%
-\subsection{Proporção de pacotes fora de ordem na WAN}
-\label{sec:proporcao_de_pacotes_fora_de_ordem_na_wan}
-
-Pacotes fora de ordem afetam a comunicação TCP principalmente por ocuparem
-buffers em elementos de rede intermediários e finais no aguardo dos pacotes
-anteriores a eles.
-
-A partir disso, os níveis selecionados foram:
-
-\begin{itemize} \item 0.05\% \item 5\% \end{itemize}
-
+\paragraph{Proporção de pacotes fora de ordem na WAN}Pacotes fora de ordem
+afetam a comunicação TCP principalmente por ocuparem buffers em elementos de
+rede intermediários e finais no aguardo dos pacotes anteriores a eles.
 %TODO: checar problemas de pacotes fora de ordem
 
-%% ------------------------------------------------------------------------- %%
-\subsection{Algoritmo de congestionamento}
-\label{sec:algoritmo_de_congestionamento}
-
-O desempenho da comunicação TCP é dependente do algoritmo de congestionamento
-usado. Esse tipo de algoritmo é responsável pelo dimensionamento da janela de
-transmissão. Em referências sobre otimização da pilha TCP para WANs é comum ver
-dois algoritmos citados.
-
-A partir disso, os níveis selecionados foram:
-
-\begin{itemize} \item cubic \item htcp \end{itemize}
-
+\paragraph{Algoritmo de congestionamento}O desempenho da comunicação TCP é
+dependente do algoritmo de congestionamento usado. Esse tipo de algoritmo é
+responsável pelo dimensionamento da janela de transmissão. Em referências sobre
+otimização da pilha TCP para WANs é comum ver dois algoritmos citados.
 %TODO: checar como algoritmo de congestionamento realmente opera TODO: refs dos
 %algoritmos
 
-%% ------------------------------------------------------------------------- %%
-\subsection{Relação entre banda e latência (Produto Banda-Latência -- BDP) }
-\label{sec:relacao_entre_banda_e_latencia}
-
-A quantidade de dados em trânsito em uma conexão TCP é dada pelo Produto
+\paragraph{Relação entre banda e latência (Produto Banda-Latência -- BDP) }A
+quantidade de dados em trânsito em uma conexão TCP é dada pelo Produto
 Banda-Latência. Dessa forma, dada uma largura de banda, quanto maior a latência
 da rede, maior a quantidade de pacotes em trânsito. Um gargalo comum nesse caso
 é o tamanho dos buffers de envio e recepção. Referências sobre otimização da
 pilha TCP para WANs sugerem que o tamanho ideal para esses buffers é o dobro do
 BDP.
 
-A partir disso, os níveis selecionados foram:
+\paragraph{Distribuição de operações}Diferentes distribuições de escrita/leitura
+resultam em diferentes desempenhos.  Por exemplo, a consistência na linha do
+tempo pode apresentar desempenho mais baixo em um cenário de escrita intensiva,
+pois a réplica mestre pode se tornar um gargalo. Além disso, a probabilidade de
+haver conflitos entre réplicas aumenta com o aumento da taxa de escritas em um
+sistema que usa consistência em momento indeterminado, que pode sofrer um
+impacto no seu desempenho devido à execução de seus algoritmos de resolução de
+conflitos. Por outro lado, um sistema que usa consistência na linha do tempo não
+apresenta esse problema dado que conflitos entre réplicas não são possíveis.
 
-\begin{itemize} \item 2 \item 4 \end{itemize}
+\paragraph{Popularidade dos objetos acessados}Em muitas aplicações a
+popularidade dos objetos não é uniforme, alguns são mais acessados do que
+outros. Um exemplo é uma loja virtual em que o interesse dos clientes pelos
+produtos tende a obedecer uma lei de potência \cite{Anderson2006}. A existência
+de objetos muito populares pode prejudicar o desempenho de um modelo de
+consistência como a consistência na linha do tempo, em que a réplica mestre pode
+se tornar um gargalo nas escritas.
 
-%% ------------------------------------------------------------------------- %%
-\subsection{Distribuição de operações} \label{sec:distribuicao_de_operacoes}
-
-Diferentes distribuições de escrita/leitura resultam em diferentes desempenhos.
-Por exemplo, a consistência na linha do tempo pode apresentar desempenho mais
-baixo em um cenário de escrita intensiva, pois a réplica mestre pode se tornar
-um gargalo. Além disso, a probabilidade de haver conflitos entre réplicas
-aumenta com o aumento da taxa de escritas em um sistema que usa consistência em
-momento indeterminado, que pode sofrer um impacto no seu desempenho devido à
-execução de seus algoritmos de resolução de conflitos. Por outro lado, um
-sistema que usa consistência na linha do tempo não apresenta esse problema dado
-que conflitos entre réplicas não são possíveis.
-
-A consistência na linha do tempo pode tornar um sistema em cargas com um maior
-número de escritas inviável pois as escritas se tornam indisponíveis em caso de
-falha. Assim, este estudo considera situações em que ela é competitiva quando
-comparada com a consistência em momento indeterminado.
-
-Ao fazer uma atualização em um objeto na consistência em momento indeterminado,
-é necessário o envio do relógio-vetor. Por isso, espera-se que antes de qualquer
-atualização haja uma leitura. Esse fato restringe a quantidade de escritas a um
-máximo de 50\% da carga de trabalho.
-
-A partir disso, os níveis selecionados foram:
-
-\begin{itemize} \item 2:1 \item 10:1 \end{itemize}
-
-%% ------------------------------------------------------------------------- %%
-\subsection{Distribuição de alvos dos acessos}
-\label{sec:distribuicao_de_alvos_dos_acessos}
-
-Em muitas aplicações a popularidade dos objetos não é uniforme, alguns são mais
-acessados do que outros. Um exemplo é uma loja virtual em que o interesse dos
-clientes pelos produtos tende a obedecer uma lei de potência
-\cite{Anderson2006}. A existência de objetos muito populares pode prejudicar o
-desempenho de um modelo de consistência como a consistência na linha do tempo,
-em que a réplica mestre pode se tornar um gargalo nas escritas.
-
-A partir disso, os níveis selecionados foram:
-
-\begin{itemize} \item Uniforme: Todos os objetos são acessados em média a mesma
-quantidade de vezes, \item Concentrada: Os acessos obedecem a uma distribuição
-Pareto.  \end{itemize}
-
-A distribuição normal não é usada por simplicidade. Pelo teorema do limite
-central, a medida em que o tamanho de uma amostra tende a infinito, a
-distribuição normal e a uniforme se aproximam. Dado que a aplicação de execução
-de testes já implementa a distribuição uniforme, não há a necessidade de
-implementar a distribuição normal.
-
-%% ------------------------------------------------------------------------- %%
-\subsection{Localidade} \label{sec:localidade}
-
-Cooper et al. notam um alto índice de localidade nos acessos aos objetos dos
-sistemas no Yahoo! \cite{Cooper2008}. Em uma análise feita no período de uma
-semana, foi observado que em média 85\% das escritas a determinado objeto vinham
-do mesmo centro de dados. Isso acontece por exemplo em uma rede social, em que
-os usuários costumam acessar a aplicação a partir da mesma localização
-geográfica e possuem a maior parte de seus contatos na mesma localização
-geográfica -- usuários brasileiros tendem a acessar o sistema do Brasil e a
-maioria de seus contatos é brasileira, por exemplo. Nesse caso, se os objetos
-são particionados no sistema a partir da localização geográfica dos acessos mais
-recentes é possível economizar um número considerável de requisições entre
-centros de dados. A implementação do PNUTS usa esse fato para implementar uma
-otimização de desempenho, movendo a réplica mestre para o centro de dados do
-qual vieram as últimas 3 escritas do objeto. Essa otimização foi implementada no
-sistema de armazenamento usado nos experimentos.
-
-A partir disso, os níveis selecionados foram:
-
-\begin{itemize} \item Uniforme: origem dos acessos para cada objeto distribuídos
-igualmente entre centros de dados, \item Concentrada: 90\% dos acessos para cada
-objeto originado em um centro de dados e os 10\% restantes originados em outros
-centros de dados.  \end{itemize}
+\paragraph{Localidade}Cooper et al. notam um alto índice de localidade nos
+acessos aos objetos dos sistemas no Yahoo! \cite{Cooper2008}. Em uma análise
+feita no período de uma semana, foi observado que em média 85\% das escritas a
+determinado objeto vinham do mesmo centro de dados. Isso acontece por exemplo em
+uma rede social, em que os usuários costumam acessar a aplicação a partir da
+mesma localização geográfica e possuem a maior parte de seus contatos na mesma
+localização geográfica -- usuários brasileiros tendem a acessar o sistema do
+Brasil e a maioria de seus contatos é brasileira, por exemplo. Nesse caso, se os
+objetos são particionados no sistema a partir da localização geográfica dos
+acessos mais recentes é possível economizar um número considerável de
+requisições entre centros de dados. A implementação do PNUTS usa esse fato para
+implementar uma otimização de desempenho, movendo a réplica mestre para o centro
+de dados do qual vieram as últimas 3 escritas do objeto. Essa otimização foi
+implementada no sistema de armazenamento usado nos experimentos.
 
 %% ------------------------------------------------------------------------- %%
 \section{Seleção da técnica de avaliação}

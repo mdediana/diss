@@ -245,8 +245,8 @@ sysstat\footnote{\url{http://sebastien.godard.pagesperso-orange.fr/}},
 bwm-ng\footnote{\url{http://www.gropp.org/?id=projects&sub=bwm-ng}} e
 iperf\footnote{\url{http://iperf.sourceforge.net/}}. Existe uma única imagem, a
 distinção entre nós executando instâncias do Riak ou do Basho Bench é feita
-através dos scripts que gerenciam os experimentos
-(\ref{sec:infraestrutura_dos_experimentos}).
+através dos scripts que gerenciam os experimentos (subseção
+\ref{sec:infraestrutura_de_execucao_e_analise_dos_experimentos}).
 
 %% ------------------------------------------------------------------------- %%
 \subsection{Infraestrutura de execução e análise dos experimentos}
@@ -268,51 +268,53 @@ valores fixados. Além deles, alguns fatores inicialmente considerados passaram a
 parâmetros fixados após os experimentos intermediários (ver seção
 \ref{sec:fatores_fixados_experimentalmente}).
 
-Os parâmetros arbitrariamente fixados são:
+Os parâmetros fixados sem suporte experimental foram:
 
-\begin{itemize} \item Quantidade de centros de dados: 2. Com esse valor os
+\paragraph{Quantidade de centros de dados} Valor: 2. Com esse valor os
 experimentos ficaram mais simples de executar e analisar devido a simetria do
 sistema.
 
-\item Quantidade de nós por centro de dados: Cada centro de dados tem o mesmo
-tamanho (definido em função do tamanho do sistema) para garantir a simetria do
-sistema.
+\paragraph{Quantidade de nós por centro de dados} Cada centro de dados tem o
+mesmo tamanho (definido em função do tamanho do sistema) para garantir a
+simetria do sistema.
 
-\item Algoritmo de particionamento das chaves: O Riak já disponibiliza uma
+\paragraph{Algoritmo de particionamento das chaves} O Riak já disponibiliza uma
 implementação de espalhamento consistente. A única configuração feita é a
 quantidade de partições utilizadas, que deve ser uma potência de 2 e a
 documenação do Riak recomenda ao menos 10 por nó. Dessa forma o valor usado foi
 512, que no maior tamanho do sistema considerado (16) garante as duas condições.
 
-\item Algoritmo de detecção de falhas: Os experimentos sempre consideram
+\paragraph{Algoritmo de detecção de falhas} Os experimentos sempre consideram
 funcionamento correto dos nós, experimentos que apresentaram falha de algum nó
 foram descartados e executados novamente.
 
-\item Fator de replicação ($N$): 3. Esse é um valor que resulta em um balanço
-razoável entre desempenho, disponibilidade e durabilidade em aplicações reais
-\cite{DeCandia2007}.
+\paragraph{Fator de replicação ($N$)} Valor: 3. Esse é um valor que resulta em
+um balanço razoável entre desempenho, disponibilidade e durabilidade em
+aplicações reais \cite{DeCandia2007}.
 
-\item Limiar de migração (para consistência na linha do tempo): 3. Valor usado
-pelo PNUTS.
+\paragraph{Limiar de migração (para consistência na linha do tempo)} Valor: 3.
+Valor usado pelo PNUTS.
 
-\item Interface de acesso: HTTP.
+\paragraph{Interface de acesso} A interface HTTP foi usada. O Riak também
+suporta uma versão do Protocol Buffers, mais eficiente que a interface HTTP. A
+opção de usar HTTP ocorreu pois a carga sobre o sistema era relativamente baixa,
+portanto eficiência não era tão relevante, e a inteface HTTP é mais simples de
+usar e modificar.
 
-\item Nível de log: WARN. Alguns experimentos exploratórios mostraram perda de
-desempenho quando o  nível de log estava em INFO. 
+\paragraph{Nível de log} Valor: WARN. Alguns experimentos exploratórios
+mostraram perda de desempenho quando o  nível de log estava em INFO. 
 
-\item Topologia da rede: Os experimentos estavam limitados a topologia da rede
-do aglomerado utilizado, consistindo dos 47 nós ligados a um switch.
-
+\paragraph{Topologia da rede} Os experimentos estavam limitados a topologia da
+rede do aglomerado utilizado, consistindo dos 47 nós ligados a um switch.
 %TODO: aqui ou outro lugar
 %https://www.grid5000.fr/mediawiki/index.php/Sophia:Network#Sol_Cluster_.28Sun_X2200_M2.29
 
-\item Banda disponível nos elementos intermediários (switches, roteadores, etc):
-Limitada à oferecida pelo switch do aglomerado utilizado. Estudos exploratórios
-mostraram que mesmo nos experimentos que mais demandavam banda não encontraram
-gargalos devido a ela.
+\paragraph{Largura de banda nos elementos intermediários (switches, roteadores,
+etc)} Limitada à oferecida pelo switch do aglomerado utilizado. Estudos
+exploratórios mostraram que mesmo nos experimentos que mais demandavam banda não
+encontraram gargalos devido a ela.
 
-\item Latência da LAN: Limitada pelo aglomerado usado.  \end{itemize}
-
+\paragraph{Latência da LAN} Limitada pelo aglomerado usado.
 %TODO: qual é a latência?
 
 %% ------------------------------------------------------------------------- %%
@@ -352,7 +354,7 @@ locais, da ordem de poucos milisegundos, e remotas, da ordem de centenas de
 milisegundos. Dessa forma, as requisições remotas dominam a média já que são em
 geral duas ordens de grandeza maiores que as locais. Por isso os estudos fazem
 análises distintas para cada tipo de requisição, usando percentis: percentis
-baixos representam requisiçõesl ocais e percentis altos representam requisições
+baixos representam requisições locais e percentis altos representam requisições
 remotas. Também é feita a distinção entre escritas e leituras dada a diferença
 de natureza dessas operações.
 
@@ -426,12 +428,22 @@ Comparando todos os $FSQX$s é possível descobrir quais os efeitos (e
 consequentemente quais fatores) mais influenciam os resultados dos experimentos.
 
 %% ------------------------------------------------------------------------- %%
-\subsection{Mecanismo de armazenamento} \label{sec:mecanismo_de_armazenamento}
+\subsection{Mecanismo de armazenamento e aglomerado}
+\label{sec:mecanismo_de_armazenamento_e_aglomerado}
 
 Esse é o único fator que não usou experimentos fatoriais para ser fixado -- na
 época em que foi feito o pesquisador ainda não conhecia o projeto desse tipo de
 experimento. Apesar disso, os resultados obtidos são suficientes para apoiar a
 decisão de fixar esse fator.
+
+Os aglomerados do Grid5000 considerados foram paradent, parapide, sol e suno. A
+descrição do hardware e a quantidade de nós de cada um deles se encontra na
+Tabela \ref{tab:aglomerados_do_grid5000}.
+
+\begin{table}[!h] \begin{center} \begin{tabular}{|c|c|c|c|c|} \hline Aglomerado
+& CPU & Memória & Disco & Quantidade de nós \\ \hline parapide & & & & \\ \hline
+paradent & & & & \\ \hline \end{tabular} \caption{Aglomerados do Grid5000}
+\label{tab:aglomerados_do_grid5000} \end{center} \end{table}
 
 Os experimentos feitos para o mecanismo de armazenamento mostraram diferenças
 consideráveis no desempenho do Riak em aglomerados diferentes. Considerando que
@@ -489,8 +501,8 @@ interações entre rede, disco e cache de disco e a análise pode ser focada apenas
 na rede.
 
 %% ------------------------------------------------------------------------- %%
-\subsection{Quantidade de nós do sistema e aglomerado}
-\label{sec:quantidade_de_nos_do_sistema_e_aglomerado}
+\subsection{Quantidade de nós do sistema}
+\label{sec:quantidade_de_nos_do_sistema}
 
 Além da quantidade de nós do sistema, estes experimentos fatoriais incluíram
 dois fatores não considerados na lista de fatores inicial: quantidade de
@@ -501,6 +513,10 @@ seleção da técnica de avaliação. Assim, eles só foram considerados após medição
 ser definida como técnica de avaliação para este estudo, o que fez surgir a
 necessidade de dimensionar não só sistema mas também a aplicação de execução dos
 testes.
+
+Os níveis inicialmente selecionados foram:
+
+\begin{itemize} \item 8 \item 16 \end{itemize}
 
 Este estudo usou modo lt\_rec, localidade de 50\% e latência de rede de 100ms.
 Esses valores foram escolhidos pois através deles obtém-se uma quantidade
@@ -555,6 +571,15 @@ consideraram o atraso de rede como fator. O atraso de rede foi usado como uma
 simplificação da WAN, dessa forma foi possível comparar a importância relativa
 entre esses fatores e a rede.
 
+Os níveis inicialmente selecionados para quantidade de objetos armazenados
+foram:
+
+\begin{itemize} \item 64000 \item 256000 \end{itemize}
+
+Os níveis inicialmente selecionados para tamanho dos objetos armazenados foram:
+
+\begin{itemize} \item 100 \item 10000 \end{itemize}
+
 Este estudo usou modo lt\_rec e localidade de 50\%.  Esses valores foram
 escolhidos pois através deles obtém-se uma quantidade balanceada de leituras e
 escritas locais e remotas. O resultado do estudo pode ser visto na Tabela
@@ -599,8 +624,13 @@ Um estudo preliminar foi feito para verificar o tamanho dos buffers de leitura e
 escrita para verificar as recomendações que dizem que os buffers devem ser o
 dobro do BDP. A principal motivação de checar esse fato é que alguns
 experimentos com iperf mostraram ganhos de desempenho para buffers até quatro
-vezes maiores que o BDP.  . Esse é um tipo de cenário que coloca bastante
-pressão nos buffers.
+vezes maiores que o BDP. Esse é um tipo de cenário que coloca bastante pressão
+nos buffers.
+
+Os níveis inicialmente selecionados para a proporção entre tamanho dos buffers e
+BDP foram:
+
+\begin{itemize} \item 2 \item 4 \end{itemize}
 
 Este estudo usou modo lt\_rec e localidade de 50\%. Esses valores foram
 escolhidos pois através deles obtém-se uma quantidade balanceada de leituras e
@@ -625,9 +655,36 @@ configurá-los como o dobro do BDP, seguindo as recomendações.
 
 Feito isso, os experimentos para rede foram executados. A taxa de pacotes
 corrompidos não foi considerada neste estudo pois experimentos preliminares
-fizeram com que nós do Riak falhasesm por problemas de comunicação. Como nenhuma
+fizeram com que nós do Riak falhassem por problemas de comunicação. Como nenhuma
 referência indicando que a taxa de pacotes corrompidos é um fator fundamental em
 WANs, a opção foi ignorar esse fator.
+
+Os níveis inicialmente selecionados para latência da WAN foram:
+
+\begin{itemize} \item 100 ms \item 300 ms \end{itemize}
+
+Os níveis inicialmente selecionados para variação da latência da WAN foram:
+
+\begin{itemize} \item 1\% (Pouca variação) \item 50\% (Muita variação)
+\end{itemize}
+
+Os níveis inicialmente selecionados para taxa de perda de pacotes da WAN foram:
+
+\begin{itemize} \item 0.05\% (Pouca perda) \item 1\% (Muita perda) \end{itemize}
+
+Os níveis inicialmente selecionados para taxa de duplicação de pacotes da WAN
+foram:
+
+\begin{itemize} \item 0.05\% \item 5\% \end{itemize}
+
+Os níveis inicialmente selecionados para proporção de pacotes fora de ordem na
+WAN foram:
+
+\begin{itemize} \item 0.05\% \item 5\% \end{itemize}
+
+Os níveis inicialmente selecionados para algoritmo de congestionamento foram:
+
+\begin{itemize} \item cubic \item htcp \end{itemize}
 
 O resultado do estudo pode ser visto na Tabela
 \ref{tab:estudo_para_fatores_de_rede} (devido ao grande números de colunas da
@@ -670,21 +727,56 @@ As taxas de duplicação e de pacotes fora de ordem foram fixadas em 0. O
 algoritmo de congestionamento foi fixado como ``cubic'', pois esse é o padrão no
 Linux utilizado nos experimentos.
 
-Apesar de a taxa de pacotes fora de ordem ser
-fixada, a ocorrência de alguns pacotes fora
-de ordem é possível dada a variação da latência. O emulador de WAN foi configurado para aplicar uma
-correlação na variação da latência usando distribuição normal. Com isso, a
-probabilidade de grandes diferenças de latência entre pacotes consecutivos é 
-baixa, diminuindo assim a probabilidade de pacotes fora de ordem.
+Apesar de a taxa de pacotes fora de ordem ser fixada, a ocorrência de alguns
+pacotes fora de ordem é possível dada a variação da latência. O emulador de WAN
+foi configurado para aplicar uma correlação na variação da latência usando
+distribuição normal. Com isso, a probabilidade de grandes diferenças de latência
+entre pacotes consecutivos é baixa, diminuindo assim a probabilidade de pacotes
+fora de ordem.
 
 %% ------------------------------------------------------------------------- %%
 \subsection{Fatores de carga de trabalho}
 \label{sec:fatores_de_carga_de_trabalho}
 
-Os experimentos para fatores de carga de trabalho também
-consideraram o atraso de rede como fator. O atraso de rede foi usado como uma
-simplificação da WAN, dessa forma foi possível comparar a importância relativa
-entre esses fatores e a rede.
+Os experimentos para fatores de carga de trabalho também consideraram o atraso
+de rede como fator. O atraso de rede foi usado como uma simplificação da WAN,
+dessa forma foi possível comparar a importância relativa entre esses fatores e a
+rede.
+
+A consistência na linha do tempo pode tornar um sistema sob cargas com um maior
+número de escritas inviável pois as escritas se tornam indisponíveis em caso de
+falha. Assim, este estudo considera situações em que ela é competitiva quando
+comparada com a consistência em momento indeterminado.
+
+Ao fazer uma atualização em um objeto na consistência em momento indeterminado,
+é necessário o envio do relógio-vetor. Por isso, espera-se que antes de qualquer
+atualização haja uma leitura. Esse fato restringe a quantidade de escritas a um
+máximo de 50\% da carga de trabalho.
+
+A partir disso, os níveis inicialmente selecionados para distribuição de
+operações foram:
+
+\begin{itemize} \item 2:1 \item 10:1 \end{itemize}
+
+Os níveis inicialmente selecionados para popularidade dos objetos acessados
+foram:
+
+\begin{itemize} \item Uniforme: Todos os objetos são acessados em média a mesma
+quantidade de vezes, \item Concentrada: Os acessos obedecem a uma distribuição
+Pareto.  \end{itemize}
+
+A distribuição normal não foi usada por simplicidade. Pelo teorema do limite
+central, a medida em que o tamanho de uma amostra tende a infinito, a
+distribuição normal e a uniforme se aproximam. Dado que a aplicação de execução
+de testes já implementa a distribuição uniforme, não há a necessidade de
+implementar a distribuição normal.
+
+Os níveis inicialmente selecionados para localidade foram:
+
+\begin{itemize} \item Uniforme: origem dos acessos para cada objeto distribuídos
+igualmente entre centros de dados, \item Concentrada: 90\% dos acessos para cada
+objeto originado em um centro de dados e os 10\% restantes originados em outros
+centros de dados.  \end{itemize}
 
 Como os modos possuem comportamentos diferentes para requisições locais e
 remotas, os experimentos foram executados para cada modo. O resultado para
@@ -694,43 +786,39 @@ requisições remotas apresentaram CV de aproximadamente 0,5 e 100\% de influência
 do atraso para ind2, tl\_qqer e tl\_rec (ind1 não tem requisições remotas).
 
 A análise da relação leitura/escrita e localidade são feitas pela média do tempo
-de resposta do total de requisições e não pelos percentis. Isso
-porque o primeiro fator diz respeito à composição entre leituras e escritas e o
-segundo à composição entre requisições locais e remotas. Por exemplo, com
-localidade 0,5 percebe-se que o percentil 70 representa requisições remotas,
-enquanto com localidade 0,9 o mesmo percentil representa requisições locais. Se
-a análise fosse feita por percentis, essa informação se perderia e localidade
-nunca teria influência (como pode ser observado pelos baixos CVs). Dado issom, o resultado do estudo pode ser visto na Tabela
+de resposta do total de requisições e não pelos percentis. Isso porque o
+primeiro fator diz respeito à composição entre leituras e escritas e o segundo à
+composição entre requisições locais e remotas. Por exemplo, com localidade 0,5
+percebe-se que o percentil 70 representa requisições remotas, enquanto com
+localidade 0,9 o mesmo percentil representa requisições locais. Se a análise
+fosse feita por percentis, essa informação se perderia e localidade nunca teria
+influência (como pode ser observado pelos baixos CVs). Dado issom, o resultado
+do estudo pode ser visto na Tabela
 \ref{tab:estudo_para_fatores_de_carga_de_trabalho}
 
 \begin{table}[!h] \begin{center}
-\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
-\hline Modo & R & X & P & L & RX & RP & RL & XP & XL & PL & RXP
-& RXL & RPL & XPL & RXPL\\
-\hline ind1 & 19 & 12 & 2 & 31 & 0 & 3 & 2 & 4 & 6 & 6 & 4 & 0 & 0 & 8 & 1\\
-\hline ind2 & 50 & 0 & 0 & 39 & 0 & 0 & 11 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0\\
-\hline lt\_qqer & 25 & 30 & 0 & 19 & 9 & 0 & 6 & 0 & 8 & 0 & 0 & 3 & 0 & 0 & 0\\
-\hline lt\_rec & 0 & 53 & 0 & 34 & 0 & 0 & 0 & 0 & 13 & 0 & 0 & 0 & 0 & 0 & 0\\
-\hline
-\end{tabular}
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|} \hline Modo & R & X & P & L &
+RX & RP & RL & XP & XL & PL & RXP & RXL & RPL & XPL & RXPL\\ \hline ind1 & 19 &
+12 & 2 & 31 & 0 & 3 & 2 & 4 & 6 & 6 & 4 & 0 & 0 & 8 & 1\\ \hline ind2 & 50 & 0 &
+0 & 39 & 0 & 0 & 11 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0\\ \hline lt\_qqer & 25 & 30
+& 0 & 19 & 9 & 0 & 6 & 0 & 8 & 0 & 0 & 3 & 0 & 0 & 0\\ \hline lt\_rec & 0 & 53 &
+0 & 34 & 0 & 0 & 0 & 0 & 13 & 0 & 0 & 0 & 0 & 0 & 0\\ \hline \end{tabular}
 \caption{Estudo para fatores de carga de trabalho para ind1. R representa a
 relação leitura/escrita, X representa a localidade, P representa a popularidade
 e L representa a latência de rede.}
-\label{tab:estudo_para_fatores_de_carga_de_trabalho}.
-\end{center}
-\end{table}
+\label{tab:estudo_para_fatores_de_carga_de_trabalho}.  \end{center} \end{table}
 
 Apesar de alguns modos aparentemente sofrerem impacto considerável da relação
-leitura/escrita, há indícios de que esse impacto na verdade é consequência da relação
-entre requisições locais e remotas. O modo ind1 tem tanto leituras quanto
-escritas locais e a relação leitura/escrita e suas interações com outros fatores impacta pouco
-esse modo. No modo lt\_rec tanto leituras quanto escritas são locais ou remotas
-dependendo da localidade e a relação leitura/escrita não impacta esse modo. O
-modo ind2 tem todas as leituras locais e todas as escritas remotas. Assim, ao 
-mudar a relação leitura/escrita está mudando a relação entre requisições locais
-e remotas. Como esperado, esse modo é impactado pela relação leitura/escrita.
-O mesmo vale para lt\_qqer que tem todas as leituras locais e escritas
-dependendo da localidade. Esse modo também sofre impacto da relação
+leitura/escrita, há indícios de que esse impacto na verdade é consequência da
+relação entre requisições locais e remotas. O modo ind1 tem tanto leituras
+quanto escritas locais e a relação leitura/escrita e suas interações com outros
+fatores impacta pouco esse modo. No modo lt\_rec tanto leituras quanto escritas
+são locais ou remotas dependendo da localidade e a relação leitura/escrita não
+impacta esse modo. O modo ind2 tem todas as leituras locais e todas as escritas
+remotas. Assim, ao mudar a relação leitura/escrita está mudando a relação entre
+requisições locais e remotas. Como esperado, esse modo é impactado pela relação
+leitura/escrita.  O mesmo vale para lt\_qqer que tem todas as leituras locais e
+escritas dependendo da localidade. Esse modo também sofre impacto da relação
 leitura/escrita.
 
 Caso o mecanismo de armazenamento fosse disco ao invés de memória, a relação
