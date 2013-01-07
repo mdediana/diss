@@ -17,7 +17,7 @@ resultados \end{enumerate}
 Métricas são os critérios usados para a comparação de desempenho, como vazão e
 tempo de resposta (variáveis dependentes). Parâmetros são todas as
 características do sistema, do ambiente de operação e da carga de trabalho que
-podem influenciar o desempenho do sistema, como a CPU ou a latência da rede.
+podem afetar o desempenho do sistema, como a CPU ou a latência da rede.
 Fatores são os parâmetros que são variados nos experimentos (variáveis
 independentes). Além dos fatores, a interação entre fatores também pode afetar o
 desempenho. A ordem de uma interação entre fatores é a quantidade de fatores
@@ -200,8 +200,8 @@ parâmetros que não são fatores e seus valores estão na seção
 \label{sec:selecao_de_fatores_a_serem_estudados}
 
 Os fatores foram escolhidos de forma a aproximar este estudo dos ambientes de
-produção de sistemas web geo-replicados, assim fatores que influenciam o
-comportamento do sistema operando sobre WAN foram priorizados. Apesar disso,
+produção de sistemas web geo-replicados, assim fatores que afetam o
+desempenho do sistema operando sobre WAN foram priorizados. Apesar disso,
 essa lista não é exaustiva por limitações de recursos e do escopo deste estudo
 (ver as ameaças à validade na subseção \ref{sec:ameacas_a_validade}).
 
@@ -286,14 +286,14 @@ nós é assumir uma quantidade de nós que também fosse potência de 2.
 \paragraph{Quantidade de objetos armazenados}A quantidade de objetos armazenados
 pode influenciar na quantidade de dados no cache de disco (caso seja esse o
 mecanismo de armazenamento utilizado). Além disso, esse fator também pode
-influenciar a quantidade de conflitos, já que quanto menos objetos existirem no
+afetar a quantidade de conflitos, já que quanto menos objetos existirem no
 banco de dados, maior a chance de um dado objeto receber uma requisição.
 
 \paragraph{Tamanho dos objetos armazenados}O tamanho dos objetos armazenados
 pode influenciar na quantidade de dados no cache de disco (caso seja esse o
 mecanismo de armazenamento utilizado). No caso de armazenamento em memória, eles
 podem causar fragmentação de memória, o que também afeta o desempenho. Além
-disso, esse fator pode influenciar no desempenho da rede, dado que objetos muito
+disso, esse fator pode afetar o desempenho da rede, dado que objetos muito
 grandes podem precisar ser divididos em mais de um pacote TCP e objetos muito
 pequenos resultam em uma carga paga relativamente menor.
 
