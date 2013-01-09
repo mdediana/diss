@@ -182,8 +182,9 @@ execução de testes usando Riak bastante completa (ver subseção
 \ref{sec:aplicacao_de_execucao_dos_testes}). O Voldemort também possui aplicação
 semelhante, mas ela oferece menos opções de configuração.
 
-\subsubsection{Implementação da consistência na linha do tempo e outros} A
-implementação da consistência na linha do tempo é incompleta. Para os
+\subsubsection{Implementação da consistência na linha do tempo e outros}
+
+A implementação da consistência na linha do tempo é incompleta. Para os
 experimentos, a distinção entre leituras e escritas era importante. Mas a
 distinção entre os tipo de escrita (inserção, atualização ou remoção) não era
 muito importante dado que todos os tipos se comportam da mesma forma do ponto de
@@ -249,11 +250,12 @@ kadeploy\footnote{\url{http://kadeploy.imag.fr/}}, responsável pela implantação
 de imagens nos nós reservados pelo usuário.
 
 %% ------------------------------------------------------------------------- %%
-\subsubsection{Imagem} A imagem usada nos experimentos é um Debian GNU/Linux 6.0
-(Squeeze) com kernel 2.6.32-5-amd64 baseado em uma imagem pré-configurada
-disponibilizada pelo Grid5000. Além do conteúdo, essa imagem possui o Riak e o
-Basho Bench modificados e algumas ferramentas de monitoração e análise de
-desempenho como
+\subsubsection{Imagem}
+
+A imagem usada nos experimentos é um Debian GNU/Linux 6.0 (Squeeze) com kernel
+2.6.32-5-amd64 baseado em uma imagem pré-configurada disponibilizada pelo
+Grid5000. Além do conteúdo, essa imagem possui o Riak e o Basho Bench
+modificados e algumas ferramentas de monitoração e análise de desempenho como
 sysstat\footnote{\url{http://sebastien.godard.pagesperso-orange.fr/}},
 bwm-ng\footnote{\url{http://www.gropp.org/?id=projects&sub=bwm-ng}} e
 iperf\footnote{\url{http://iperf.sourceforge.net/}}. Uma única imagem foi usada,
@@ -261,14 +263,16 @@ a distinção entre nós executando instâncias do Riak ou do Basho Bench foi feita
 através dos scripts que gerenciam os experimentos.
 
 %% ------------------------------------------------------------------------- %%
-\subsubsection{Scripts de execução e análise dos experimentos} Os experimentos
-foram conduzidos através de um conjunto de scripts (cmb) que se localiza no
-frontend do Grid5000 e era usado para reserva de nós, instalação da imagem,
-gerenciamento do sistema de armazenamento, configuração e execução da aplicação
-de execução de testes e coleta dos resultados. Os scripts foram escritos em
-bash. A parte de análise dos dados não usou o Grid5000 como ambiente, mas sim a
-máquina do pesquisador, e foi feita através de um segundo conjunto de scripts
-(cmb-local).  Esses scripts foram escritos em bash, Ruby e R.
+\subsubsection{Scripts de execução e análise dos experimentos}
+
+Os experimentos foram conduzidos através de um conjunto de scripts (cmb) que se
+localiza no frontend do Grid5000 e era usado para reserva de nós, instalação da
+imagem, gerenciamento do sistema de armazenamento, configuração e execução da
+aplicação de execução de testes e coleta dos resultados. Os scripts foram
+escritos em bash. A parte de análise dos dados não usou o Grid5000 como
+ambiente, mas sim a máquina do pesquisador, e foi feita através de um segundo
+conjunto de scripts (cmb-local).  Esses scripts foram escritos em bash, Ruby e
+R.
 
 %% ------------------------------------------------------------------------- %%
 \subsection{Rede} \label{sec:rede}
@@ -300,11 +304,12 @@ ajuste da pilha TCP foi usado. A principal otimização desse script era ajustar
 os tamanhos dos buffers de transmissão e recepção ao BDP (para mais detalhes,
 ver seção \ref{sec:fatores_de_rede}).
 
-\subsubsection{Centros de dados} \label{centros_de_dados} Para simular os
-centros de dados, os nós que compunham o sistema eram divididos em dois
-conjuntos CD1 e CD2, cada um representando um centro de dados. Além dos nós,
-duas sub-redes SR1 e SR2 eram reservadas. Cada nó de CD1 recebia, além de seu IP
-da rede do Grid5000, um IP de SR1, o mesmo valendo para CD2 e SR2.
+\subsubsection{Centros de dados}
+
+Para simular os centros de dados, os nós que compunham o sistema eram divididos
+em dois conjuntos CD1 e CD2, cada um representando um centro de dados. Além dos
+nós, duas sub-redes SR1 e SR2 eram reservadas. Cada nó de CD1 recebia, além de
+seu IP da rede do Grid5000, um IP de SR1, o mesmo valendo para CD2 e SR2.
 
 Sistemas Linux usam o arquivo /etc/hosts como fonte primária para resolução de
 nomes, apenas quando não encontram um nome definido ali (o que é a situação
@@ -697,7 +702,7 @@ evitar um excesso de conflitos.
 O tamanho dos objetos não afeta o desempenho das requisições remotas. E apesar
 desse fator aparecer com 100\% de influência nas requisições locais, o CV dessas
 requisições foi de 19\% para leituras e 16\% para escritas.  Além disso, o foco
-desta pesquisa está no comportamento do sistema na WAN, onde as requisições são
+deste trabalho está no comportamento do sistema na WAN, onde as requisições são
 duas ordens de grandeza maiores. O valor para tamanho dos objetos armazenados
 foi escolhido baseado em estudo dos sistemas de caching distribuído no Facebook
 que relata que 90\% dos valores de praticamente todos os sistemas está abaixo
