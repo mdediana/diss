@@ -337,13 +337,14 @@ a mesma sub-rede saíam inalteradas.
 \label{sec:aplicacao_de_execucao_dos_testes}
 
 A aplicação de execução de testes usada foi o Basho Bench \cite{Basho},
-específica para o Riak. Ela provê configurações para quantidade de clientes,
-distribuições de acesso, proporção entre leituras e escritas, entre outras. A
-aplicação foi modificada, pois mais de uma instância dela foi executada
-simultaneamente nos experimentos. Além de evitar gargalos na aplicação de
-execução de testes, isso era importante para implementação de localidade nos
-experimentos. Além disso, foi necessária a implementação de um script para a
-consolidação dos dados dos obtidos pelas diversas instâncias do Basho Bench.
+específica para o Riak. Ela provê configurações para quantidade de clientes
+concorrentes (threads), distribuição de operações, popularidade dos objetos
+acessados, entre outras. A aplicação foi modificada, pois mais de uma instância
+dela foi executada simultaneamente nos experimentos. Além de evitar gargalos na
+aplicação de execução de testes, isso era importante para implementação de
+localidade nos experimentos. Além disso, foi necessária a implementação de um
+script para a consolidação dos dados obtidos pelas diversas instâncias do Basho
+Bench.
 
 Outra aplicação de execução de testes considerada foi o YCSB \cite{Cooper2010}.
 Apesar de possuir mais flexibilidade que o Basho Bench nas suas configurações,
@@ -422,7 +423,8 @@ utilizado no estudo. Todos os aglomerados considerados apresentam variações de
 latência semelhantes. A mesma medição feita para a latência mostrou desvio
 padrão de 90$\mu$s.
 
-\paragraph{Taxa de chegada de requisições} %TODO
+\paragraph{Taxa de chegada de requisições}15 operações/s para cada thread de
+cada instância da aplicação de execução de testes.
 
 Nesse ponto seria usado disco como mecanismo de armazenamento. Mas durante os
 experimentos para aglomerado essa decisão foi mudada (ver subseção
@@ -431,33 +433,55 @@ experimentos para aglomerado essa decisão foi mudada (ver subseção
 %% ------------------------------------------------------------------------- %%
 \section{Seleção final de fatores} \label{sec:selecao_final_de_fatores}
 
+A seleção inicial de fatores (seção
+\ref{sec:selecao_de_fatores_a_serem_estudados}) continha uma quantidade  muito
+grande deles, portanto a lista precisava ser reduzida. Como o foco deste
+trabalho é a operação do sistema sobre WAN, fatores relacionados a rede e carga
+de trabalho eram prioridade. Mas mais informações sobre outros fatores, como
+tamanho do sistema, eram necessárias antes de passar a tratá-los como parâmetros
+fixados.  Primeiro, para saber quais valores deviam ser adotados para eles como
+parâmetros no estudo final. Depois, para entender a importância relativa deles
+para o desempenho do sistema -- os fatores relevantes e desconsiderados são
+ameaças à validade, mas os menos relevantes não são.
+
+Assim, os fatores podiam podem ser divididos em dois grupos, de acordo com a
+forma com que seriam tratados. O primeiro era o grupo dos fatores que já se
+sabia seriam desconsiderados no estudo final: aglomerado, quantidade de nós do
+sistema e quantidade e tamanho dos objetos. O segundo era o grup dos fatores que
+eram reais candidatos a serem usados no estudo final e precisavam passar por uma
+triagem: rede e carga de trabalho.
+
 Uma abordagem possível para a seleção final de fatores seria agrupar todos os
-fatores levantados na seção \ref{sec:selecao_de_fatores_a_serem_estudados} em um
-único projeto de experimentos fatoriais 2\textsuperscript{k}. O problema é que
-mesmo com apenas 2 níveis por fator, a quantidade final de experimentos seria
-proibitiva, dado que a quantidade de fatores era X. Por isso, a opção adotada
-foi dividir os fatores em grupos menores e realizar experimentos para cada
-grupo. Os grupos foram: aglomerado, quantidade de nós do sistema, quantidade e
-tamanho dos objetos armazenados, rede e carga de trabalho.
-%TODO: contar fatores iniciais
+fatores levantados em um único projeto de experimentos fatoriais
+2\textsuperscript{k}. O problema é que mesmo com apenas 2 níveis por fator, a
+quantidade final de experimentos seria proibitiva, dado que a quantidade de
+fatores era X. Por isso, a opção adotada foi dividir os fatores em grupos
+menores e realizar experimentos para cada grupo. O principal problema de fazer
+essa separação é o fato de se perder a importância relativa entre os fatores de
+grupos diferentes. Por exemplo, uma localidade de 0,5 ou 0,9 poderia ser
+comparada com outros fatores de carga de trabalho, mas provavelmente não
+apareceria como influente caso os experimentos fossem executados sem considerar
+a rede. Nos casos em que isso aconteceu, os fatores precisavam ser comparados
+com a rede. A abordagem adotada foi usar o a latência, fator que já era sabido
+ser influente, como um representante da rede. A partir dessa abordagem foi
+possível concluir, por exemplo, que apesar de o tamanho dos objetos armazenados
+aparecer como fator influente no estudo fatorial para ele, desconsiderá-lo no
+final não era uma grande ameaça à validade pois a latência de rede era um fator
+mais relevante.
 
-%O principal problema de fazer essa separação é o fato de se perder a
-%importância relativa entre os fatores de grupos diferentes. Por exemplo, uma
-%localidade de 0,5 ou 0,9 poderia ser comparada com outros fatores de carga de
-%trabalho, mas provavelmente não apareceria como influente caso os experimentos
-%fossem executados sem considerar a rede. 
-
-Existem situações em que desconsiderar um fator que aparece como influente não
-necessariamente implica em ameaça à validade. Experimentos fatoriais mostram a
-influência relativa de cada fator e cada interação entre fatores. Nesse tipo de
-análise, o total de todas as influências relativas deve ser sempre 100\%. Por
-isso, mesmo que todos os fatores afetem pouco o resultado, um ou mais vão
-aparecer nos experimentos fatoriais com influência alta. Assim, também foram
-calculados os coeficientes de variabilidade\footnote{O coeficiente de variação é
-a divisão do desvio padrão pela média e é uma maneira de representar a
-variabilidade dos dados desconsiderando sua ordem de grandeza} (CVs) para cada
-resultado de forma a estimar qual a importância daquele conjunto de fatores e
-interações como um todo.
+Existem outras situações em que desconsiderar um fator que aparece como
+influente não necessariamente implica em ameaça à validade. Experimentos
+fatoriais mostram a influência relativa de cada fator e cada interação entre
+fatores. Nesse tipo de análise, o total de todas as influências relativas deve
+ser sempre 100\%. Por isso, mesmo que todos os fatores afetem pouco o resultado,
+um ou mais vão aparecer nos experimentos fatoriais com influência alta. Assim,
+também foram calculados os coeficientes de variabilidade\footnote{O coeficiente
+de variação é a divisão do desvio padrão pela média e é uma maneira de
+representar a variabilidade dos dados desconsiderando sua ordem de grandeza}
+(CVs) para cada resultado de forma a estimar qual a importância daquele conjunto
+de fatores e interações como um todo. Se o CV é baixo ao final de um experimento
+fatorial, isso implica que nenhum daqueles fatores é influente, dado que todas
+as combinações possíveis entre eles foram consideradas.
 
 Os experimentos descritos nesta seção usam percentis dos tempos de resposta das
 requisições ao invés de médias. As requisições deste estudo são divididas entre
@@ -475,7 +499,6 @@ requisitada nas leituras (para consistência na linha do tempo). Isso porque seus
 níveis influenciam na proporção de requisições locais e remotas, fundamental
 para este estudo. Por isso, esses dois fatores são tratados como um único,
 chamado modo (subseção \ref{sec:modo}).
-
 
 %% ------------------------------------------------------------------------- %%
 \subsection{Modo} \label{sec:modo}
@@ -796,6 +819,8 @@ Assim, os níveis escolhidos para esses três fatores nos experimentos foram:
 
 \begin{itemize} \item Latência da WAN (ms): 0, 100, 200 e 300
 
+\item Variação da latência da WAN (\%): 0 e 50
+
 \item Taxa de perda de pacotes da WAN (\%): 0, 0,01 e 0,1 
 
 \end{itemize}
@@ -817,8 +842,6 @@ definição, não operam nessas condições.
 Os valores fixados dos fatores desconsiderados foram:
 
 \begin{itemize}
-
-\item Variação da latência da WAN (\%): 50 (muita variação)
 
 \item Taxa de perda de pacotes da WAN (\%): 0 
 

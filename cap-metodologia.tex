@@ -127,7 +127,7 @@ de cliente).  \end{itemize}
 \section{Seleção de métricas} \label{sec:selecao_de_metricas}
 
 A principal métrica usada como base de comparação do desempenho dos modelos de
-consistência é o tempo de resposta das requisições (medido em s).  Quanto menor
+consistência é o tempo de resposta das requisições (em s).  Quanto menor
 o tempo de resposta, melhor o desempenho de um modelo de consistência. Como
 requisições locais e remotas apresentam tempos de resposta bem diferentes,
 percentis ao invés de média são usados na maior parte das análises.
@@ -213,10 +213,7 @@ os fatores mais influentes para o estudo em questão. Apenas esses fatores mais
 influentes compõem a seleção final de fatores (seção
 \ref{sec:selecao_final_de_fatores}).
 
-Os fatores desta seção foram escolhidos de forma a aproximar este estudo dos
-ambientes de produção de sistemas web geo-replicados, assim fatores que afetam o
-desempenho do sistema operando sobre WAN foram priorizados. Os fatores
-inicialmente selecionados foram:
+Os fatores inicialmente selecionados a partir da lista de parâmetros de sistema foram:
 
 \paragraph{Aglomerado}Esse fator engloba os fatores CPU local e CPU remota,
 quantidade de memória local e remota, largura de banda local e remota,
@@ -261,6 +258,8 @@ dois centros de dados e N = 3, é possível que um centro de dados tenha duas
 réplicas e o segundo apenas uma. Assim, se W = 2 e a requisição chegar ao
 segundo centro de dados, a replicação precisará atravessar a WAN, caso contrário
 será local.
+
+Os fatores inicialmente selecionados a partir da lista de parâmetros de rede foram:
 
 \paragraph{Latência da WAN}Quanto maior a distância a ser percorrida pelos
 pacotes, maior a latência, dado que existe um limite do meio físico para a
@@ -317,6 +316,9 @@ de dados em trânsito em uma conexão TCP é dada pelo Produto Banda-Latência.
 Dessa forma, dada uma largura de banda, quanto maior a latência da rede, maior a
 quantidade de pacotes em trânsito. Um gargalo comum nesse caso é o tamanho dos
 buffers de transmissão e recepção.
+
+Os fatores inicialmente selecionados a partir da lista de parâmetros de carga de
+trabalho foram:
 
 \paragraph{Distribuição de operações}Diferentes distribuições de leitura/escrita
 resultam em diferentes desempenhos.  Por exemplo, a consistência na linha do
