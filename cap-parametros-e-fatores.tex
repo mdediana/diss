@@ -4,110 +4,115 @@
 A definição da lista de parâmetros e a seleção de fatores e níveis são passos
 fundamentais de um estudo experimental. Os requisitos e limitações a serem
 considerados nesses passos são dados pelas definições do estudo e pelos aspectos
-técnicos, que em conjunto definem o que deve ser feito e quais são os
+técnicos (ver capítulo \ref{cap:metodo_e_aspectos_tecnicos}), que em conjunto definem o que deve ser feito e quais são os
 procedimentos e recursos disponíveis para tal.
 
-Primeiramente, foi levantada a lista de parâmetros. Dessa lista, alguns
-parâmetros já foram imediatamente fixados por impossibilidade de variá-los,
-por limitação de recursos ou por não serem foco do estudo. A seleção inicial de
+Primeiramente, a lista de parâmetros foi levantada. Dessa lista, alguns
+parâmetros já foram imediatamente fixados por impossibilidade de variá-los, por
+limitação de recursos ou por não serem foco do estudo. A seleção inicial de
 fatores foi formada pelos parâmetros restantes. Como essa seleção era grande,
-experimentos fatoriais fracionados foram usados para identificar os fatores mais
+projetos de experimentos fatoriais fracionados foram usados para identificar os fatores mais
 influentes para o estudo. Os fatores menos influentes foram tratados como
-parâmetros e tiveram seus valores fixados. Os fatores mais influentes foram usados nos experimentos finais, que usaram um projeto de experimentos fatoriais completo.
+parâmetros e tiveram seus valores fixados. Os fatores mais influentes foram
+usados nos experimentos finais, que usaram um projeto de experimentos fatoriais
+completo.
 
 %TODO: seções
 
 %% ------------------------------------------------------------------------- %%
 \section{Lista de parâmetros} \label{sec:lista_de_parametros}
 
-Os parâmetros que afetam o desempenho do sistema foram divididos em três
+Os parâmetros foram divididos em três
 categorias: parâmetros de sistema, de rede e de carga de trabalho. As
-justificativas abaixo não consideram todas as situações possíveis em que um
-determinado parâmetro pode afetar o desempenho do sistema, em muitos casos uma
-única razão foi considerada suficiente para considerar um parâmetro. Algumas
-justificativas citam desemepenho de nós, centros de dados ou sistema, variações
-nesses desempenhos a se refletem no tempo de resposta das requisições.
+justificativas para a escolha de um parâmetro nem sempre consideraram todas as situações
+possíveis em que ele pode afetar o desempenho do sistema, em alguns casos uma
+única razão foi considerada suficiente para tratá-lo como parâmetro.
 
 Os parâmetros de sistema levantados foram:
+
+\paragraph{Modelo de consistência}Objeto do estudo.
   
 % Chequei app.config e vm/args
-\paragraph{Configuração de hardware (CPU, memória, disco e placa de
-rede)}O tempo de resposta de uma requisição é dado pela soma dos
-seus tempos de envio, de processamento e de recebimento. CPU, memória e disco
-afetam o tempo de processamento, a placa de rede afeta os tempos de envio e recebimento.
+\paragraph{Configuração de hardware (CPU, memória, disco e placa de rede)}O
+tempo de resposta de uma requisição é dado pela soma dos seus tempos de envio,
+de processamento e de recebimento. CPU, memória e disco afetam o tempo de
+processamento, a placa de rede afeta os tempos de envio e recebimento.
 
 \paragraph{Mecanismo de armazenamento -- memória ou disco}O desempenho da
-memória é ordens de grandeza maior que o desempenho de um disco\footnote{Com
-exceção de SSDs}. Em um sistema de armazenamento, o desempenho de
-leituras em disco pode ser próximo do desempenho de leituras em memória
-dependendo do tamanho relativo do cache de disco e do conjunto de dados
-armazenado. Para escritas, o desempenho em disco é sempre menor.
+memória é ordens de grandeza maior que o desempenho de um disco\footnote{SSDs
+são uma exceção, mas eles não estavam disponíveis no ambiente dos experimentos.}. Em um sistema de armazenamento, o desempenho de leituras em
+disco pode ser próximo do desempenho de leituras em memória dependendo do
+tamanho relativo do cache de disco e do conjunto de dados armazenado. Para
+escritas, o desempenho em disco é sempre menor.
 
 \paragraph{Quantidade de nós do sistema}A menos que um sistema distribuído
-apresente escalabilidade linear, quanto mais nós ele tiver, menor o seu desempenho por nó.
+apresente escalabilidade linear, quanto mais nós ele tiver, menor o seu
+desempenho por nó.
 % citar contenção e coerência - gcap
 
 \paragraph{Quantidade de centros de dados}A menos que as redes que ligam os
-centros de dados tomados dois a dois tenham as mesmas caraterísticas, o
-desempenho (tempo de resposta) de uma dada requisição é dependente de sua origem e destino.
+centros de dados tomados dois a dois tenham as mesmas características, o
+tempo de resposta de uma dada requisição é dependente de sua origem
+e destino.
 
-\paragraph{Capacidade dos centro de dados}A menos que todos os centros de
-dados possuam as mesmas capacidades agregadas de processamento, armazenamento e
-comunicação, a vazão de cada centro de dados é diferente, o que se reflete no desempenho das requisições.
+\paragraph{Capacidade dos centro de dados}A menos que todos os centros de dados
+possuam as mesmas capacidades agregadas de processamento, armazenamento e
+comunicação, a vazão de cada centro de dados é diferente, o que se reflete no
+desempenho das requisições.
 
 \paragraph{Quantidade de instâncias da aplicação de execução de testes}Uma
-quantidade muito pequena de instâncias pode se tornar o gargalo do experimento, uma quantidade
-muito grande pode resultar em sobrecarga do sistema. Em ambos os casos o
-desempenho medido do sistema não corresponde a suas condições normais de
+quantidade muito pequena de instâncias pode se tornar o gargalo do experimento,
+uma quantidade muito grande pode resultar em sobrecarga do sistema. Em ambos os
+casos o desempenho medido do sistema não corresponde a suas condições normais de
 operação.
 
-\paragraph{Quantidade de threads em cada instânca da aplicação de testes}A
-quantidade de threads por instância se relaciona com a quantidade de
-instâncias. Um balanço entre essas duas quantidades é necessário para medir o
-desempenho do sistema em condições normais de operação.
+\paragraph{Quantidade de threads por instânca da aplicação de execução de
+testes}Mesma justificativa que para quantidade de instâncias da aplicação de
+execução de testes.
 
 \paragraph{Algoritmo de particionamento das chaves}O algoritmo de
 particionamento define a distribuição dos objetos pelos nós. No caso de
-distribuição heterogênea, existe uma tendência de que nós com mais objetos apresentarem desempenho pior por receberem uma maior quantidade de requisições.
+distribuição heterogênea, nós com mais objetos tendem a receber uma maior
+quantidade de requisições e ter seu desempenho prejudicado com relação a outros.
 
 \paragraph{Fator de replicação ($N$)}Quanto maior o fator de replicação, maior o
-tráfego de rede, o que tende a se refletir como uma diminuição do desempenho do
+tráfego de rede, o que tende a causar uma diminuição do desempenho do
 sistema.
 
 \paragraph{Configuração de replicação -- $R$ e $W$ (para consistência em momento
 indeterminado)}Em um ambiente com mais de um centro de dados, a configuração de
-replicação afeta a proporção entre requisições locais e remotas. Por exemplo,
-se todo centro de dados possui uma e apenas uma réplica de cada objeto, todas as
+replicação afeta a proporção entre requisições locais e remotas. Por exemplo, se
+todo centro de dados possui uma e apenas uma réplica de cada objeto, todas as
 leituras são locais para R = 1 e remotas para R = 2. Dessa forma, a configuração
 de replicação afeta o tempo de resposta das requisições.
 
 \paragraph{Limiar de migração (para consistência na linha do tempo)}O limiar de
 migração é uma otimização que visa aumentar a quantidade de requisições locais.
 Dependendo da carga de trabalho, valores diferentes do limiar resultam em
-proporções entre requisições locais e remotas diferentes, afetando assim o
-tempo de resposta das requisições.
+proporções entre requisições locais e remotas diferentes, afetando assim o tempo
+de resposta das requisições.
 
-\paragraph{Protocolo de acesso}Um protocolo mais eficiente (que envia menos
-metadados, por exemplo) resulta em desempenho das requisições mais altos.
+\paragraph{Protocolo de acesso}Um protocolo mais eficiente, que envia menos
+metadados, por exemplo, resulta em desempenho das requisições mais alto.
 
 \paragraph{Nível de log}O nível de log afeta a quantidade de escritas em disco,
 o que por sua vez afeta o desempenho do sistema.
 
-Os parâmetros de rede de rede levantados foram:
+Os parâmetros de rede levantados foram:
 
-\paragraph{Capacidade dos elementos de rede intermediários (switches,
+\paragraph{Configuração de hardware dos elementos de rede intermediários (switches,
 roteadores, etc)}A capacidade dos elementos de rede intermediários é dada pela
-largura de banda disponível, tamanho dos buffers de entrada e saída,
-capacidade de processamento de requisições, entre outros. Dessa forma, sistemas
-se comunicando através desses elementos têm seu desempenho afetado por eles. 
+largura de banda disponível, tamanho dos buffers de entrada e saída, capacidade
+de processamento de requisições, entre outros. Dessa forma, sistemas se
+comunicando através desses elementos têm seu desempenho afetado por eles. 
 
 \paragraph{Topologia da rede}Várias características da topologia de rede afetam
 o desempenho do sistema. Por exemplo, a quantidade de segmentos de rede pelos
-quais uma requisição passa afeta o seu tempo de resposta.
+quais uma requisição precisa passar para chegar ao destino afeta o seu tempo de resposta.
 
-\paragraph{Latência da LAN}O tempo de resposta de uma requisição é dado pela soma dos
-seus tempos de envio, de processamento e de recebimento. A latência afeta os
-tempos de envio e recebimento.
+\paragraph{Latência da LAN}O tempo de resposta de uma requisição é dado pela
+soma dos seus tempos de envio, de processamento e de recebimento. A latência
+afeta os tempos de envio e recebimento.
 
 \paragraph{Variação da latência da LAN}A latência em uma rede não é constante,
 dado que dentre suas causas está a dinâmica da rede. Por exemplo, rajadas de
@@ -120,6 +125,8 @@ normalmente a latência vista pelo transmissor passa a ser mais baixa. Por isso,
 além da variação existe uma correlação entre os valores de latência observados
 ao longo do tempo. Dado isso, grandes variações de latência tendema a afetar
 negativamente o tempo de resposta das requisições.
+%TODO: citar paper mdcc sobre variação de latência e
+%http://amplab.cs.berkeley.edu/2011/10/20/latencies-gone-wild/
 
 \paragraph{Latência da WAN}Mesma justificativa que para latência da LAN. Um
 agravante é que latências em WANs são ordens de grandeza maiores que em LANs,
@@ -127,30 +134,32 @@ dado que quanto maior a distância a ser percorrida pelos pacotes, maior a
 latência devido ao limite do meio físico para a velocidade de transmissão.
 
 \paragraph{Variação da latência da WAN}Mesma justificativa que para variação de
-latência na LAN. Um agravante para WAN é que requisições em uma WAN atravessam uma
-quantidade maior de segmentos de rede, portando são mais suscetíveis à variação da latência.
+latência na LAN. Um agravante para WAN é que requisições em uma WAN atravessam
+uma quantidade maior de segmentos de rede, portando são mais suscetíveis à
+variação da latência.
 
 \paragraph{Taxa de perda de pacotes da WAN}A perda de pacotes é uma das
 principais causas de atrasos e gargalos em um sistema usando TCP, dado que ao
 registrar a perda de um pacote a janela de transmissão da conexão é reiniciada,
 o que se manifesta como diminuição da largura de banda. Além disso, o mecanismo
 padrão de retransmissão do TCP aumenta exponencialmente o tempo entre
-tentativas, portanto quanto maior o número de pacotes perdidos, mais tempo
-é necessário para os pacotes serem reenviados. Assim, perdas causam
-diminuição da vazão e/ou aumento do tempo de resposta de requisições.
-%TODO: ref sobre perdas
-%Considera-se que perdas acima de x\% tornam a comunicação impraticável.
+tentativas, portanto quanto maior o número de pacotes perdidos, mais tempo é
+necessário para os pacotes serem reenviados. Assim, perdas causam diminuição da
+vazão e/ou aumento do tempo de resposta de requisições.
+%TODO: ref sobre perdas Considera-se que perdas acima de x\% tornam a
+%comunicação impraticável.
 
 \paragraph{Taxa de duplicação de pacotes da WAN}Pacotes duplicados afetam a
 comunicação TCP principalmente por gerarem tráfico desnecessariamente. Isso
-causa diminuição da largura de banda, que consequentemente pode causar diminuição de vazão e/ou aumento do tempo de resposta das requisições.
-%TODO: checar problemas de duplicação
-%O tratamento dado pelo TCP é o descarte dos pacotes duplicados no receptor.
+causa diminuição da largura de banda, que pode causar
+diminuição de vazão e/ou aumento do tempo de resposta das requisições.
+%TODO: checar problemas de duplicação O tratamento dado pelo TCP é o descarte
+%dos pacotes duplicados no receptor.
 
 \paragraph{Taxa de corrupção de pacotes da WAN}Pacotes corrompidos afetam a
-comunicação TCP por gerarem retransmissões. Isso 
-causa diminuição da largura de banda, que consequentemente pode causar diminuição de
-vazão e/ou aumento do tempo de resposta das requisições.
+comunicação TCP por gerarem retransmissões. Isso causa diminuição da largura de
+banda, que pode causar diminuição de vazão e/ou aumento do
+tempo de resposta das requisições.
 %TODO: checar problemas de corrupção
 
 \paragraph{Proporção de pacotes fora de ordem na WAN}Pacotes fora de ordem
@@ -168,28 +177,27 @@ de transmissão, maior a quantidade dados em trânsito e maior a vazão do sistema.
 \paragraph{Produto Banda-Latência (\emph{Bandwidth Delay Product} -- BDP)}A
 quantidade de dados em trânsito em uma conexão TCP é dada pelo Produto
 Banda-Latência. Dessa forma, dada uma largura de banda, quanto maior a latência
-da rede, maior a quantidade de pacotes em trânsito. Um gargalo comum nesse caso
-é o tamanho dos buffers de transmissão e recepção, que pode diminui a vazão e/ou
+da rede, maior é a quantidade de pacotes em trânsito. Um gargalo comum nesse caso
+é o tamanho dos buffers de transmissão e recepção nas pontas, o que pode diminui a vazão e/ou
 aumentar o tempo de resposta das requisições.
 
-Taxas de perda, de
-duplicação e de corrupção de pacotes e proporção de pacotes fora de ordem não
-são considerados para LAN pois ocorrem com menor frequência e geram pouco
-impacto nesse tipo de rede. Em WANs, esses fenômenos estão relacionados a uma
-maior quantidade de nós intermediários (incluindo roteadores e proxies) e redes
-heterogêneas que os pacotes atravessam.
+Taxas de perda, de duplicação e de corrupção de pacotes e proporção de pacotes
+fora de ordem não são considerados para LAN pois ocorrem com menor frequência e
+geram pouco impacto nesse tipo de rede. Em WANs, esses fenômenos estão
+relacionados a uma maior quantidade de nós intermediários (incluindo roteadores
+e proxies) e redes heterogêneas que os pacotes atravessam.
 
 Os parâmetros de carga de trabalho levantados foram:
 
 \paragraph{Distribuição de operações}Escritas normalmente são mais lentas que
 leituras, portanto a distribuição de operações afeta o tempo de resposta das
-requisições em geral. Além disso, a consistência na linha do
-tempo pode apresentar desempenho mais baixo em um cenário de escrita intensiva,
-pois a réplica mestre pode se tornar um gargalo. Outro ponto a considerar é que a probabilidade de
-haver conflitos entre réplicas aumenta com o aumento da taxa de escritas em um
-sistema que usa consistência em momento indeterminado, que pode sofrer um
-impacto no seu desempenho devido à execução de seus algoritmos de resolução de
-conflitos.
+requisições em geral. Além disso, a consistência na linha do tempo pode
+apresentar desempenho mais baixo em um cenário de escrita intensiva, pois a
+réplica mestre pode se tornar um gargalo. Outro ponto a considerar é que a
+probabilidade de haver conflitos entre réplicas aumenta com o aumento da taxa de
+escritas em um sistema que usa consistência em momento indeterminado, que pode
+sofrer um impacto no seu desempenho devido à execução de seus algoritmos de
+resolução de conflitos.
 
 \paragraph{Popularidade dos objetos acessados}Em muitas aplicações a
 popularidade dos objetos não é uniforme, alguns são mais acessados do que
@@ -205,16 +213,15 @@ feita no período de uma semana, foi observado que em média 85\% das escritas a
 determinado objeto vinham do mesmo centro de dados. Isso acontece por exemplo em
 uma rede social, em que os usuários costumam acessar a aplicação a partir da
 mesma localização geográfica e possuem a maior parte de seus contatos na mesma
-localização geográfica -- usuários brasileiros tendem a acessar o sistema do
-Brasil e a maioria de seus contatos é brasileira, por exemplo. Nesse caso, se os
+localização geográfica -- por exemplo, usuários brasileiros tendem a acessar o sistema do
+Brasil e a maioria de seus contatos é brasileira. Nesse caso, se os
 objetos são particionados no sistema a partir da localização geográfica dos
 acessos mais recentes é possível economizar um número considerável de
-requisições entre centros de dados. A implementação do PNUTS usa esse fato para
-implementar uma otimização de desempenho, movendo a réplica mestre para o centro
-de dados do qual vieram as últimas escritas do objeto.
+requisições entre centros de dados. A implementação de consistência na linha do
+tempo usada neste estudo implementa migração de réplica mestre por esse motivo.
 
-\paragraph{Taxa de chegada de requisições}Uma taxa de chegada de requisições
-muito grande pode sobrecarregar o sistema, o que diminui seu desempenho.
+\paragraph{Taxa de chegada de requisições}Mesma justificativa que para quantidade de instâncias da aplicação de
+execução de testes.
 
 \paragraph{Versão requisitada nas leituras (para consistência na linha do
 tempo)}Leituras de ``qualquer versão'' apresentam tempo de resposta menor que
@@ -224,24 +231,23 @@ por centro de dados, as leituras de ``qualquer versão'' só não são atendidas
 localmente em caso de falha.
 
 \paragraph{Quantidade de objetos armazenados}A quantidade de objetos armazenados
-influencia o volume de dados no cache de disco (caso seja esse o
-mecanismo de armazenamento utilizado). Além disso, ela também afeta
-a quantidade de conflitos, já que quanto menos objetos existirem no sistema de
-armazenamento, maior a chance de um dado objeto ser requerido.
+influencia o volume de dados no cache de disco (caso seja esse o mecanismo de
+armazenamento utilizado). Além disso, ela também afeta a quantidade de
+conflitos, já que quanto menos objetos existirem no sistema de armazenamento,
+maior a chance de um dado objeto ser requerido.
 
 \paragraph{Tamanho dos objetos armazenados}O tamanho dos objetos armazenados
-influencia o volume de dados no cache de disco (caso seja esse o
-mecanismo de armazenamento utilizado). No caso de armazenamento em memória, a
-fragmentação da memória é afetada, o que também afeta o desempenho. Além
-disso, o tamanho dos objetos afeta o consumo de banda, dado que objetos muito
-grandes podem precisar ser divididos em mais de um pacote TCP e objetos muito
-pequenos resultam em uma carga paga relativamente menor. Consumo maior de banda
-tende a se refletir como diminuição da vazão e/ou aumento do tempo de resposta
-das requisições.
+influencia o volume de dados no cache de disco, caso seja esse o mecanismo de
+armazenamento utilizado. No caso de armazenamento em memória, o tamanho dos
+objetos influencia a fragmentação da memória, o que também afeta o desempenho. Além disso, o tamanho dos
+objetos afeta o consumo de banda, dado que objetos muito grandes podem precisar
+ser divididos em mais de um pacote TCP e objetos muito pequenos resultam em uma
+carga paga relativamente menor. Consumo maior de banda tende a se refletir como
+diminuição da vazão e/ou aumento do tempo de resposta das requisições.
 
 Dessa lista de parâmetros, alguns foram fixados, as justificativas e seus
-valores estão descritos na subseção abaixo. Os restantes foram considerados
-fatores e o tratamento dado a eles está na seção \ref{sec:fatores}.
+valores estão descritos na seção abaixo. Os restantes foram considerados fatores
+e o tratamento dado a eles está na seção \ref{sec:selecao_dos_fatores}.
 
 %% ------------------------------------------------------------------------- %%
 \section{Parâmetros fixados} \label{sec:parametros_fixados}
@@ -252,20 +258,40 @@ para o analista/pesquisador. Um outro motivo é saber de antemão que, apesar de
 afetar o desempenho do sistema, o parâmetro é pouco relevante para o estudo em
 questão -- caso contrário, ele seria considerado um fator.
 
-Os parâmetros inicialmente levantados na seção \ref{sec:lista_de_parametros} que
-não foram considerados fatores foram fixados nos seguintes valores:
+Favorecer simetria e homogeneidade nos experimentos foi um princípio que guiou
+algumas das decisões abaixo, pois assim a implementação e a análise dos resultados dos
+experimentos torna-se mais simples. A desvantagem disso é a
+possibilidade de perda de realismo, dado que sistemas distribuídos de larga
+escala não costumam ser
+perfeitamente simétricos nem homogêneos.
 
-\paragraph{Quantidade de centros de dados:}2. Com esse valor os experimentos
-ficaram mais simples de executar e analisar devido à simetria do sistema.
+Como o foco do estudo era a operação do sistema sobre WAN, fatores relacionados
+a rede e carga de trabalho eram prioridade. Por isso, sempre que possível,
+parâmetros de sistema foram fixados, mesmo quando se sabia que eles afetavam o
+desempenho.
+
+Os parâmetros inicialmente levantados que não foram considerados fatores foram
+fixados nos seguintes valores:
+
+\paragraph{Configuração de hardware (CPU, memória, disco e placa de
+rede)}Definida pelo aglomerado usado nos experimentos (ver
+subseção \ref{sec:aglomerado_e_mecanismo_de_armazenamento}).
+
+\paragraph{Mecanismo de armazenamento -- memória ou disco}Memória (detalhes da
+decisão na subseção \ref{sec:aglomerado_e_mecanismo_de_armazenamento}).
+
+\paragraph{Quantidade de centros de dados:}2. Esse valor simplificou a análise
+pois existia apenas um segmento de WAN nos experimentos. Além disso, ele tornou
+a modificação do algoritmo de particionamento do Riak mais simples (ver seção
+\ref{sec:sistema_de_armazenamento}).
 
 \paragraph{Quantidade de nós por centro de dados:}Razão entre quantidade de nós
 do sistema e quantidade de centros de dados. Com esse valor os experimentos
 ficaram mais simples de executar e analisar devido à simetria do sistema.
 
-\paragraph{Algoritmo de particionamento das chaves:}Algoritmo de espalhamento
-consistente do Riak. A única configuração feita foi a quantidade de partições
-utilizadas, 512. Esse valor satisfaz as duas condições descritas na documentação
-do Riak, ser uma potência de 2 e resultar em ao menos 10 partições por nó (caso
+\paragraph{Algoritmo de particionamento das chaves:}O algoritmo padrão do Riak
+foi usado (espalhamento consistente), configurado com 512 partições. Esse valor satisfaz as duas condições descritas na documentação
+do Riak: ser uma potência de 2 e resultar em ao menos 10 partições por nó (caso
 os experimentos finais usassem mais do que 64 nós esse valor teria sido
 aumentado).
 
@@ -289,13 +315,13 @@ carga sobre o sistema era relativamente baixa, esse parâmetro era pouco
 relevante.
 
 \paragraph{Topologia da rede:}Topologia da rede do aglomerado utilizado no
-estudo. A topologia dos aglomerados considerados consistem apenas de nós ligados
-diretamente a um switch.
+estudo. A topologia dos aglomerados considerados consistiam apenas de nós
+ligados diretamente a um switch.
 
 \paragraph{Largura de banda nos elementos intermediários (switches, roteadores,
 etc):}Largura de banda no aglomerado utilizado no estudo. Esse valor é dado pelo
-switch em que os nós estão ligados (ver seção
-\ref{sec:mecanismo_de_armazenamento_e_aglomerado}). Mas antes da definição do
+switch em que os nós estão ligados (ver subseção
+\ref{sec:aglomerado_e_mecanismo_de_armazenamento}). Mas antes da definição do
 aglomerado utilizado, estudos exploratórios em alguns aglomerados mostraram que
 não existiam gargalos no switch mesmo nos experimentos que mais demandavam
 banda.
@@ -311,280 +337,27 @@ latência semelhantes. A mesma medição feita para a latência mostrou desvio
 padrão de 90$\mu$s.
 
 \paragraph{Taxa de chegada de requisições}15 operações/s para cada thread de
-cada instância da aplicação de execução de testes.
+cada instância da aplicação de execução de testes. Esse valor foi usado pois
+esse parâmetro se relaciona diretamente com a quantidade de threads por
+instância da aplicação de execução de testes. Assim, considerando que threads
+por instância foi inicialmente considerado um fator, a taxa de chegada foi
+fixada.
 
-Nesse ponto seria usado disco como mecanismo de armazenamento. Mas durante os
-experimentos para aglomerado essa decisão foi mudada (ver subseção
-\ref{sec:aglomerado}).
+Os parâmetros que não foram fixados consequentemente eram candidatos a fatores
+nos experimentos finais. A quantidade de fatores inicialmente considerada nesse
+ponto era grande, portanto experimentos foram realizados para diminuir essa
+lista. A descrição dos experimentos, dos fatores e seus níveis se encontra na
+seção \ref{sec:selecao_dos_fatores}.
 
 %% ------------------------------------------------------------------------- %%
-\section{Seleção de fatores a serem estudados}
-\label{sec:selecao_de_fatores_a_serem_estudados}
+\subsection{Aglomerado e mecanismo de armazenamento}
+\label{sec:aglomerado_e_mecanismo_de_armazenamento}
 
-Os fatores inicialmente selecionados a partir da lista de parâmetros de sistema
-foram:
-
-\paragraph{Aglomerado}Esse fator engloba os fatores CPU local e CPU remota,
-quantidade de memória local e remota, largura de banda local e remota,
-desempenhos de acesso sequencial de leitura e de escrita do disco (para disco
-como mecanismo de armazenamento e desempenhos de acesso aleatório de leitura e
-de escrita do disco (para disco como mecanismo de armazenamento). Isso porque as
-configurações de hardware estavam limitadas às oferecidas pelo Grid5000 (ver
-seção \ref{sec:ambiente}). Cada aglomerado do Grid5000 possui todos os nós com
+As configurações de hardware estavam limitadas às oferecidas pelo Grid5000. Cada aglomerado do Grid5000 possui todos os nós com
 mesma configuração de hardware. Com isso, decidiu-se restringir os experimentos
-a um único aglomerado, de forma a eliminar possíveis influências de
-heterogeneidade de hardware.
-
-\paragraph{Quantidade de nós do sistema}A decisão de usar um único aglomerado
-implicou em um tamanho máximo do sistema restrito a quantidade de nós do
-aglomerado escolhido. A forma como se opera no Grid5000 impôs algumas
-restrições operacionais. Uma delas são regras que restringem o uso diário da
-infraestrutura. Outra é a concorrência por recursos entre os usuários, quanto
-menor a quantidade de nós reservada, maiores as chances de se conseguir uma
-reserva. Além dessas, uma terceira restrição é devida ao fato de a quantidade de
-partições do anel do espalhamento consistente precisar ser uma potência de 2.
-Com isso, uma maneira simples para distribuir as partições igualmente entre os
-nós é assumir uma quantidade de nós que também fosse potência de 2.
-
-\paragraph{Configuração de replicação -- R e W (para consistência em momento
-indeterminado)}A configuraçao de replicação pode ter impacto na proporção entre
-requisições locais e remotas. Por exemplo, se o sistema está distribuído entre
-dois centros de dados e N = 3, é possível que um centro de dados tenha duas
-réplicas e o segundo apenas uma. Assim, se W = 2 e a requisição chegar ao
-segundo centro de dados, a replicação precisará atravessar a WAN, caso contrário
-será local.
-
-Os fatores inicialmente selecionados a partir da lista de parâmetros de rede
-foram:
-
-\paragraph{Latência da WAN}Quanto maior a distância a ser percorrida pelos
-pacotes, maior a latência, dado que existe um limite do meio físico para a
-velocidade de transmissão. Por isso, a latência de rede é um dos principais
-limitadores de desempenho em sistemas geo-replicados.
-
-\paragraph{Variação da latência da WAN}A latência em uma WAN não é constante,
-dado que dentre suas causas está a dinâmica da rede. Por exemplo, rajadas de
-tráfego podem encher os buffers de um roteador no caminho entre dois nós,
-fazendo com que pacotes sejam descartados, o que se manifesta para o transmissor
-como um aumento de latência. Além disso, as variações normalmente não são
-aleatórias. A partir do mesmo exemplo, enquanto o roteador está sobrecarregado a
-latência vista pelo transmissor é mais alta, quando ele volta a operar
-normalmente a latência vista pelo transmissor passa a ser mais baixa. Por isso,
-além da variação existe uma correlação entre os valores de latência observados
-ao longo do tempo.
-%TODO: citar paper mdcc sobre variação de latência e
-%http://amplab.cs.berkeley.edu/2011/10/20/latencies-gone-wild/
-
-\paragraph{Taxa de perda de pacotes da WAN}A perda de pacotes é uma das
-principais causas de atrasos e gargalos em um sistema usando TCP, dado que ao
-registrar a perda de um pacote a janela de transmissão da conexão é reiniciada,
-o que se manifesta como diminuição da largura de banda. Além disso, o mecanismo
-padrão de retransmissão do TCP aumenta exponencialmente o tempo entre
-tentativas, portanto quanto maior o número de pacotes perdidos, mais tempo
-demora para os pacotes serem reenviados.  Considera-se que perdas acima de x\%
-tornam a comunicação praticamente impossível.
-%TODO: ref sobre perdas
-
-\paragraph{Taxa de duplicação de pacotes da WAN}Pacotes duplicados afetam a
-comunicação TCP principalmente por gerarem tráfico desnecessariamente. Fora
-isso, geram pouco impacto já que o tratamento dado pelo TCP é o descarte dos
-pacotes duplicados no receptor.
-%TODO: checar problemas de duplicação
-
-\paragraph{Taxa de pacotes corrompidos da WAN}Pacotes corrompidos afetam a
-comunicação TCP por gerarem retransmissões.
-%TODO: checar problemas de corrupção
-
-\paragraph{Proporção de pacotes fora de ordem na WAN}Pacotes fora de ordem
-afetam a comunicação TCP principalmente por ocuparem buffers em elementos de
-rede intermediários e finais no aguardo dos pacotes anteriores a eles.
-%TODO: checar problemas de pacotes fora de ordem
-
-\paragraph{Algoritmo de congestionamento}O desempenho da comunicação TCP é
-dependente do algoritmo de congestionamento usado. Esse tipo de algoritmo é
-responsável pelo dimensionamento da janela de transmissão. Em referências sobre
-otimização da pilha TCP para WANs é comum ver dois algoritmos citados.
-%TODO: checar como algoritmo de congestionamento realmente opera TODO: refs dos
-%algoritmos
-
-\paragraph{Produto Banda-Latência (Bandwidth Delay Product -- BDP)}A quantidade
-de dados em trânsito em uma conexão TCP é dada pelo Produto Banda-Latência.
-Dessa forma, dada uma largura de banda, quanto maior a latência da rede, maior a
-quantidade de pacotes em trânsito. Um gargalo comum nesse caso é o tamanho dos
-buffers de transmissão e recepção.
-
-Os fatores inicialmente selecionados a partir da lista de parâmetros de carga de
-trabalho foram:
-
-\paragraph{Distribuição de operações}Diferentes distribuições de leitura/escrita
-resultam em diferentes desempenhos.  Por exemplo, a consistência na linha do
-tempo pode apresentar desempenho mais baixo em um cenário de escrita intensiva,
-pois a réplica mestre pode se tornar um gargalo. Além disso, a probabilidade de
-haver conflitos entre réplicas aumenta com o aumento da taxa de escritas em um
-sistema que usa consistência em momento indeterminado, que pode sofrer um
-impacto no seu desempenho devido à execução de seus algoritmos de resolução de
-conflitos.
-
-\paragraph{Popularidade dos objetos acessados}Em muitas aplicações a
-popularidade dos objetos não é uniforme, alguns são mais acessados do que
-outros. Um exemplo é uma loja virtual em que o interesse dos clientes pelos
-produtos tende a obedecer uma lei de potência \cite{Anderson2006}. A existência
-de objetos muito populares pode prejudicar o desempenho de um modelo de
-consistência como a consistência na linha do tempo, em que a réplica mestre pode
-se tornar um gargalo nas escritas.
-
-\paragraph{Localidade}Cooper et al. notam um alto índice de localidade nos
-acessos aos objetos dos sistemas no Yahoo! \cite{Cooper2008}. Em uma análise
-feita no período de uma semana, foi observado que em média 85\% das escritas a
-determinado objeto vinham do mesmo centro de dados. Isso acontece por exemplo em
-uma rede social, em que os usuários costumam acessar a aplicação a partir da
-mesma localização geográfica e possuem a maior parte de seus contatos na mesma
-localização geográfica -- usuários brasileiros tendem a acessar o sistema do
-Brasil e a maioria de seus contatos é brasileira, por exemplo. Nesse caso, se os
-objetos são particionados no sistema a partir da localização geográfica dos
-acessos mais recentes é possível economizar um número considerável de
-requisições entre centros de dados. A implementação do PNUTS usa esse fato para
-implementar uma otimização de desempenho, movendo a réplica mestre para o centro
-de dados do qual vieram as últimas escritas do objeto.
-
-\paragraph{Versão requisitada nas leituras (para consistência na linha do
-tempo)} Leituras de ``qualquer versão'' apresentam tempo de resposta menor que
-leituras de ``versão mais recente'' pois têm maior probabilidade de ser
-atendidas localmente. No caso onde existe garantia de haver ao menos uma réplica
-por centro de dados, as leituras de ``qualquer versão'' só não são atendidas
-localmente em caso de falha.
-
-\paragraph{Quantidade de objetos armazenados}A quantidade de objetos armazenados
-pode influenciar na quantidade de dados no cache de disco (caso seja esse o
-mecanismo de armazenamento utilizado). Além disso, esse fator também pode afetar
-a quantidade de conflitos, já que quanto menos objetos existirem no banco de
-dados, maior a chance de um dado objeto receber uma requisição.
-
-\paragraph{Tamanho dos objetos armazenados}O tamanho dos objetos armazenados
-pode influenciar na quantidade de dados no cache de disco (caso seja esse o
-mecanismo de armazenamento utilizado). No caso de armazenamento em memória, eles
-podem causar fragmentação de memória, o que também afeta o desempenho. Além
-disso, esse fator pode afetar o desempenho da rede, dado que objetos muito
-grandes podem precisar ser divididos em mais de um pacote TCP e objetos muito
-pequenos resultam em uma carga paga relativamente menor.
-
-
-%% ------------------------------------------------------------------------- %%
-\section{Seleção final de fatores} \label{sec:selecao_final_de_fatores}
-
-A seleção inicial de fatores (seção
-\ref{sec:selecao_de_fatores_a_serem_estudados}) continha uma quantidade  muito
-grande deles, portanto a lista precisava ser reduzida. Como o foco deste
-trabalho é a operação do sistema sobre WAN, fatores relacionados a rede e carga
-de trabalho eram prioridade. Mas mais informações sobre outros fatores, como
-tamanho do sistema, eram necessárias antes de passar a tratá-los como parâmetros
-fixados.  Primeiro, para saber quais valores deviam ser adotados para eles como
-parâmetros no estudo final. Depois, para entender a importância relativa deles
-para o desempenho do sistema -- os fatores relevantes e desconsiderados são
-ameaças à validade, mas os menos relevantes não são.
-
-Assim, os fatores podiam podem ser divididos em dois grupos, de acordo com a
-forma com que seriam tratados. O primeiro era o grupo dos fatores que já se
-sabia seriam desconsiderados no estudo final: aglomerado, quantidade de nós do
-sistema e quantidade e tamanho dos objetos. O segundo era o grup dos fatores que
-eram reais candidatos a serem usados no estudo final e precisavam passar por uma
-triagem: rede e carga de trabalho.
-
-Uma abordagem possível para a seleção final de fatores seria agrupar todos os
-fatores levantados em um único projeto de experimentos fatoriais
-2\textsuperscript{k}. O problema é que mesmo com apenas 2 níveis por fator, a
-quantidade final de experimentos seria proibitiva, dado que a quantidade de
-fatores era X. Por isso, a opção adotada foi dividir os fatores em grupos
-menores e realizar experimentos para cada grupo. O principal problema de fazer
-essa separação é o fato de se perder a importância relativa entre os fatores de
-grupos diferentes. Por exemplo, uma localidade de 0,5 ou 0,9 poderia ser
-comparada com outros fatores de carga de trabalho, mas provavelmente não
-apareceria como influente caso os experimentos fossem executados sem considerar
-a rede. Nos casos em que isso aconteceu, os fatores precisavam ser comparados
-com a rede. A abordagem adotada foi usar o a latência, fator que já era sabido
-ser influente, como um representante da rede. A partir dessa abordagem foi
-possível concluir, por exemplo, que apesar de o tamanho dos objetos armazenados
-aparecer como fator influente no estudo fatorial para ele, desconsiderá-lo no
-final não era uma grande ameaça à validade pois a latência de rede era um fator
-mais relevante.
-
-Existem outras situações em que desconsiderar um fator que aparece como
-influente não necessariamente implica em ameaça à validade. Experimentos
-fatoriais mostram a influência relativa de cada fator e cada interação entre
-fatores. Nesse tipo de análise, o total de todas as influências relativas deve
-ser sempre 100\%. Por isso, mesmo que todos os fatores afetem pouco o resultado,
-um ou mais vão aparecer nos experimentos fatoriais com influência alta. Assim,
-também foram calculados os coeficientes de variabilidade\footnote{O coeficiente
-de variação é a divisão do desvio padrão pela média e é uma maneira de
-representar a variabilidade dos dados desconsiderando sua ordem de grandeza}
-(CVs) para cada resultado de forma a estimar qual a importância daquele conjunto
-de fatores e interações como um todo. Se o CV é baixo ao final de um experimento
-fatorial, isso implica que nenhum daqueles fatores é influente, dado que todas
-as combinações possíveis entre eles foram consideradas.
-
-Os experimentos descritos nesta seção usam percentis dos tempos de resposta das
-requisições ao invés de médias. As requisições deste estudo são divididas entre
-locais, da ordem de poucos milissegundos, e remotas, da ordem de centenas de
-milissegundos. Dessa forma, as requisições remotas dominam a média já que são em
-geral duas ordens de grandeza maiores que as locais. Por isso os estudos fazem
-análises distintas para cada tipo de requisição, usando percentis: percentis
-baixos representam requisições locais e percentis altos representam requisições
-remotas. Também é feita a distinção entre escritas e leituras dada a diferença
-de natureza dessas operações.
-
-Dois fatores que possuem um tratamento especial ao longo do experimento são
-configuração de replicação (para consistência em momento indeterminado) e versão
-requisitada nas leituras (para consistência na linha do tempo). Isso porque seus
-níveis influenciam na proporção de requisições locais e remotas, fundamental
-para este estudo. Por isso, esses dois fatores são tratados como um único,
-chamado modo (subseção \ref{sec:modo}).
-
-%% ------------------------------------------------------------------------- %%
-\subsection{Modo} \label{sec:modo}
-
-Todas as configurações usam $N = 3$, comumente adotado em aplicações web (ver
-seção \ref{sec:parametros_fixados}). Os modos são:
-
-\begin{itemize} \item ind1: Consistência em momento indeterminado com $W$ = 1 e
-$R$ = 1 \item ind2: Consistência em momento indeterminado com $W$ = 2 e $R$ = 1
-\item lt\_qqer: Consistência na linha do tempo com leituras de qualquer versão
-\item lt\_rec: Consistência na linha do tempo com leituras da versão mais
-recente \end{itemize}
-
-Os experimentos simulam dois centros de dados. O algoritmo de particionamento
-garante que existe ao menos uma réplica em cada centro de dados (ver subseção
-\ref{sec:sistema_de_armazenamento}). Assim, existem sempre duas situações
-possíveis com relação à localização das réplicas do ponto de vista do
-coordenador: uma local e duas remota ou duas locais e uma remota. Dado isso,
-ind1 resulta em todas as leituras e escritas locais.  ind2 resulta em todas as
-leituras locais e metade das escritas locais e a outra metade remotas. lt\_qqer
-resulta em todas as leituras locais e a quantidade de escritas dependente da
-localidade dos acessos. Finalmente, lt\_rec resulta tanto em leituras quanto
-escritas dependentes da localidade.
-
-Os modos foram escolhidos de forma a representar situações encontradas em
-sistemas de produção e ao mesmo tempo limitar a quantidade de níveis de forma a
-tornar os experimentos viáveis devido a limitação de recursos. Assim,
-consistência na linha do tempo com leituras de versões específicas não foi
-considerada já que ela é um meio termo entre leituras de versão mais recente e
-leituras de qualquer versão. Consistência em momento indeterminado com $W = 1$ e
-$R = 2$ não foi considerada pois sua semântica é similar a $W = 2$ e $R = 1$,
-mas teria seu desempenho prejudicado considerando que leituras predominam nas
-distribuições de operações usadas nos experimentos (ver subseção
-\ref{sec:distribuicao_de_operacoes}).
-
-Esses modos implicam em trocas além de desempenho e consistência. A principal é
-durabilidade, que para ind2 é mais alta do que para os outros casos, em que a
-confirmação de escrita de uma única réplica é suficiente.
-
-%% ------------------------------------------------------------------------- %%
-\subsection{Mecanismo de armazenamento e aglomerado}
-\label{sec:mecanismo_de_armazenamento_e_aglomerado}
-
-Esse é o único fator que não usou experimentos fatoriais para ser desconsiderado
--- na época em que foi realizado o pesquisador ainda não conhecia o projeto
-desse tipo de experimento. Apesar disso, os resultados obtidos são suficientes
-para apoiar a decisão de desconsiderar esse fator.
+a um único aglomerado, de forma a ter homogeneidade de hardware no sistema. Dado isso,
+alguns experimentos foram feitos para decidir qual aglomerado seria usado nos
+experimentos finais.
 
 Os aglomerados do Grid5000 considerados foram paradent, parapide, sol e suno. A
 descrição do hardware e a quantidade de nós de cada um deles se encontra na
@@ -597,15 +370,18 @@ paradent & & & & \\ \hline \end{tabular} \caption{Aglomerados do Grid5000}
 
 Os experimentos feitos para o mecanismo de armazenamento mostraram diferenças
 consideráveis no desempenho do Riak em aglomerados diferentes. Considerando que
-os experimentos são limitados por E/S (e não por CPU) e que não havia gargalo de
-rede, decidiu-se verificar o desempenho dos discos em cada aglomerado. Pela
-especificação do hardware dos aglomerados é possível notar que os discos são de
-tipos diferentes. Assim, como esperado, essa diferença no desempenho dos discos
-apareceu nos resultados. Para medição do desempenho, os experimentos usaram o
-hdparm para acesso sequencial e o
+os experimentos eram limitados por E/S (e não por CPU) e que não havia gargalo
+de rede, decidiu-se checar o desempenho dos discos em cada aglomerado. A
+especificação do hardware mostrava tipos de discos diferentes entre aglomerados.
+Dada essa diferença, experimentos foram realizados para quantificá-la e tomar
+uma decisão mais informada.
+
+Testes simples de desempenho de disco foram realizados em cada aglomerado. Para
+medição do desempenho, os experimentos usaram o hdparm para acesso sequencial e
+o
 seeker\footnote{url{http://www.linuxinsight.com/how\_fast\_is\_your\_disk.html}}
 para acesso aleatório. Os resultados podem ser vistos na Tabela
-\ref{tab:comparacao_de_discos_entre_aglomerados}.
+\ref{tab:comparacao_de_desempenho_dos_discos_entre_aglomerados}.
 
 \begin{table}[!h] \begin{center} \begin{tabular}{|c|c|c|c|c|c|} \hline
 Aglomerado & Tipo & Tamanho & Acesso sequencial (MB/s) & Acesso aleatório
@@ -616,61 +392,208 @@ Aglomerado & Tipo & Tamanho & Acesso sequencial (MB/s) & Acesso aleatório
 \label{tab:comparacao_de_desempenho_dos_discos_entre_aglomerados} \end{center}
 \end{table}
 
-Além  do tipo de disco, um outro fator a considerar era o cache de disco. Em
-sistemas Linux, todo a memória livre é automaticamente usada como cache de
-disco. Dado isso, existiam três opções para a execução dos experimentos com
-relação ao mecanismo de armazenamento, considerando que um tamanho do banco de
-dados podia ser escolhido de forma a manter todos os dados em memória:
+Além  do tipo de disco, um outro ponto que precisava ser considerado foi o cache
+de disco. Em sistemas Linux, todo a memória livre é automaticamente usada como
+cache de disco. Dado isso, existiam três opções para a execução dos experimentos
+com relação ao mecanismo de armazenamento, considerando que um tamanho do banco
+de dados podia ser escolhido de forma a manter todos os dados em memória:
 
 \begin{enumerate} \item Dados em disco e cache limpo no início dos experimentos:
 O cenário seria mais real, mas mais difícil de analisar pois os efeitos do disco
 e da memória sobre o desempenho do sistema se misturariam. Além disso, o efeito
-do preenchimento do cache seria um complicador extra, dado que durante um teste
-uma dada chave acessada mais de uma vez seria servida do disco a primeira vez e
+do preenchimento do cache seria um complicador extra, dado que durante um
+experimento um determinado objetoe acessado mais de uma vez seria servido do disco a primeira vez e
 da memória nas seguintes.
 
 \item Dados em cache no início dos experimentos: O disco seria predominantemente
 usado apenas para escritas e as leituras seriam servidas a partir do cache.
 
-\item Dados em memória: O Riak pode ser configurado para funcionar como um banco
+\item Dados em memória: O Riak podia ser configurado para funcionar como um banco
 de dados em memória, eliminando definitivamente o efeito do disco.
 \end{enumerate}
 
 A terceira opção foi a escolhida. Realizar os experimentos com banco de dados em
-memória deve gerar resultados mais precisos e fáceis de ser interpretados por
-descartar a influência de desempenho do disco. A princípio os resultados podem
+memória geraria resultados mais precisos e fáceis de ser interpretados por
+descartar a influência de desempenho do disco. Em princípio, os resultados podem
 parecer menos realistas e aplicáveis, mas na prática eles são tão limitados
-quanto o uso de disco, já que nesse caso os resultados são afetados pelo tipo de
-disco e pela relação entre o tamanho do banco de dados e a memória livre. Um
+quanto o uso de disco, já que nesse caso os resultados seriam afetados pelo tipo
+de disco e pela relação entre o tamanho do banco de dados e a memória livre. Um
 exemplo pode ser visto na comparação de suno com parapluie, em que o primeiro
-possui discos com taxas de acesso acima do 1Gb/s da rede -- o gargalo em caso
+possui discos com taxas de acesso acima do 1Gb/s da rede -- o gargalo em um caso
 seria a rede, em outro o disco. Além disso, efeitos do cache de disco tornariam
-os resultados ainda mais particulares e difíceis de ser generalizados.  Dessa
-forma, ao se usar banco de dados em memória elimina-se os efeitos das interações
-entre rede, disco e cache de disco e a análise pode ser focada apenas na rede.
+os resultados ainda mais particulares e difíceis de ser generalizados. Dessa
+forma, ao adotar memória como mecanismo de armazenamento, eliminou-se os efeitos das
+interações entre rede, disco e cache de disco e a análise pode ser focada apenas
+na rede. Trabalhos futuros podem considerar os diversos cenários possíveis
+considerando disco e cache de disco.
+
+%TODO: colocar os valores escolhidos em itens
 
 %% ------------------------------------------------------------------------- %%
-\subsection{Quantidade de nós do sistema}
-\label{sec:quantidade_de_nos_do_sistema}
+\section{Seleção dos fatores} \label{sec:selecao_dos_fatores}
 
-Além da quantidade de nós do sistema, estes experimentos fatoriais incluíram
-dois fatores não considerados na lista de fatores inicial: quantidade de
-instâncias da aplicação de execução de testes e quantidade de threads em cada
-instância da aplicação de execução de testes. Esses dois fatores não haviam sido
-considerados inicialmente pois o passo de levantamento dos parâmetros acontece
-antes da seleção da técnica de avaliação. Assim, eles só foram considerados após
-medição ser definida como técnica de avaliação para este estudo, o que fez
-surgir a necessidade de dimensionar não só sistema mas também a aplicação de
-execução dos testes.
+Os parâmetros que não foram fixados imediatamente passaram a ser candidatos a
+fatores. Como essa lista continha muitos deles, ela precisava ser reduzida,
+portanto experimentos foram realizados.
+
+Assim, os fatores foram divididos em dois grupos, de acordo com a forma com que
+seriam tratados. O primeiro era o grupo dos fatores que tinham baixa prioridade
+para entrar no estudo final:
+
+\begin{itemize}
+
+\item Quantidade de nós do sistema
+
+\item Quantidade de instâncias da aplicação de execução de testes
+
+\item Quantidade de threads por instância da aplicação de execução de testes
+
+\item Quantidade dos objetos armazenados
+
+\item Tamanho dos objetos armazenados.
+
+\end{itemize}
+
+O segundo era o grupo dos fatores com alta prioridade para entrar no estudo
+final. Como a lista ainda era grande, eles precisavam passar por uma triagem:
+
+\begin{itemize}
+
+\item Modelo de consistência
+
+\item Latência da WAN
+
+\item Variação da latência da WAN
+
+\item Taxa de perda de pacotes da WAN
+
+\item Taxa de duplicação de pacotes da WAN
+
+\item Taxa de corrupção de pacotes da WAN
+
+\item Proporção de pacotes fora de ordem na WAN
+
+\item Algoritmo de congestionamento
+
+\item Produto Banda-Latência (\emph{Bandwidth Delay Product} -- BDP)
+
+\item Distribuição de operações
+
+\item Popularidade dos objetos acessados
+
+\item Localidade
+
+\end{itemize}
+
+Uma abordagem possível para a seleção final de fatores seria agrupar todos os
+fatores levantados em um único projeto de experimentos fatoriais
+2\textsuperscript{k}. O problema é que mesmo com apenas 2 níveis por fator, a
+quantidade final de experimentos seria proibitiva, dado que a quantidade de
+fatores era 17. Por isso, a opção adotada foi dividir os fatores em grupos
+menores e realizar experimentos para cada grupo. O principal problema de fazer
+essa separação é o fato de se perder a comparação da importância entre fatores de
+grupos diferentes. Por exemplo, uma localidade de 0,5 ou 0,9 poderia ser
+comparada com outros fatores de carga de trabalho, mas não apareceria como
+influente caso os experimentos fossem executados sem considerar a rede. Nos
+casos em que isso aconteceu, os fatores precisavam ser comparados com a rede. A
+abordagem adotada foi usar a latência, fator que já era sabido ser influente
+(fato comprovado experimentalmente), como um representante da rede. A partir
+dessa abordagem foi possível concluir, por exemplo, que apesar de o tamanho dos
+objetos armazenados aparecer como fator influente no estudo fatorial para ele,
+desconsiderá-lo no estudo final não era uma grande ameaça à validade pois a
+latência de rede era um fator bem mais relevante.
+
+Existem outras situações em que desconsiderar um fator que aparece como
+influente não implica necessariamente em ameaça à validade. Experimentos
+fatoriais mostram a influência relativa de cada fator e cada interação entre
+fatores. Nesse tipo de análise, o total de todas as influências relativas deve
+ser sempre 100\%. Por isso, mesmo que todos os fatores afetem pouco o resultado,
+um ou mais vão aparecer nos experimentos fatoriais com influência alta. Assim,
+também foram calculados os coeficientes de variabilidade\footnote{O coeficiente
+de variação é a divisão do desvio padrão pela média e é uma maneira de
+representar a variabilidade dos dados desconsiderando sua ordem de grandeza}
+(CVs) para cada resultado de forma a estimar qual a importância daquele conjunto
+de fatores e interações como um todo. Se o CV é baixo ao final de um estudo
+fatorial, isso implica que nenhum daqueles fatores é influente, dado que todas
+as combinações entre eles foram testadas e o desempenho variou pouco de um experimento para o outro.
+
+Os experimentos descritos nesta seção usam percentis dos tempos de resposta das
+requisições ao invés de médias. As requisições deste estudo são divididas entre
+locais, da ordem de poucos milissegundos, e remotas, da ordem de centenas de
+milissegundos. Dessa forma, as requisições remotas dominam a média já que são em
+geral duas ordens de grandeza maiores que as locais. Por isso os estudos fazem
+análises distintas para cada tipo de requisição, usando percentis: percentis
+baixos representam requisições locais e percentis altos representam requisições
+remotas. Também é feita a distinção entre escritas e leituras dada a diferença
+de natureza dessas operações.
+
+Três fatores receberam um tratamento diferente ao longo do experimento: modelo
+de consistência, configuração de replicação (para consistência em momento
+indeterminado) e versão requisitada nas leituras (para consistência na linha do
+tempo). Isso porque seus níveis influenciam na proporção de requisições locais e
+remotas, fundamental para este estudo. Por isso, esses fatores foram tratados
+como um único, chamado modo (subseção seguinte). Projetos de experimentos
+fatoriais fracionados 2\textsuperscript{k} foram realizados para cada um dos
+fatores restantes e estão descritos nas subseções subsequentes.
+
+%% ------------------------------------------------------------------------- %%
+\subsection{Modo} \label{sec:modo}
+
+Os modos adotados são:
+
+\begin{itemize} \item ind1: Consistência em momento indeterminado com $W$ = 1 e
+$R$ = 1 \item ind2: Consistência em momento indeterminado com $W$ = 2 e $R$ = 1
+\item lt\_qqer: Consistência na linha do tempo com leituras de qualquer versão
+\item lt\_rec: Consistência na linha do tempo com leituras da versão mais
+recente \end{itemize}
+
+Todas as configurações usam $N = 3$ (ver
+seção \ref{sec:parametros_fixados}). O algoritmo de particionamento
+garante que existe ao menos uma réplica em cada centro de dados (ver subseção
+\ref{sec:sistema_de_armazenamento}). Assim, existem sempre duas situações
+possíveis com relação à localização das réplicas do ponto de vista do
+coordenador: uma local e duas remota ou duas locais e uma remota. Dado isso,
+ind1 resulta em todas as leituras e escritas locais. ind2 resulta em todas as
+leituras locais e metade das escritas locais e a outra metade remotas. lt\_qqer
+resulta em todas as leituras locais e a quantidade de escritas dependente da
+localidade dos acessos. Finalmente, lt\_rec resulta tanto em leituras quanto
+escritas dependentes da localidade.
+
+Os modos foram escolhidos de forma a representar situações encontradas em
+sistemas de produção e ao mesmo tempo limitar a quantidade de níveis. Assim,
+consistência na linha do tempo com leituras de versões específicas não foi
+considerada já que ela é um meio termo entre leituras de versão mais recente e
+leituras de qualquer versão. Consistência em momento indeterminado com $W = 1$ e
+$R = 2$ não foi considerada pois sua semântica é similar a $W = 2$ e $R = 1$,
+mas teria seu desempenho prejudicado considerando que leituras predominam nas
+distribuições de operações usadas nos experimentos (ver subseção
+\ref{sec:fatores_de_carga_de_trabalho}).
+
+Esses modos implicam em trocas além de desempenho e consistência. A principal é
+durabilidade, que para ind2 é mais alta do que para os outros casos, em que a
+confirmação de escrita de uma única réplica é suficiente.
+
+%% ------------------------------------------------------------------------- %%
+\subsection{Quantidade de nós do sistema, quantidade de instâncias da aplicação
+de execução de testes e quantidade de threads por instância da aplicação de
+execução de testes}
+\label{sec:quantidade_de_nos_do_sistema_quantidade_de_instancias_da_aplicacao_de_execucao_de_testes_e_quantidade_de_threads_por_instancia_da_aplicacao_de_execucao_de_testes}
 
 Os níveis inicialmente selecionados para esse estudo foram:
 
-\begin{itemize} \item Quantidade de nós do sistema: 8 e 16 \item Quantidade de
-instâncias da aplicação de execução de testes: 2 e 4 \item Quantidade de threads
-em cada instância da aplicação de execução de testes: 32 e 64 \end{itemize}
+\begin{itemize}
 
-A quantidade de partições ser uma potência de 2 (ver seção
-\ref{sec:parametros_fixados}. Para manter a simetria do sistema, os níveis
+\item Quantidade de nós do sistema: 8 e 16
+
+\item Quantidade de instâncias da aplicação de execução de testes: 2 e 4
+
+\item Quantidade de threads em cada instância da aplicação de execução de
+testes: 32 e 64
+
+\end{itemize}
+
+A quantidade de partições deve ser uma potência de 2 (ver seção
+\ref{sec:parametros_fixados}). Para manter a simetria do sistema, os níveis
 considerados para quantidade de nós no sistema também foram potências de 2,
 garantindo assim a mesma quantidade de partições por nó. Por sua vez, a
 quantidade de instâncias da aplicação de execução dos testes e a quantidade de
@@ -1014,32 +937,3 @@ Os valores fixados dos fatores desconsiderados foram:
 
 \item Popularidade dos objetos acessados: uniforme (todos os objetos são
 acessados em média a mesma quantidade de vezes) \end{itemize}
-
-%% ------------------------------------------------------------------------- %%
-\section{Ameaças à validade} \label{sec:ameacas_a_validade}
-
-O controle da latência para caracterizar uma WAN é uma simplificação. Existem
-outros fatores em uma WAN que afetam o desempenho de um sistema executando nela,
-como limitações na largura da banda disponível, congestionamento, perda de
-pacotes e explosões de tráfego. Os resultados obtidos podem ser diferentes em
-uma WAN real, sujeita a esses fatores.
-
-O Riak usa uma arquitetura muito semelhante à descrita no artigo sobre o Dynamo.
-Com isso, os modelos de consistência usados nos experimentos podem apresentar
-outros resultados em sistemas que usem outras arquiteturas, embora a
-implementação de cada modelo de consistência é bastante isolada dos outros
-componentes da arquitetura.
-
-Por limitação de tempo e recursos algumas variáveis que podem alterar os
-resultados desse trabalho foram desconsideradas ou fixadas. Esse é o caso de
-todas as variáveis de controle e constantes, que poderiam ser trabalhadas como
-variáveis independentes. Com isso, os resultados dos experimentos podem ser
-diferentes caso sejam usados, por exemplo, um fator de replicação ou uma
-quantidade de centros de dados diferentes. Em particular, testes de
-escalabilidade serão realizados para entender a influência do tamanho do sistema
-nos resultados.
-
-Os experimentos consideram que todos os nós sempre operam sem falhas. Os
-resultados de experimentos com o sistema operando em algum modo de falha (desde
-a falha de um nó até de um centro de dados inteiro) devem ser diferentes dos
-obtidos nesse estudo.

@@ -67,3 +67,28 @@ leitura qualquer.
 Outros valores e gráficos que ajudem na interpretação dos resultados serão
 apresentados, como a quantidade de conflitos no caso da consistência em momento
 indeterminado.
+
+%% ------------------------------------------------------------------------- %%
+\section{Ameaças à validade} \label{sec:ameacas_a_validade}
+
+O Riak usa uma arquitetura muito semelhante à descrita no artigo sobre o Dynamo.
+Com isso, os modelos de consistência usados nos experimentos podem apresentar
+outros resultados em sistemas que usem outras arquiteturas, embora o desempenho 
+analisado neste estudo foi mais afetado for fatores de rede e carga de trabalho.
+
+Por limitação de tempo e recursos algumas variáveis que podem alterar os
+resultados desse trabalho foram desconsideradas ou fixadas. Esse é o caso de
+todas as variáveis de controle e constantes, que poderiam ser trabalhadas como
+variáveis independentes. Com isso, os resultados dos experimentos podem ser
+diferentes caso sejam usados, por exemplo, um fator de replicação ou uma
+quantidade de centros de dados diferentes. Em particular, testes de
+escalabilidade serão realizados para entender a influência do tamanho do sistema
+nos resultados.
+
+Os experimentos consideram que todos os nós sempre operam sem falhas. Os
+resultados de experimentos com o sistema operando em algum modo de falha (desde
+a falha de um nó até de um centro de dados inteiro) devem ser diferentes dos
+obtidos nesse estudo.
+
+%% ------------------------------------------------------------------------- %%
+\section{Trabalhos futuros} \label{sec:trabalhos_futuros}
