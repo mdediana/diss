@@ -1,0 +1,466 @@
+%% ------------------------------------------------------------------------- %%
+\chapter{Método e Aspectos Técnicos} \label{cap:metodo_e_aspectos_tecnicos}
+
+O método usado neste trabalho se baseia na abordagem para análise de desempenho
+proposta por Jain em \cite{Jain1991}. As atividades envolvidas neste estudo se
+dividiram em três etapas. A primeira contemplou a definição do que seria
+realizado e dos aspectos técnicos de implementação dos experimentos e está
+descrita neste capítulo. A segunda etapa teve por objetivo definir parâmetros e
+selecionar fatores e níveis e está descrita no capítulo
+\ref{cap:parametros_e_fatores}. A terceira etapa compreendeu a execução dos
+experimentos seguida da análise dos resultados e se encontra no capítulo
+\ref{analise_dos_resultados}.
+
+%TODO: seções.
+
+%% ------------------------------------------------------------------------- %%
+\section{Definição do estudo} \label{sec:definicao_do_estudo}
+
+%TODO: intro + seções
+
+%% ------------------------------------------------------------------------- %%
+\subsection{Nomenclatura} \label{sec:nomenclatura}
+
+A literatura sobre experimentos apresenta alguns termos importantes para a
+comunicação de objetivos, procedimentos e resultados. Termos usados
+frequentemente neste e nos próximos capítulos são:
+
+\begin{itemize} \item Variáveis de resposta: Resultados de um experimento
+(variáveis dependentes). Como este estudo é uma análise de desempenho, as
+variáveis de resposta são as métricas, que são os critérios usados em uma
+comparação de desempenho.
+
+\item Parâmetros: Características do sistema, do ambiente de operação e da carga
+de trabalho que podem afetar o desempenho do sistema.
+
+\item Fatores: Parâmetros que são variados nos experimentos (variáveis
+independentes) e cujo efeito no desempenho é analisado. Parâmetros que não são
+fatores possuem um único valor em todos os experimentos (variáveis fixas e
+constantes).
+
+\item Níveis: Valores dos fatores nos experimentos.
+
+\item Interação entre fatores: Quando o desempenho varia sempre da mesma forma
+ao se alterar o nível de um determinado fator, não há interação entre esse e os
+demais fatores. Mas se a variação do desempenho acontece de acordo com o nível
+de outro(s) fator(es), existe interação entre eles.
+
+\item Ordem de uma interação entre fatores: A quantidade de fatores envolvidos
+na interação -- por exemplo, uma interação de terceira ordem é uma interação
+entre três fatores.
+
+\item Projeto dos experimentos: Especificação do número de experimentos e das
+combinações de fatores e níveis usados.
+
+\end{itemize}
+
+%% ------------------------------------------------------------------------- %%
+\subsection{Metas do estudo} \label{sec:metas_do_estudo}
+
+O objetivo deste estudo é comparar o desempenho da consistência em momento
+indeterminado com o da consistência na linha do tempo em um sistema de
+armazenamento distribuído geo-replicado. Essa situação é modelada como um único
+sistema distribuído entre dois centros de dados ligados por uma WAN. Nesse
+cenário, uma requisição local é aquela atendida no mesmo centro de dados em que
+chega e possui baixo tempo de resposta (da ordem de poucos milissegundos). Já
+uma requisição remota é aquela que chega em um determinado centro de dados e é
+encaminhada para ser atendida em outro e normalmente possui tempo de resposta
+alto (da ordem de dezenas ou centenas de milissegundos). O modelo usado neste
+estudo possibilita diferentes combinações entre requisições locais e remotas
+dependendo do modelo de consistência usado e da sua configuração (ver
+\ref{sec:modo}).
+
+% Definição do TCP, no summary do TCP em Stevens. TODO: citar
+Para entender a dinâmica do sistema geo-replicado é necessário entender as
+características da rede sobre a qual ele opera. Esse estudo considera um sistema
+operando sobre TCP/IP, pilha de protocolos comumente utilizada nesses sistemas.
+O protocolo IP provê os mecanismos de endereçamento e roteamento. O protocolo
+TCP provê conexão ponto-a-ponto confiável, reconhecendo os dados recebidos,
+enviando-os novamente caso o reconhecimento não seja recebido dentro de um
+determinado período de tempo, reordenando pacotes recebidos fora de ordem,
+descartando pacotes duplicados, verificando pacotes corrompidos e provendo
+controle de fluxo.
+
+Por limitações de escopo e recurso, este estudo analisa o sistema apenas do
+ponto de vista do desempenho. Isso implica que o estudo não considera outros
+atributos de qualidade como disponibilidade e manutenibilidade. Assim, o escopo
+está limitado à operação normal do sistema, não levando em consideração
+condições excepcionais, como falha de nós ou sobrecarga do sistema.  Essas e
+outras condições podem ser estudadas em trabalho futuros.
+
+%% ------------------------------------------------------------------------- %%
+\subsection{Métricas} \label{sec:metricas}
+
+A principal métrica usada como base de comparação do desempenho dos modelos de
+consistência é o tempo de resposta das requisições (em s). Quanto menor o tempo
+de resposta, melhor o desempenho de um modelo de consistência. Como requisições
+locais e remotas apresentam tempos de resposta bem diferentes, percentis em vez
+de média são usados na maior parte das análises.
+
+Além do tempo de resposta, outras métricas observadas foram vazão (em
+operações/s), quantidade de migrações e quantidade de conflitos (ambas dadas
+pela porcentagem com relação ao total de operações do experimento). Vazão não é
+considerada uma meta principal pois os clientes apresentam uma taxa de
+requisição fixada nos experimentos, de forma a diminuir possíveis influências de
+sobrecarga do sistema. A quantidade de migrações, exclusiva da consistência na
+linha do tempo, oferece uma visão da dinâmica de um sistema que use esse modelo
+de consistência. A quantidade de conflitos proporciona uma noção da frequência
+com que cliente leem valores desatualizados. Uma diferença entre conflitos nos
+dois tipos de consistência é que na linha do tempo eles são causados apenas por
+atualizações que ainda não chegaram a todas as réplicas, portanto serão
+automaticamente resolvidos. Já na consistência em momento indeterminado, eles
+podem ser mais graves, dado que esse modelo permite atualizações concorrentes
+divergentes.
+
+%% ------------------------------------------------------------------------- %%
+\subsection{Técnica de avaliação} \label{sec:tecnica_de_avaliacao}
+
+Existem três técnicas comumente usadas na análise de desempenho de sistemas:
+simulação, modelagem analítica e medição \cite{Jain1991}. É muito difícil criar
+simuladores ou modelos que levem em consideração a interação entre todos os
+fatores que afetam o desempenho de um modelo de consistência: as diferentes
+cargas de trabalho (incluindo questões de localidade), as características da
+rede, os algoritmos de resolução de conflitos, etc. Assim, a adoção de simulação
+ou modelagem analítica sacrificaria o realismo e a precisão deste estudo. Daí a
+escolha de medição, pela qual é possível analisar o comportamento de um sistema
+de armazenamento que represente o resultado da interação de vários dos fatores
+que afetam o desempenho de um modelo de consistência.
+
+Dada a técnica de avaliação selecionada, este estudo precisava de um sistema
+implementado para que as medições fossem feitas. Mas considerando que o objetivo
+era comparar dois modelos de consistência e não sistemas que os implementem, os
+experimentos foram planejados e executados de forma a isolar tanto quanto
+possível questões específicas do sistema. Além disso, era importante testar os
+modelos em diferentes condições da rede, portanto os experimentos usaram uma WAN
+emulada. Os nós do sistema foram agrupados como se estivessem em centros de
+dados diferentes, ligados pela WAN emulada. A carga de trabalho foi executada
+por uma aplicação de execução de testes que simulava clientes localizados em
+cada um dos centros de dados. Cada experimento era definido por um modelo de
+consistência, uma configuração de rede (latência, perda de pacotes, etc) e uma
+carga de trabalho (relação leitura/escrita, localidade, etc). Detalhes sobre o
+sistema e a aplicação de execução dos testes usados e o ambiente em que eles
+operaram nos experimentos estão na seção \ref{sec:aspectos_tecnicos}.
+
+%% ------------------------------------------------------------------------- %%
+\section{Tipos de experimentos} \label{sec:tipos_de_experimentos}
+
+%TODO: talvez citar o outro livro de performance
+São alguns os tipos de experimentos que podem ser usados em um estudo. A escolha
+entre eles se dá principalmente pelo balanço entre recursos utilizados (tempo,
+dinheiro, energia, etc) e quantidade de informação -- quando mais recursos
+gastos, maior a quantidade de informação adquirida. Este trabalho usou dois
+tipos de experimentos fatoriais descritos em \cite{Jain1991}.
+
+Experimentos fatoriais consistem da combinação de dois ou mais fatores em cada
+experimento que compõe o estudo. Existem dois tipos principais de projeto de
+experimentos fatoriais: completo e fracionado \cite{Jain1991}.
+
+Um projeto de experimentos fatoriais completo é constituído por todas as
+combinações possíveis de todos os níveis de todos os fatores. Assim, a
+quantidade total de experimentos é dada por:
+
+$n = \prod_{i=1}^k{n_i}$,
+
+onde k é o número de fatores e $n_i$ é a quantidade de níveis do
+i$^{\textrm{\'esimo}}$ fator.
+
+Esse tipo de projeto de experimentos tem a vantagem de identificar com precisão
+a influência de todos os fatores e suas interações nas variáveis de resposta.
+Mas quanto maior a quantidade de fatores e de níveis em um estudo experimental,
+maior a quantidade de recursos necessários para sua execução. Normalmente os
+fatores não afetam igualmente as variáveis de resposta. Pelo contrário, é comum
+alguns poucos fatores explicarem a maior parte dos efeitos nos resultados.
+
+Para esses casos, utiliza-se o projeto de experimentos fatoriais fracionado para
+fazer uma triagem dos fatores, identificando quais deles são os mais influentes.
+Nesse tipo de experimento, utiliza-se apenas uma parte de todos os experimentos
+definidos no projeto de experimentos fatoriais completo. Um tipo particular de
+projeto de experimentos fatoriais fracionado é o 2\textsuperscript{k}. Nesse
+tipo, todos os fatores inicialmente selecionados são usados, mas apenas com dois
+níveis cada (normalmente o mínimo e o máximo), resultando em um total de
+2\textsuperscript{k} experimentos.
+
+Este estudo usou um projeto de experimentos fatoriais fracionado para seleção de
+fatores e níveis e um projeto de experimentos fatoriais completo para o estudo
+final, ambos descritos no capítulo \ref{cap:projeto_dos_experimentos}. O
+procedimento da seleção de fatores a partir de um projeto de experimento
+fracionados 2\textsuperscript{k} estão descritos abaixo.
+
+\subsubsection{Projeto de experimentos fatoriais fracionados
+2\textsuperscript{k}}
+
+Um projeto de experimentos fatoriais fracionais 2\textsuperscript{k} é composto
+por 2\textsuperscript{k} experimentos que por sua vez resultam em
+2\textsuperscript{k} medições de desempenho. Dadas essas medições, o desempenho
+pode ser expresso por um modelo de regressão não-linear da forma:
+
+$y = q_0 + q_Ax_A + q_Bx_B + q_Cx_C + ... + q_{AB}x_Ax_B + q_{AC}x_Ax_C +
+q_{BC}x_Bx_C... + q_{ABC}x_Ax_Bx_C + ...$,
+
+onde $y$ é o desempenho medido, $q_0$, $q_A$, $q_B$, etc são os coeficentes do
+modelo, $x_A$, $x_B$, $x_C$, etc representam respectivamente os níveis dos
+fatores A, B, C, etc. Os termos compostos pela multiplicação de dois ou mais
+fatores representam as interações entre os fatores em questão.
+
+Feito o modelo, define-se para cada fator uma relação entre seus níveis e os
+valores -1 ou 1. Por exemplo, pode-se definir que a localidade 0,5 valerá -1 e a
+0,9 valerá 1. Fazendo a substituição dos níveis por esses valores, tem-se um
+sistema de 2\textsuperscript{k} equações e 2\textsuperscript{k} variáveis (os
+coeficientes).
+
+Com os coeficientes, calcula-se a variação total de y -- soma total dos
+quadrados -- a partir da equação:
+
+$STQ = SQA + SQB + SQC + ... + SQAB + SQAC + SQBC + ... + SQABC + ...$, onde
+cada $SQX$ é dado por:
+
+$SQX = 2^kq_X$
+
+Cada $SQX$ é a porção da variação total explicada por X, que é um fator ou uma
+interação entre eles. A partir disso, é possível finalmente calcular a fração da
+variação explicada por cada X por:
+
+$FSQX = SQX / STQ$
+
+Comparando todos os $FSQX$s é possível descobrir quais são os fatores e
+interações entre eles que mais afetam os resultados dos experimentos.
+
+%% ------------------------------------------------------------------------- %%
+\section{Aspectos técnicos} \label{sec:aspectos_tecnicos}
+
+Após definir medição como técnica de avaliação de desempenho neste estudo, o
+passo seguinte foi o planejamento técnico dos experimentos. Esse planejamento
+envolveu predominantemente atividades de programação e administração de
+sistemas, como implementação da consistência na linha do tempo e preparação de
+scripts para a execução dos experimentos.
+
+O sistema de armazenamento usado como objeto de testes é descrito na subseção
+\ref{sec:sistema_de_armazenamento}. O ambiente dos experimentos é definido pela
+plataforma escolhida para executá-los, descrita na subseção \ref{sec:ambiente}.
+A forma como a WAN é emulada é descrita na subseção \ref{sec:rede}. A carga
+sobre o sistema é definida pela aplicação de execução dos testes, descrita na
+subseção \ref{sec:aplicacao_de_execucao_dos_testes}.
+
+%% ------------------------------------------------------------------------- %%
+\subsection{Sistema de armazenamento} \label{sec:sistema_de_armazenamento}
+
+Uma abordagem para a comparação dos modelos de consistência seria o uso de um
+sistema de armazenamento já existente que implementasse os dois modelos de
+consistência, mas tal sistema não foi encontrado. A partir disso, uma outraa
+abordagem seria o uso de sistemas diferentes, cada um implementando um modelo de
+consistência. Apesar de existirem experimentos que usam essa abordagem
+\cite{Cooper2008,Stonebraker2007,Pavlo2009}, dois problemas foram identificados.
+O primeiro é que o desempenho de cada sistema pode ser afetado por fatores
+particulares do sistema que não o modelo de consistência, como a tecnologia
+utilizada, detalhes de configuração, entre outros. O segundo é que apesar de
+existirem sistemas de armazenamento de software livre / código aberto que
+implementam consistência em momento indeterminado, não foram encontrados
+sistemas que implementassem consistência na linha do tempo.
+
+Assim, decidiu-se usar um único sistema para os experimentos. Uma opção para tal
+era implementar um sistema de armazenamento distribuído específico para os
+experimentos. O problema dessa abordagem é que esse tipo de sistema é bastante
+complexo, já que precisa prover funcionalidades como controle de entrada e saída
+dos nós, algoritmos de particionamento, etc. Desenvolver todas essas
+funcionalidades inviabilizaria este trabalho devido ao alto custo em tempo para
+implementação.
+
+Para evitar a implementação completa de um sistema de armazenamento, algumas
+opções de software livre / código aberto foram analisadas. A seleção das opções
+foi feita considerando modelos de consistência, estabilidade da solução e
+simplicidade de desenvolvimento. Como não foram encontrados sistemas de
+armazenamento de software livre / código aberto que implementem consistência na
+linha do tempo, as soluções avaliadas foram aquelas que implementam consistência
+em momento indeterminado. Os sistemas encontrados foram Dynomite
+\cite{Dynomite}, Cassandra \cite{Lakshman2010}, Voldemort \cite{Voldemort} e
+Riak \cite{Riak}. Todos eles usam basicamente a mesma arquitetura do Dynamo,
+provendo gerenciamento de entrada e saída de nós no aglomerado, relógios vetor
+para identificação e resolução de conflitos entre diferentes réplicas dos
+objetos \cite{Lamport1978} e espalhamento consistente para o particionamento dos
+objetos \cite{Karger1997a}.
+
+O Dynomite foi descartado pois o projeto foi abandonado pela comunidade em um
+estado ainda instável. O Cassandra por outro lado possui estabilidade e uma
+comunidade bastante ativa, mas é mais complexo que os outros sistemas dado que
+também implementa características de SGBDs orientados a colunas
+\cite{Chang2006}. Dos dois sistemas restantes, o Riak foi escolhido por ser
+implementado em Erlang, linguagem focada no desenvolvimento de sistemas
+distribuídos, apresentando assim maior facilidade para o desenvolvimento do
+modelo de consistência na linha do tempo. Um indício dessa facilidade é que o
+riak\_kv, o módulo do Riak usado na implementação do novo modelo de
+consistência, apresenta aproximadamente 20 mil linhas de código contra
+aproximadamente 85 mil do Voldemort. Além disso, existe uma aplicação para
+execução de testes usando Riak bastante completa (ver subseção
+\ref{sec:aplicacao_de_execucao_dos_testes}). O Voldemort também possui aplicação
+semelhante, mas ela oferece menos opções de configuração.
+
+\subsubsection{Implementação da consistência na linha do tempo e outros}
+
+A implementação da consistência na linha do tempo é incompleta. Para os
+experimentos, a distinção entre leituras e escritas era importante. Mas a
+distinção entre os tipo de escrita (inserção, atualização ou remoção) não era
+muito importante dado que todos os tipos se comportam da mesma forma do ponto de
+vista de tráfego local x remoto. Assim, apenas atualizações foram implementadas
+de forma completa e eficiente, distinguindo a localização de cada nó com relação
+aos centros de dados. As inserções são ineficientes, ocorrendo sempre pela mesma
+réplica, mesmo que em outro centro de dados. Isso foi feito para não precisar
+implementar um mecanismo para evitar conflitos de inserção. Remoções não foram
+implementadas. Importante para a análise do desempenho com relação à
+localidade,foi implementada a heurística do PNUTS em que a réplica mestre migra
+para o centro de dados de onde vieram as últimas escritas.
+
+Além da implementação de consistência na linha do tempo, o riak\_kv foi alterado
+para tratar corretamente os parâmetros extras necessários para a consistência na
+linha do tempo recebidos através da interface HTTP. Outras alterações menores
+dizem respeito a implementação de estatísticas sobre migrações.
+
+Além do riak\_kv, outro módulo alterado foi o riak\_core. Quando o Riak recebe
+uma requisição, ele descobre qual o nó responsável por tratá-la através do
+algoritmo de espalhamento consistente, que se baseia no valor da chave do objeto
+para tal. O Riak foi projetado para ser implantado em um único centro de
+dados\footnote{O Riak Entreprise implementa replicação entre centros de dados,
+mas é pago.}, portanto o algoritmo não leva em consideração os centros de dados
+no momento de decidir para qual das réplicas a requisição deve seguir. Dessa
+forma, algumas modificações foram necessárias no riak\_core, módulo responsável
+pelo roteamento das requisições, para que ele priorizasse nós do mesmo centro de
+dados em que a requisição chegou. A implementação é muito simples e pouco
+versátil, funcionando apenas para o cenário do estudo (dois centros de dados) e
+baseada nos nomes dos nós para saber em qual centro de dados cada um deles se
+encontra.
+
+%% ------------------------------------------------------------------------- %%
+\subsection{Ambiente} \label{sec:ambiente}
+
+Os experimentos foram executados no
+Grid5000\footnote{\url{http://www.grid5000.fr/}}, uma plataforma para criação,
+execução e monitoramento de experimentos de sistemas paralelos e distribuídos. A
+plataforma possui mais de 5000 cores distribuídos em 9 sítios na França e um no
+Brasil.
+
+Outras plataformas como o OpenCirrus\footnote{\url{http://opencirrus.org/}} e
+PlanetLab\footnote{\url{http://www.planet-lab.org/}} também foram consideradas,
+mas foram descartadas por uma questão de conveniência, já que o autor deste
+trabalho utilizou o Grid5000 em dois estágios de mestrado de respectivamente
+quatro meses e um mês pelo INRIA na França. A experiência no ambiente adquirida
+nesse período pode ser reutilizada neste trabalho, tornando o projeto e a
+execução dos experimentos mais produtivos. O Amazon Web Services (AWS)
+\footnote{\url{http://aws.amazon.com/}} também foi considerado, mas foi
+descartado por não ser possível ter controle sobre as características de rede
+entre os centros de dados, o que dificultaria a a interpretação dos resultados e
+a reprodutibilidade dos experimentos.
+
+A operação no Grid5000 se dá através do acesso ssh ao frontend de cada sítio.
+Nele o usuário encontra seu diretório home, onde ele pode armazenar seus scripts
+e dados dos experimentos, e tem acesso a ferramentas específicas da
+infraestrutura. Como o Grid5000 é compartilhado por diversos pesquisadores, ele
+oferece um conjunto de ferramentas (OAR\footnote{\url{http://oar.imag.fr/}}) e
+regras para que um pesquisador reserve nós exclusivamente para ele por um
+determinado período de tempo. Além dos nós, é possível reservar IPs para compor
+sub-redes, recurso utilizado nos experimentos (ver \ref{sec:rede}). Outra
+ferramenta bastante utilizada é o
+kadeploy\footnote{\url{http://kadeploy.imag.fr/}}, responsável pela implantação
+de imagens nos nós reservados pelo usuário.
+
+%% ------------------------------------------------------------------------- %%
+\subsubsection{Imagem}
+
+A imagem usada nos experimentos é um Debian GNU/Linux 6.0 (Squeeze) com kernel
+2.6.32-5-amd64 baseado em uma imagem pré-configurada disponibilizada pelo
+Grid5000. Além do conteúdo, essa imagem possui o Riak e o Basho Bench
+modificados e algumas ferramentas de monitoração e análise de desempenho como
+sysstat\footnote{\url{http://sebastien.godard.pagesperso-orange.fr/}},
+bwm-ng\footnote{\url{http://www.gropp.org/?id=projects&sub=bwm-ng}} e
+iperf\footnote{\url{http://iperf.sourceforge.net/}}. Uma única imagem foi usada,
+a distinção entre nós executando instâncias do Riak ou do Basho Bench foi feita
+através dos scripts que gerenciam os experimentos.
+
+%% ------------------------------------------------------------------------- %%
+\subsubsection{Scripts de execução e análise dos experimentos}
+
+Os experimentos foram conduzidos através de um conjunto de scripts (cmb) que se
+localiza no frontend do Grid5000 e era usado para reserva de nós, instalação da
+imagem, gerenciamento do sistema de armazenamento, configuração e execução da
+aplicação de execução de testes e coleta dos resultados. Os scripts foram
+escritos em bash. A parte de análise dos dados não usou o Grid5000 como
+ambiente, mas sim a máquina do pesquisador, e foi feita através de um segundo
+conjunto de scripts (cmb-local).  Esses scripts foram escritos em bash, Ruby e
+R.
+
+%% ------------------------------------------------------------------------- %%
+\subsection{Rede} \label{sec:rede}
+
+Os sítios do Grid5000 são conectados por redes de alta velocidade. Suas redes
+apresentam latências da ordem de cetenas de nanosegundos entre nós de um mesmo
+aglomerado e da ordem de 20 ms entre sítios, e portanto não caracterizam uma
+WAN. De qualquer forma, mesmo que caracterizassem, é necessário ter controle
+sobre esses valores para poder testar o sistema em diferentes condições de rede
+e possibilitar a reprodutibilidade dos experimentos.
+
+Por isso, os experimentos usam a ferramenta traffic control (tc). que
+possibilita a manipulação das filas de saída de pacotes de uma interface de
+rede, por exemplo, priorizando um determinado tipo de tráfego. Mais
+especificamente para emulação da WANs, é possível usar o
+netem\footnote{\url{http://www.linuxfoundation.org/collaborate/workgroups/networking/}},
+que provê funcionalidade para inserção de latência de rede, variação da
+latência, perda de pacotes, pacotes duplicados, corrompidos e/ou fora de ordem.
+Existem outras ferramentas como o
+dummynet\footnote{\url{http://info.iet.unipi.it/~luigi/dummynet/}} e o
+NISTNet\footnote{\url{http://snad.ncsl.nist.gov/itg/nistnet/}}, mas elas foram
+desconsideradas dado que o netem já vem integrado ao tc e satisfazia os
+requisitos funcionais dos experimentos.
+
+Existem recomendações sobre otimizações de sistemas Linux para quando se
+comunicam usando WANs -- o foco da configuração padrão são LANs.  Durante os
+experimentos, sempre que os parâmetros da WAN foram alterados, um script para
+ajuste da pilha TCP foi usado. A principal otimização desse script era ajustar
+os tamanhos dos buffers de transmissão e recepção ao BDP (para mais detalhes,
+ver seção \ref{sec:fatores_de_rede}).
+
+\subsubsection{Centros de dados}
+
+Para simular os centros de dados, os nós que compunham o sistema eram divididos
+em dois conjuntos CD1 e CD2, cada um representando um centro de dados. Além dos
+nós, duas sub-redes SR1 e SR2 eram reservadas. Cada nó de CD1 recebia, além de
+seu IP da rede do Grid5000, um IP de SR1, o mesmo valendo para CD2 e SR2.
+
+Sistemas Linux usam o arquivo /etc/hosts como fonte primária para resolução de
+nomes, apenas quando não encontram um nome definido ali (o que é a situação
+padrão) consultam um DNS. Todos os nós no Grid5000 possuem um nome registrado no
+DNS que aponta para o seu IP da rede do Grid5000. Nos experimentos, dois
+arquivos hosts1 e hosts2 eram criados e substituíam o /etc/hosts dos nós de CD1
+e CD2 respectivamente. O conteúdo de hosts1 eram os nomes dos nós de CD1
+sendoresolvidos para os IPs de SR1, o mesmo valendo entre hosts2 e SR2. Com
+isso, os nós de CD1 resolviam os nomes dos nós de CD2 para os IPs de SR2 e
+vice-versa.  Como o /etc/hosts tem prioridade sobre o DNS na resolução de nomes,
+todas as requisições que saíam de um centro de dados para o outro usavam o IP
+daquela sub-rede, enquanto as requisições para o mesmo centro de dados usavam o
+IP da rede do Grid5000.
+
+A partir dessa configuração foi possível adicionar um filtro baseado em
+sub-redes ao tc de modo que as características de WAN eram aplicadas às
+requisições que saíam para o outro centro de dados, enquanto as requisições para
+a mesma sub-rede saíam inalteradas.
+
+%TODO: dummynet: Marta Carbone and Luigi Rizzo, Dummynet Revisited, ACM SIGCOMM
+%Computer Communication Review, 40(2) pg.12-20, March 2010
+
+%% ------------------------------------------------------------------------- %%
+\subsection{Aplicação de execução dos testes}
+\label{sec:aplicacao_de_execucao_dos_testes}
+
+A aplicação de execução de testes usada foi o Basho Bench \cite{Basho},
+específica para o Riak. Ela provê configurações para quantidade de clientes
+concorrentes (threads), distribuição de operações, popularidade dos objetos
+acessados, entre outras. A aplicação foi modificada, pois mais de uma instância
+dela foi executada simultaneamente nos experimentos. Além de evitar gargalos na
+aplicação de execução de testes, isso era importante para implementação de
+localidade nos experimentos. Além disso, foi necessária a implementação de um
+script para a consolidação dos dados obtidos pelas diversas instâncias do Basho
+Bench.
+
+Outra aplicação de execução de testes considerada foi o YCSB \cite{Cooper2010}.
+Apesar de possuir mais flexibilidade que o Basho Bench nas suas configurações,
+ela não está preparada para acessar o Riak, acesso esse que precisaria ser
+implementado. Além disso, ela também não oferece todas as funcionalidades
+necessárias para os experimentos, que precisariam ser implementadas.
+
