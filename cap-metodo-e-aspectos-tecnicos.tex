@@ -240,8 +240,7 @@ O sistema de armazenamento usado como objeto dos experimentos é descrito na
 subseção \ref{sec:sistema_de_armazenamento}. O ambiente dos experimentos é
 definido pela plataforma escolhida para executá-los, descrita na subseção
 \ref{sec:ambiente}.  A forma como a WAN é emulada é descrita na subseção
-\ref{sec:rede}. A carga sobre o sistema é definida pela aplicação de execução
-dos testes, descrita na subseção \ref{sec:benchmark}.
+\ref{sec:rede}. A carga sobre o sistema é definida pelo benchmark, descrito na subseção \ref{sec:benchmark}.
 
 %% ------------------------------------------------------------------------- %%
 \subsection{Sistema de armazenamento} \label{sec:sistema_de_armazenamento}
@@ -293,9 +292,8 @@ distribuídos, apresentando assim maior facilidade para o desenvolvimento do
 modelo de consistência na linha do tempo. Um indício dessa facilidade é que o
 riak\_kv, o módulo do Riak usado na implementação do novo modelo de
 consistência, apresenta aproximadamente 20 mil linhas de código contra
-aproximadamente 85 mil do Voldemort. Além disso, existe uma aplicação para
-execução de testes para o Riak bastante completa (ver subseção
-\ref{sec:benchmark}). O Voldemort também possui aplicação semelhante, mas ela
+aproximadamente 85 mil do Voldemort. Além disso, existe um benchmark para o Riak bastante completa (ver subseção
+\ref{sec:benchmark}). O Voldemort também possui benchmark semelhante, mas ele
 oferece menos opções de configuração.
 
 \subsubsection{Implementação da consistência na linha do tempo no Riak}
