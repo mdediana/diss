@@ -342,13 +342,13 @@ parecer menos realistas e aplicáveis, mas na prática eles são tão limitados
 quanto o uso de disco, já que nesse caso os resultados seriam afetados pelo tipo
 de disco e pela relação entre o tamanho do banco de dados e a memória livre. Um
 exemplo é a comparação de suno com parapluie, em que o primeiro aglomerado
-possui discos com taxas de acesso acima do 1 Gb/s da rede -- o gargalo em um caso
-seria a rede, em outro o disco. Além disso, efeitos do cache de disco tornariam
-os resultados ainda mais particulares e difíceis de ser generalizados. Dessa
-forma, ao adotar memória como mecanismo de armazenamento, eliminou-se os efeitos
-das interações entre rede, disco e cache de disco e a análise foi focada apenas
-na rede. Trabalhos futuros podem estudar o efeito de disco e cache de disco no
-desempenho.
+possui discos com taxas de acesso acima do 1 Gb/s da rede -- o gargalo em um
+caso seria a rede, em outro o disco. Além disso, efeitos do cache de disco
+tornariam os resultados ainda mais particulares e difíceis de ser generalizados.
+Dessa forma, ao adotar memória como mecanismo de armazenamento, eliminou-se os
+efeitos das interações entre rede, disco e cache de disco e a análise foi focada
+apenas na rede. Trabalhos futuros podem estudar o efeito de disco e cache de
+disco no desempenho.
 %TODO: colocar os valores escolhidos em itens
 
 Ao definir que o sistema usaria memória como mecanismo de armazenamento, a
@@ -783,7 +783,9 @@ Riak falhassem por problemas de comunicação. Como não foi encontrada nenhuma
 referência indicando que a taxa de pacotes corrompidos é um fator fundamental em
 WANs, a opção foi ignorar esse fator.
 
-Assim, os níveis inicialmente selecionados para fatores de rede foram:
+Este estudo usou a mesma configuração de modo e localidade que o estudo para
+tamanho de buffers, pelo mesmo motivo. Os níveis inicialmente selecionados para
+fatores de rede foram:
 
 \begin{itemize}
 
@@ -791,7 +793,7 @@ Assim, os níveis inicialmente selecionados para fatores de rede foram:
 
 \item Variação da latência da WAN (\%): 1 e 50
 
-\item Taxa de perda de pacotes na WAN (\%): 0,05 e 1
+\item Taxa de perda de pacotes na WAN (\%): 0,01 e 0,1
  
 \item Taxa de duplicação de pacotes na WAN (\%): 0,05 e 5
 
@@ -816,26 +818,32 @@ de perdas, D representa a taxa de pacotes duplicados, O representa a taxa de
 pacotes fora de ordem e C representa o algoritmo de congestionamento.}
 \label{tab:estudo_para_fatores_de_rede}.  \end{center} \end{table}
 
-%TODO: decidir se faz uma tabela pra cada ordem de efeitos (3a e talvez 4a ordem
-%precisem de 2 tabelas) ou se só usa colunas != 0 (2 tabelas)
+Como esperado, fatores relacionados a WAN afetam pouco as requisições locais,
+que apresentaram CVs de 1\% tanto para leituras quanto para escritas. O mesmo
+não acontece para requisições remotas, cujos CVs são 58\% e 62\% para leituras e
+escritas, respectivamente.
 
-A latência, a variação da latência, a taxa de perdas e as interações entre elas
-são os fatores que mais afetam o desempenho do sistema.  Assim, os níveis
-escolhidos para esses três fatores nos experimentos foram:
+O mesmo estudo havia sido realizado anteriormente com níveis de perda de pacotes
+0,01\% e 1\%. Nesse estudo, a perda de pacotes era mais influente até do que a
+variação da latência. Mas como redes normalmente não apresentam taxas de perda
+de pacotes tão altas quanto 1\%, o estudo foi refeito com nível máximo de 0,1\%
+e a perda de pacotes não afetou o resultado nesse caso.
+
+A latência, a variação de latência e a interação de primeira ordem entre elas
+respondem por 100\% dos resultados. Assim, os níveis escolhidos para esses
+fatores nos experimentos foram:
 
 \begin{itemize} \item Latência da WAN (ms): 0, 100, 200 e 300
 
 \item Variação da latência da WAN (\%): 0 e 50
 
-\item Taxa de perda de pacotes na WAN (\%): 0, 0,01 e 0,1 
-
 \end{itemize}
 
-Níveis nulos de latência, variação da latência e taxa de perdas equivalem a ter
-todo o sistema operando em uma rede local. Os resultados obtidos para esses
-casos foram usados como auxílio na interpretação dos resultados, mas não foram
-considerados na análise final dado que sistemas geo-replicados, por definição,
-não operam nessas condições.
+Níveis nulos de latência e variação da latência equivalem a ter todo o sistema
+operando em uma rede local. Os resultados obtidos para esses casos foram usados
+como auxílio na interpretação dos resultados, mas não foram considerados na
+análise final dado que sistemas geo-replicados, por definição, não operam nessas
+condições.
 
 Os níveis da latências são baseados em estudo que relata as latências entre os
 centros de dados dos Amazon Web Services \cite{Sovran2011}. Os centros de dados
@@ -843,9 +851,7 @@ considerados são Califórnia (EUA -- Costa Oeste), Virginia (EUA -- Costa Leste),
 Irlanda e Singapura. A menor latência observada foi 82 ms entre os centros de
 dados dos EUA e a maior foi 277 ms entre Irlanda e Singapura. O valor de 50\% de
 variação da latência é aproximado, ele foi baseado em um gráfico do mesmo
-estudo, mas não está claramente descrito. De qualquer forma, dos três fatores
-esse é o que tem menos impacto, portanto algum erro de aproximação não é tão
-prejudicial. Os valores das perdas foram escolhidos pois TODO.
+estudo, mas não está claramente descrito.
 
 Os valores fixados dos fatores desconsiderados foram:
 
@@ -861,15 +867,16 @@ Os valores fixados dos fatores desconsiderados foram:
 
 \end{itemize}
 
-Taxas de perda de pacotes e de duplicação de pacotes e proporção de pacotes fora
-de ordem foram ignorados. O algoritmo de congestionamento foi fixado como
-``cubic'', pois esse é o padrão no sistema Linux utilizado nos experimentos.
+Taxas de perda de pacotes, taxa de duplicação de pacotes e proporção de pacotes
+fora de ordem foram ignorados no estudo final. O algoritmo de congestionamento
+foi fixado como ``cubic'', pois esse é o padrão no sistema Linux utilizado nos
+experimentos.
 
 Apesar de a taxa de pacotes fora de ordem ser fixada, a ocorrência de alguns
 pacotes fora de ordem é possível dada a variação da latência. Por exemplo, com
 uma latência de 100 ms e uma variação de 50\%, é possível que o emulador aplique
 atrasos de 120ms para um pacote e 80 ms para um outro no mesmo milissegundo, o
-que faz com que o segundo pacote seja transmitido antes do primeiro.  Mas a
+que faz com que o segundo pacote seja transmitido antes do primeiro. Mas a
 ocorrência de grandes diferenças de latência entre pacotes consecutivos é rara,
 dado que o emulador foi configurado para aplicar uma correlação na variação da
 latência usando distribuição normal.
