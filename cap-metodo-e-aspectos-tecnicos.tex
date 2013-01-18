@@ -14,7 +14,7 @@ experimentos seguida da análise dos resultados e se encontra no capítulo
 TODO: seções
 
 %% ------------------------------------------------------------------------- %%
-\section{Definição do estudo} \label{sec:definicao_do_estudo}
+\section{Definição do Estudo} \label{sec:definicao_do_estudo}
 
 TODO: intro + seções
 
@@ -143,7 +143,7 @@ sistema e o benchmark usados e o ambiente em que eles operaram nos experimentos
 estão na seção \ref{sec:aspectos_tecnicos}.
 
 %% ------------------------------------------------------------------------- %%
-\section{Aspectos técnicos} \label{sec:aspectos_tecnicos}
+\section{Aspectos Técnicos} \label{sec:aspectos_tecnicos}
 
 Após definir medição como técnica de avaliação de desempenho neste estudo, o
 passo seguinte foi o planejamento técnico dos experimentos. Esse planejamento
@@ -405,7 +405,8 @@ passos:
     % Place nodes
     \node [block] (deploy) {Implantação da imagem nos nós};
 
-    \node [block, right of=deploy, node distance=8em] (srvs) {Configuração dos nós};
+    \node [block, right of=deploy, node distance=8em] (srvs) {Configuração dos
+nós};
 
     \node [block, below of=srvs] (riak) {Configuração do Riak};
 
@@ -415,9 +416,11 @@ passos:
 
     \node [block, below of=load] (wan) {Configuração da WAN emulada};
 
-    \node [block, below of=wan, node distance=10em] (run) {Execução de um experimento};
+    \node [block, below of=wan, node distance=10em] (run) {Execução de um
+experimento};
 
-    \node [decision, right of=run, node distance=10em] (loop) {Último experimento?};
+    \node [decision, right of=run, node distance=10em] (loop) {Último
+experimento?};
     
     \node [decision, above of=loop, node distance=10em] (reconf) {Modo ou
 localidade mudaram?};
@@ -454,8 +457,7 @@ localidade mudaram?};
 \end{tikzpicture}
 
 \caption{Fluxo de trabalho da execução do estudo.}
-\label{fig:fluxo_de_trabalho_da_execucao_do_estudo}
-\end{figure}
+\label{fig:fluxo_de_trabalho_da_execucao_do_estudo} \end{figure}
 
 %%\item Configuração da WAN emulada -- incluindo ajuste da pilha TCP/IP
 %%
