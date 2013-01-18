@@ -399,30 +399,71 @@ Ruby e R.
 Uma vez feita a reserva de nós, a execução de um estudo consistia dos seguintes
 passos:
 
+\begin{figure}[p] \centering
+
 \begin{tikzpicture}[node distance = 2cm, auto]
+    % Place nodes
+    \node [block] (deploy) {Implantação da imagem nos nós};
 
-\node [block] (deploy) {Implantação da imagem nos nós};
+    \node [block, right of=deploy, node distance=8em] (srvs) {Configuração dos nós};
 
-\node [block, below of=deploy] (srvs) {Configuração dos nós};
+    \node [block, below of=srvs] (riak) {Configuração do Riak};
 
-\path [line] (deploy) -- (srvs);
-%\item Configuração do Riak
-%
-%\item Inicialização do Riak
-%
-%\item Configuração do benchmark
-%
-%\item Carga do sistema -- incluindo aquecimento
-%
-%\item Configuração da WAN emulada -- incluindo ajuste da pilha TCP/IP
-%
-%\item Configuração do benchmark
-%
-%\item Execução do benchmark
-%
-%\item Finalização do Riak
+    \node [block, below of=riak] (start) {Inicialização do Riak};
+
+    \node [block, below of=start] (load) {Carga do sistema};
+
+    \node [block, below of=load] (wan) {Configuração da WAN emulada};
+
+    \node [block, below of=wan, node distance=10em] (run) {Execução de um experimento};
+
+    \node [decision, right of=run, node distance=10em] (loop) {Último experimento?};
+    
+    \node [decision, above of=loop, node distance=10em] (reconf) {Modo ou
+localidade mudaram?};
+
+    \node [block, right of=loop, node distance=10em] (stop) {Término do Riak};
+
+    \node [block, right of=stop, node distance=8em] (end) {Fim};
+
+    % Draw edges
+    \path [line] (deploy) -- (srvs);
+
+    \path [line] (srvs) -- (riak);
+
+    \path [line] (riak) -- (start);
+
+    \path [line] (start) -- (load);
+
+    \path [line] (load) -- (wan);
+
+    \path [line] (wan) -- (run);
+
+    \path [line] (run) -- (loop);
+
+    \path [line] (loop) -- node [near start] {não} (reconf);
+
+    \path [line] (loop) -- node [near start] {sim}(stop);
+
+    \path [line] (reconf) -- node [near start] {não} (wan);
+
+    \path [line] (reconf) |- node [near start] {sim}(riak);
+
+    \path [line] (stop) -- (end);
 
 \end{tikzpicture}
+
+\caption{Fluxo de trabalho da execução do estudo.}
+\label{fig:fluxo_de_trabalho_da_execucao_do_estudo}
+\end{figure}
+
+%%\item Configuração da WAN emulada -- incluindo ajuste da pilha TCP/IP
+%%
+%%\item Execução do benchmark
+%%
+%%\item Finalização do Riak
+%
+%\end{tikzpicture}
 
 Cada um desses passos corresponde a um script. Os passos estavam definidos em um
 outro script (run-all), responsável pelo fluxo de trabalho.
