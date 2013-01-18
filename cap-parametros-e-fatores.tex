@@ -18,7 +18,95 @@ tratados como parâmetros e tiveram seus valores fixados. Os fatores mais
 influentes foram usados nos experimentos finais, que usaram um projeto de
 experimentos fatoriais completo.
 
+Os tipos de experimentos usados na seleção dos fatores e no estudo final são
+explicados na seção \ref{sec:tipos_de_experimentos}...
 %TODO: seções
+
+%% ------------------------------------------------------------------------- %%
+\section{Tipos de experimentos} \label{sec:tipos_de_experimentos}
+
+%TODO: talvez citar o outro livro de performance
+São alguns os tipos de experimentos que podem ser usados em um estudo
+experimental. A escolha entre eles se dá principalmente pelo balanço entre
+recursos utilizados (tempo, dinheiro, energia, etc) e quantidade de informação
+adquirida -- quando mais recursos gastos, maior a quantidade de informação
+adquirida. Este trabalho usou dois tipos de experimentos fatoriais descritos em
+\cite{Jain1991}.
+
+Experimentos fatoriais consistem da combinação de dois ou mais fatores em cada
+experimento que compõe o estudo. Existem dois tipos principais de projetos de
+experimentos fatoriais: completo e fracionado \cite{Jain1991}.
+
+Um projeto de experimentos fatoriais completo é constituído por todas as
+combinações possíveis de todos os níveis de todos os fatores. Assim, a
+quantidade total de experimentos é dada por:
+
+$n = \prod_{i=1}^k{n_i}$,
+
+onde k é o número de fatores e $n_i$ é a quantidade de níveis do
+i$^{\textrm{\'esimo}}$ fator.
+
+Esse tipo de projeto de experimentos tem a vantagem de identificar com precisão
+a influência de todos os fatores e suas interações nas variáveis de resposta.
+Mas quanto maior a quantidade de fatores e de níveis em um estudo experimental,
+maior a quantidade de recursos necessários para sua execução. Normalmente os
+fatores não afetam igualmente as variáveis de resposta, pelo contrário, é comum
+alguns poucos fatores explicarem a maior parte dos efeitos nos resultados.
+
+Para esses casos, utiliza-se o projeto de experimentos fatoriais fracionado para
+fazer uma triagem dos fatores, identificando quais deles são os mais influentes.
+Nesse tipo de experimento, utiliza-se apenas uma parte de todos os experimentos
+definidos no projeto de experimentos fatoriais completo. Um tipo particular de
+projeto de experimentos fatoriais fracionado é o 2\textsuperscript{k}. Nesse
+tipo, todos os fatores inicialmente selecionados são usados, mas apenas com dois
+níveis cada (normalmente o mínimo e o máximo), resultando em um total de
+2\textsuperscript{k} experimentos.
+
+Este estudo usou alguns projetos de experimentos fatoriais fracionados para
+seleção de fatores e níveis e um projeto de experimentos fatoriais completo para
+o estudo final, ambos descritos no capítulo \ref{cap:parametros_e_fatores}. A
+subseção seguinte descreve o procedimento da seleção de fatores a partir de um
+projeto de experimentos fatoriais fracionados 2\textsuperscript{k}.
+
+\subsubsection{Projeto de experimentos fatoriais fracionados
+2\textsuperscript{k}}
+
+Um projeto de experimentos fatoriais fracionados 2\textsuperscript{k} é composto
+por 2\textsuperscript{k} experimentos que por sua vez resultam em
+2\textsuperscript{k} medições de desempenho. Dadas essas medições, o desempenho
+é expresso por um modelo de regressão não-linear da forma:
+
+$y = q_0 + q_Ax_A + q_Bx_B + q_Cx_C + ... + q_{AB}x_Ax_B + q_{AC}x_Ax_C +
+q_{BC}x_Bx_C... + q_{ABC}x_Ax_Bx_C + ...$,
+
+onde $y$ é o desempenho medido, $q_0$, $q_A$, $q_B$, etc são os coeficientes do
+modelo e $x_A$, $x_B$, $x_C$, etc representam respectivamente os níveis dos
+fatores A, B, C, etc. Os termos compostos pela multiplicação de dois ou mais
+fatores representam as interações entre os fatores em questão.
+
+Feito o modelo, define-se para cada fator uma relação entre seus níveis e os
+valores -1 ou 1. Por exemplo, pode-se definir que a localidade 0,5 valerá -1 e a
+0,9 valerá 1. Fazendo a substituição dos níveis por esses valores, tem-se um
+sistema de 2\textsuperscript{k} equações e 2\textsuperscript{k} variáveis (os
+coeficientes).
+
+Com os coeficientes, calcula-se a variação total de y -- soma total dos
+quadrados -- a partir da equação:
+
+$STQ = SQA + SQB + SQC + ... + SQAB + SQAC + SQBC + ... + SQABC + ...$, onde
+cada $SQX$ é dado por:
+
+$SQX = 2^kq_X$
+
+Cada $SQX$ é a porção da variação total explicada pelo fator ou interação entre
+fatores X. A partir disso, é possível finalmente calcular a fração da variação
+explicada por cada X por:
+
+$FSQX = SQX / STQ$
+
+Comparando todos os $FSQX$s é possível descobrir quais são os fatores e
+interações entre eles que mais afetam os resultados dos experimentos.
+
 
 %% ------------------------------------------------------------------------- %%
 \section{Lista de parâmetros} \label{sec:lista_de_parametros}

@@ -143,91 +143,6 @@ sistema e o benchmark usados e o ambiente em que eles operaram nos experimentos
 estão na seção \ref{sec:aspectos_tecnicos}.
 
 %% ------------------------------------------------------------------------- %%
-\section{Tipos de experimentos} \label{sec:tipos_de_experimentos}
-
-%TODO: talvez citar o outro livro de performance
-São alguns os tipos de experimentos que podem ser usados em um estudo
-experimental. A escolha entre eles se dá principalmente pelo balanço entre
-recursos utilizados (tempo, dinheiro, energia, etc) e quantidade de informação
-adquirida -- quando mais recursos gastos, maior a quantidade de informação
-adquirida. Este trabalho usou dois tipos de experimentos fatoriais descritos em
-\cite{Jain1991}.
-
-Experimentos fatoriais consistem da combinação de dois ou mais fatores em cada
-experimento que compõe o estudo. Existem dois tipos principais de projetos de
-experimentos fatoriais: completo e fracionado \cite{Jain1991}.
-
-Um projeto de experimentos fatoriais completo é constituído por todas as
-combinações possíveis de todos os níveis de todos os fatores. Assim, a
-quantidade total de experimentos é dada por:
-
-$n = \prod_{i=1}^k{n_i}$,
-
-onde k é o número de fatores e $n_i$ é a quantidade de níveis do
-i$^{\textrm{\'esimo}}$ fator.
-
-Esse tipo de projeto de experimentos tem a vantagem de identificar com precisão
-a influência de todos os fatores e suas interações nas variáveis de resposta.
-Mas quanto maior a quantidade de fatores e de níveis em um estudo experimental,
-maior a quantidade de recursos necessários para sua execução. Normalmente os
-fatores não afetam igualmente as variáveis de resposta, pelo contrário, é comum
-alguns poucos fatores explicarem a maior parte dos efeitos nos resultados.
-
-Para esses casos, utiliza-se o projeto de experimentos fatoriais fracionado para
-fazer uma triagem dos fatores, identificando quais deles são os mais influentes.
-Nesse tipo de experimento, utiliza-se apenas uma parte de todos os experimentos
-definidos no projeto de experimentos fatoriais completo. Um tipo particular de
-projeto de experimentos fatoriais fracionado é o 2\textsuperscript{k}. Nesse
-tipo, todos os fatores inicialmente selecionados são usados, mas apenas com dois
-níveis cada (normalmente o mínimo e o máximo), resultando em um total de
-2\textsuperscript{k} experimentos.
-
-Este estudo usou alguns projetos de experimentos fatoriais fracionados para
-seleção de fatores e níveis e um projeto de experimentos fatoriais completo para
-o estudo final, ambos descritos no capítulo \ref{cap:parametros_e_fatores}. A
-subseção seguinte descreve o procedimento da seleção de fatores a partir de um
-projeto de experimentos fatoriais fracionados 2\textsuperscript{k}.
-
-\subsubsection{Projeto de experimentos fatoriais fracionados
-2\textsuperscript{k}}
-
-Um projeto de experimentos fatoriais fracionados 2\textsuperscript{k} é composto
-por 2\textsuperscript{k} experimentos que por sua vez resultam em
-2\textsuperscript{k} medições de desempenho. Dadas essas medições, o desempenho
-é expresso por um modelo de regressão não-linear da forma:
-
-$y = q_0 + q_Ax_A + q_Bx_B + q_Cx_C + ... + q_{AB}x_Ax_B + q_{AC}x_Ax_C +
-q_{BC}x_Bx_C... + q_{ABC}x_Ax_Bx_C + ...$,
-
-onde $y$ é o desempenho medido, $q_0$, $q_A$, $q_B$, etc são os coeficientes do
-modelo e $x_A$, $x_B$, $x_C$, etc representam respectivamente os níveis dos
-fatores A, B, C, etc. Os termos compostos pela multiplicação de dois ou mais
-fatores representam as interações entre os fatores em questão.
-
-Feito o modelo, define-se para cada fator uma relação entre seus níveis e os
-valores -1 ou 1. Por exemplo, pode-se definir que a localidade 0,5 valerá -1 e a
-0,9 valerá 1. Fazendo a substituição dos níveis por esses valores, tem-se um
-sistema de 2\textsuperscript{k} equações e 2\textsuperscript{k} variáveis (os
-coeficientes).
-
-Com os coeficientes, calcula-se a variação total de y -- soma total dos
-quadrados -- a partir da equação:
-
-$STQ = SQA + SQB + SQC + ... + SQAB + SQAC + SQBC + ... + SQABC + ...$, onde
-cada $SQX$ é dado por:
-
-$SQX = 2^kq_X$
-
-Cada $SQX$ é a porção da variação total explicada pelo fator ou interação entre
-fatores X. A partir disso, é possível finalmente calcular a fração da variação
-explicada por cada X por:
-
-$FSQX = SQX / STQ$
-
-Comparando todos os $FSQX$s é possível descobrir quais são os fatores e
-interações entre eles que mais afetam os resultados dos experimentos.
-
-%% ------------------------------------------------------------------------- %%
 \section{Aspectos técnicos} \label{sec:aspectos_tecnicos}
 
 Após definir medição como técnica de avaliação de desempenho neste estudo, o
@@ -240,7 +155,8 @@ O sistema de armazenamento usado como objeto dos experimentos é descrito na
 subseção \ref{sec:sistema_de_armazenamento}. O ambiente dos experimentos é
 definido pela plataforma escolhida para executá-los, descrita na subseção
 \ref{sec:ambiente}.  A forma como a WAN é emulada é descrita na subseção
-\ref{sec:rede}. A carga sobre o sistema é definida pelo benchmark, descrito na subseção \ref{sec:benchmark}.
+\ref{sec:rede}. A carga sobre o sistema é definida pelo benchmark, descrito na
+subseção \ref{sec:benchmark}.
 
 %% ------------------------------------------------------------------------- %%
 \subsection{Sistema de armazenamento} \label{sec:sistema_de_armazenamento}
@@ -292,10 +208,11 @@ distribuídos, apresentando assim maior facilidade para o desenvolvimento do
 modelo de consistência na linha do tempo. Um indício dessa facilidade é que o
 riak\_kv, o módulo do Riak usado na implementação do novo modelo de
 consistência, apresenta aproximadamente 20 mil linhas de código contra
-aproximadamente 85 mil do Voldemort. Além disso, existe um benchmark para o Riak bastante completa (ver subseção
-\ref{sec:benchmark}). O Voldemort também possui benchmark semelhante, mas ele
-oferece menos opções de configuração.
+aproximadamente 85 mil do Voldemort. Além disso, existe um benchmark para o Riak
+bastante completa (ver subseção \ref{sec:benchmark}). O Voldemort também possui
+benchmark semelhante, mas ele oferece menos opções de configuração.
 
+%% ------------------------------------------------------------------------- %%
 \subsubsection{Implementação da consistência na linha do tempo no Riak}
 
 A implementação da consistência na linha do tempo é incompleta. Para os
@@ -317,11 +234,13 @@ consistência na linha do tempo, que explora a localidade de requisições: a
 réplica mestre migra para o centro de dados de onde vieram as últimas escritas.
 Essa heurística foi implementada no Riak.
 
-\subsubsection{Outras modificações implementadas no Riak} Além da implementação
-de consistência na linha do tempo, o riak\_kv foi alterado para tratar
-corretamente os parâmetros extras necessários para a consistência na linha do
-tempo recebidos através da interface HTTP. Outras alterações menores dizem
-respeito a implementação de estatísticas sobre migrações.
+%% ------------------------------------------------------------------------- %%
+\subsubsection{Outras modificações implementadas no Riak}
+
+Além da implementação de consistência na linha do tempo, o riak\_kv foi alterado
+para tratar corretamente os parâmetros extras necessários para a consistência na
+linha do tempo recebidos através da interface HTTP. Outras alterações menores
+dizem respeito a implementação de estatísticas sobre migrações.
 
 Além do riak\_kv, outro módulo alterado foi o riak\_core. Quando o Riak recebe
 uma requisição, ele descobre qual o nó responsável por tratá-la através do
@@ -406,17 +325,6 @@ a distinção entre nós executando instâncias do Riak ou do Basho Bench foi feita
 através dos scripts que gerenciam os experimentos.
 
 %% ------------------------------------------------------------------------- %%
-\subsubsection{Scripts de execução e análise dos experimentos}
-
-Os experimentos foram conduzidos através de um conjunto de scripts (cmb) que se
-localiza no frontend do Grid5000 e era usado para reserva de nós, instalação da
-imagem, gerenciamento do sistema de armazenamento, configuração e execução do
-benchmark e coleta dos resultados. Os scripts foram escritos em bash. A parte de
-análise dos dados não usou o Grid5000 como ambiente, mas sim a máquina do
-pesquisador, e foi feita através de um segundo conjunto de scripts (cmb-local).
-Esses scripts foram escritos em bash, Ruby e R.
-
-%% ------------------------------------------------------------------------- %%
 \subsection{Rede} \label{sec:rede}
 
 Os sítios do Grid5000 são conectados por redes de alta velocidade. Suas redes
@@ -480,4 +388,43 @@ o mesmo centro de dados saíam inalteradas.
 \subsection{Fluxo de trabalho dos experimentos}
 \label{sec:fluxo_de_trabalho_dos_experimentos}
 
-TODO
+O fluxo de trabalho dos experimentos foi dado por dois conjuntos de scripts.  O
+primeiro (cmb) se localizava no frontend do Grid5000 e era usado para reserva de
+nós, instalação da imagem, gerenciamento do sistema de armazenamento,
+configuração e execução do benchmark e coleta dos resultados. Os scripts foram
+escritos em bash. O segundo conjunto (cmb-local) foi usado na análise dos dados
+e se localizava no computador do autor. Esses scripts foram escritos em bash,
+Ruby e R.
+
+Uma vez feita a reserva de nós, a execução de um estudo consistia dos seguintes
+passos:
+
+\begin{tikzpicture}[node distance = 2cm, auto]
+
+\node [block] (deploy) {Implantação da imagem nos nós};
+
+\node [block, below of=deploy] (srvs) {Configuração dos nós};
+
+\path [line] (deploy) -- (srvs);
+%\item Configuração do Riak
+%
+%\item Inicialização do Riak
+%
+%\item Configuração do benchmark
+%
+%\item Carga do sistema -- incluindo aquecimento
+%
+%\item Configuração da WAN emulada -- incluindo ajuste da pilha TCP/IP
+%
+%\item Configuração do benchmark
+%
+%\item Execução do benchmark
+%
+%\item Finalização do Riak
+
+\end{tikzpicture}
+
+Cada um desses passos corresponde a um script. Os passos estavam definidos em um
+outro script (run-all), responsável pelo fluxo de trabalho.
+
+% Comentar sanity checks
