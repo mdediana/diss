@@ -1,79 +1,189 @@
 %% ------------------------------------------------------------------------- %%
 \chapter{Análise dos Resultados} \label{cap:analise_dos_resultados}
 
-%% ------------------------------------------------------------------------- %%
-\subsection{Resultados parciais} \label{sec:resultados_parciais}
+O estudo final foi um estudo fatorial completo (seção
+\ref{sec:tipos_de_experimentos}). A sua execução foi bastante simples, rápida e
+usou poucos recursos devido aos estudos fatoriais fracionados feitos para
+triagem dos fatores. O estudo final usou os fatores e níveis descritos na Tabela
+\ref{tab:fatores_e_niveis_do_estudo_final}, em um total de 64 experimentos.
 
-Até o momento foram executados alguns testes para um melhor entendimento do
-problema sendo tratado e para o estudo e a avaliação das tecnologias usadas nos
-experimentos.
+\begin{table}[!h] \begin{center} \begin{tabular}{|l|c|c|} \hline
 
-Primeiramente foram executados alguns experimentos no Revoada, aglomerado de 8
-nós administrado pelo IME - USP. Esses experimentos usaram o Cassandra
-\cite{Lakshman2010} como sistema de armazenamento e YCSB \cite{Cooper2010} como
-aplicação para execução dos testes, e foram feitos como testes preliminares
-sobre o efeito da latência de rede no desempenho de diferentes níveis de
-consistência. Os experimentos usaram 3 nós de Cassandra e uma instância do YCSB.
-Foram usados os níveis de consistência ONE ($W = 1$ ou $R = 1$), QUORUM ($W =
-\lceil(N+1)/2\rceil$ ou $R = \lceil(N+1)/2\rceil)$ e ALL ($W = N$ ou $R = N$) e
-latências variando de 0 a 300 ms. O YCSB não estava preparado para lidar com
-diferentes configurações de consistência do Cassandra e foi alterado para tal.
-Para uma dada latência de rede, foi observado um aumento no tempo de resposta e
-diminuição da vazão a medida em que configurações mais rígidas de consistência
-foram usadas. Para uma dada configuração de consistência, foi observado um
-aumento no tempo de resposta e diminuição da vazão a medida em que a latência de
-rede foi aumentada. A preparação e execução desses experimentos colaborou para
-um melhor entendimento de ferramentas e técnicas a serem usadas neste trabalho.
+\multicolumn{1}{|c|}{Fator} & \multicolumn{1}{|c|}{Níveis} &
+\multicolumn{1}{|c|}{Total de níveis}\\ \hline
 
-Um segundo conjunto de experimentos foi realizado no Grid5000 com três
-configurações de consistência implementadas no Riak \cite{Riak}: consistência em
-momento indeterminado, consistência na linha do tempo com leituras consistentes
-e consistência na linha do tempo com leituras de qualquer versão. Os
-experimentos usaram um aglomerado de 6 nós para o Riak, e um nó para o Basho
-Bench \cite{Basho}. Os experimentos foram feitos usando latências de 0 a 150 ms.
-Foram usadas 3 configurações relativas à distribuição dos nós por centros de
-dados: todos os nós no mesmo centro de dados, dois nós em um centro de dados
-remoto e quatro nós em um centro de dados remoto (o centro de dados local é o
-centro de dados onde a aplicação de execução de testes roda). A carga de
-trabalho usada foi uniforme para distribuição das chaves e para alvos dos
-acessos. Esses experimentos funcionaram como testes da implementação de
-consistência na linha do tempo. Os resultados observados não foram os esperados,
-pois indicaram um melhor desempenho da consistência em momento indeterminado,
-seguido da consistência na linha do tempo com leituras consistentes e por último
-consistência na linha do tempo com leituras de versão qualquer. O resultado
-esperado seria que leituras de versão qualquer apresentassem desempenho melhor
-do que leituras consistentes. Isso pode ter acontecido por problemas na
-implementação ou por algum fator não previsto no funcionamento desses modelos de
-consistência. Esse fato precisa ser investigado. Além disso, como esperado, os
-experimentos mostraram a existência de conflitos na consistência em momento
-indeterminado, enquanto nenhum conflito aconteceu na consistência na linha do
-tempo. O impacto desses conflitos no desempenho não foi medido. A partir desses
-experimentos foi possível entender o comportamento do Riak no ambiente do
-Grid5000, além de servir como prova de conceito da implementação da consistência
-na linha do tempo no Riak.
+Modo & ind1, ind2, lt\_qqer e lt\_rec & 4\\ \hline
+
+Latência da WAN (ms) & 0, 100, 200 e 300 & 4\\ \hline
+
+Variação da latência da WAN (\%) & 0 e 50 & 2\\ \hline
+
+Localidade & 0,5 e 0,9 & 2\\ \hline
+
+\end{tabular}
+
+\caption{Fatores e níveis do estudo final.}
+\label{tab:fatores_e_niveis_do_estudo_final}
+
+\end{center} \end{table}
+
+O pequeno número de fatores e níveis foi importante para uma análise consistente
+dos resultados. Isso é enfatizado pela principal referência metodológica usada
+neste trabalho \cite{Jain1991}. Esse fato também foi sugerido para o autor em
+conversa com o pesquisador visitante no IME Jean-Marc Vincent, que possui longa
+experiência em estudos de desempenho.
+
+TODO: seções
 
 %% ------------------------------------------------------------------------- %%
-\subsection{Apresentação dos resultados} \label{sec:apresentacao_dos_resultados}
+\section{Análise dos Tempos de Resposta}
+\label{sec:analise_dos_tempos_de_resposta}
 
-A comparação de desempenho dos dois modelos de consistência será apresentada em
-duas tabelas, uma para os valores obtidos de tempo de resposta e outra para
-vazão. Cada linha corresponde a uma carga de trabalho, dada pela tripla
-(distribuição de operações, distribuição dos destinos dos acessos, localidade).
-Cada latência da rede define uma coluna. Cada célula da tabela apresenta 3
-valores: o desempenho da consistência em momento indeterminado, consistência na
-linha do tempo com leitura mais recente e consistência na linha do tempo com
-leitura qualquer.
+A principal métrica usada neste estudo foi o tempo de resposta. Tomou-se o
+cuidado de evitar sobrecarregar o sistema, de forma que os tempos de resposta
+representassem o comportamento do sistema em regime. Todas as figuras desta
+seção apresentam duas linhas de grade para auxiliar na interpretação: a linha
+vertical representa a latência de rede para aqueles gráficos e a horizontal
+representa a localidade.
 
-Outros valores e gráficos que ajudem na interpretação dos resultados serão
-apresentados, como a quantidade de conflitos no caso da consistência em momento
-indeterminado.
+%TODO: refazer graficos
+Os gráficos das FDAs dos tempos de resposta quando a latência é 0 ms está na
+Figura \ref{fig:fda_dos_tempos_de_resposta_para_latencia_de_rede_de_0_ms} Como
+esperado, todas as requisições se comportam como se fossem locais. Um fato a se
+notar é um degrau nos percentis mais altos das leituras em todos os modos. Uma
+explicação possível seria algum tipo de sobrecarga no sistema, mas nesse caso
+seria esperado ver comportamento semelhante nas escritas.
+
+\begin{figure}[p] \centering
+
+\includegraphics[width=1\textwidth]{ecdf0.png}
+
+\caption{FDA dos tempos de resposta para latência de rede de 0 ms.}
+\label{fig:fda_dos_tempos_de_resposta_para_latencia_de_rede_de_0_ms}
+\end{figure}
+
+Os gráficos das FDAs para 100 ms, 200 ms e 300 ms têm a mesma forma, portanto a
+opção foi fazer a análise do valor intermediário. O gráfico para latência de
+rede de 200 ms pode ser visto na Figura
+\ref{fig:fda_dos_tempos_de_resposta_para_latencia_de_rede_de_200_ms}.
+
+No caso de leituras e localidade 0,5, apenas lt\_rec apresenta requisições
+remotas.  Uma porção pequena dessas leituras possui tempo de resposta entre o
+tempo das requisições locais e a latência da rede, o que se explica pela
+variação da latência. A localidade 0,9 beneficia lt\_rec, que continua
+apresentando tempos de resposta mais altos que os outros modos. Em ambos os
+gráficos de leitura o degrau que existia continuar, mas no caso de lt\_rec ele
+surge próximo do percentil equivalente a localidade (percentil 50 para
+localidade 0,5 e percentil 90 para localidade 0,9). Isso sugere que esse e um
+efeito que sempre afeta requisições locais.
+
+No caso de escritas e localidade 0,5, lt\_rec apresenta um desempenho um pouco
+melhor que ev2 e lt\_qqer. A explicação provável para isso é o fato de o sistema
+como um todo estar menos carregado para esse modo do que os outros. Isso
+acontece pois as leituras de lt\_rec são mais lentas. Esse fato pode ser
+comprovado pela vazão dos modos lt\_rec, ev2 e lt\_qqer, respectivamente, 387,
+664, 600 operações/s.  Já no caso de localidade 0,9, lt\_rec e lt\_qqer se
+beneficiam da localidade, enquanto ev2 não e continua com o mesmo perfil
+apresentado para localidade 0,5.
+
+%TODO: refazer vazão subset(t, loc == 0.5 & delay == 200 & delay_var == 150 &
+%loss == 0) 
+
+\begin{figure}[p] \centering
+
+\includegraphics[width=1\textwidth]{ecdf200.png}
+
+\caption{FDA dos tempos de resposta para latência de rede de 200 ms.}
+\label{fig:fda_dos_tempos_de_resposta_para_latencia_de_rede_de_200_ms}
+\end{figure}
+
+Com exceção dos degraus que aparecem nos gráficos, todos os modos apresentam
+comportamento como o esperado.
+
+%% ------------------------------------------------------------------------- %%
+\section{Análise dos Conflitos} \label{sec:analise_dos_conflitos}
+
+%% ------------------------------------------------------------------------- %%
+\section{Análise das Migrações} \label{sec:analise_das_migracoes}
+
+%% ------------------------------------------------------------------------- %%
+%\section{TEXTO DA QUALIFICAÇÃO - DESCARTAR?} \subsection{Resultados parciais}
+%\label{sec:resultados_parciais}
+%
+%Até o momento foram executados alguns testes para um melhor entendimento do
+%problema sendo tratado e para o estudo e a avaliação das tecnologias usadas nos
+%experimentos.
+%
+%Primeiramente foram executados alguns experimentos no Revoada, aglomerado de 8
+%nós administrado pelo IME - USP. Esses experimentos usaram o Cassandra
+%\cite{Lakshman2010} como sistema de armazenamento e YCSB \cite{Cooper2010} como
+%aplicação para execução dos testes, e foram feitos como testes preliminares
+%sobre o efeito da latência de rede no desempenho de diferentes níveis de
+%consistência. Os experimentos usaram 3 nós de Cassandra e uma instância do
+%YCSB.  Foram usados os níveis de consistência ONE ($W = 1$ ou $R = 1$), QUORUM
+%($W = \lceil(N+1)/2\rceil$ ou $R = \lceil(N+1)/2\rceil)$ e ALL ($W = N$ ou $R =
+%N$) e latências variando de 0 a 300 ms. O YCSB não estava preparado para lidar
+%com diferentes configurações de consistência do Cassandra e foi alterado para
+%tal.  Para uma dada latência de rede, foi observado um aumento no tempo de
+%resposta e diminuição da vazão a medida em que configurações mais rígidas de
+%consistência foram usadas. Para uma dada configuração de consistência, foi
+%observado um aumento no tempo de resposta e diminuição da vazão a medida em que
+%a latência de rede foi aumentada. A preparação e execução desses experimentos
+%colaborou para um melhor entendimento de ferramentas e técnicas a serem usadas
+%neste trabalho.
+%
+%Um segundo conjunto de experimentos foi realizado no Grid5000 com três
+%configurações de consistência implementadas no Riak \cite{Riak}: consistência
+%em momento indeterminado, consistência na linha do tempo com leituras
+%consistentes e consistência na linha do tempo com leituras de qualquer versão.
+%Os experimentos usaram um aglomerado de 6 nós para o Riak, e um nó para o Basho
+%Bench \cite{Basho}. Os experimentos foram feitos usando latências de 0 a 150
+%ms.  Foram usadas 3 configurações relativas à distribuição dos nós por centros
+%de dados: todos os nós no mesmo centro de dados, dois nós em um centro de dados
+%remoto e quatro nós em um centro de dados remoto (o centro de dados local é o
+%centro de dados onde a aplicação de execução de testes roda). A carga de
+%trabalho usada foi uniforme para distribuição das chaves e para alvos dos
+%acessos. Esses experimentos funcionaram como testes da implementação de
+%consistência na linha do tempo. Os resultados observados não foram os
+%esperados, pois indicaram um melhor desempenho da consistência em momento
+%indeterminado, seguido da consistência na linha do tempo com leituras
+%consistentes e por último consistência na linha do tempo com leituras de versão
+%qualquer. O resultado esperado seria que leituras de versão qualquer
+%apresentassem desempenho melhor do que leituras consistentes. Isso pode ter
+%acontecido por problemas na implementação ou por algum fator não previsto no
+%funcionamento desses modelos de consistência. Esse fato precisa ser
+%investigado. Além disso, como esperado, os experimentos mostraram a existência
+%de conflitos na consistência em momento indeterminado, enquanto nenhum conflito
+%aconteceu na consistência na linha do tempo. O impacto desses conflitos no
+%desempenho não foi medido. A partir desses experimentos foi possível entender o
+%comportamento do Riak no ambiente do Grid5000, além de servir como prova de
+%conceito da implementação da consistência na linha do tempo no Riak.
+%
+%%% ------------------------------------------------------------------------- %%
+%\subsection{Apresentação dos resultados}
+%\label{sec:apresentacao_dos_resultados}
+%
+%\textbf{TEXTO DA QUALIFICAÇÃO}
+%
+%A comparação de desempenho dos dois modelos de consistência será apresentada em
+%duas tabelas, uma para os valores obtidos de tempo de resposta e outra para
+%vazão. Cada linha corresponde a uma carga de trabalho, dada pela tripla
+%(distribuição de operações, distribuição dos destinos dos acessos, localidade).
+%Cada latência da rede define uma coluna. Cada célula da tabela apresenta 3
+%valores: o desempenho da consistência em momento indeterminado, consistência na
+%linha do tempo com leitura mais recente e consistência na linha do tempo com
+%leitura qualquer.
+%
+%Outros valores e gráficos que ajudem na interpretação dos resultados serão
+%apresentados, como a quantidade de conflitos no caso da consistência em momento
+%indeterminado.
 
 %% ------------------------------------------------------------------------- %%
 \section{Ameaças à validade} \label{sec:ameacas_a_validade}
 
 O Riak usa uma arquitetura muito semelhante à descrita no artigo sobre o Dynamo.
 Com isso, os modelos de consistência usados nos experimentos podem apresentar
-outros resultados em sistemas que usem outras arquiteturas, embora o desempenho 
+outros resultados em sistemas que usem outras arquiteturas, embora o desempenho
 analisado neste estudo foi mais afetado for fatores de rede e carga de trabalho.
 
 Por limitação de tempo e recursos algumas variáveis que podem alterar os
@@ -89,6 +199,3 @@ Os experimentos consideram que todos os nós sempre operam sem falhas. Os
 resultados de experimentos com o sistema operando em algum modo de falha (desde
 a falha de um nó até de um centro de dados inteiro) devem ser diferentes dos
 obtidos nesse estudo.
-
-%% ------------------------------------------------------------------------- %%
-\section{Trabalhos futuros} \label{sec:trabalhos_futuros}
