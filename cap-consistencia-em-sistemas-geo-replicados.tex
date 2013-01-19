@@ -243,7 +243,7 @@ nula. Como qualquer sistema distribuído apresenta latência, consistência estrita
 
 \begin{table}[!h] \begin{center} \begin{tabular}{c|c|c} & T0     & T1		\\
 \hline R1 & W(x,a) &			\\ \hline R2 &        & a = R(x)	\\ \end{tabular}
-\caption{Sequência de operações válida para consistência estrita}
+\caption{Sequência de operações válida para consistência estrita.}
 \label{tab:consistencia_estrita_valida} \end{center} \end{table}
 
 Consistência forte (ou linearibilidade) \cite{Herlihy1990,Attiya1994} define que
@@ -264,7 +264,7 @@ entre réplicas.
 \begin{table}[!h] \begin{center} \begin{tabular}{c|c|c|c} & T0     & T1       &
 T2			\\ \hline R1 & W(x,a) &          &				\\ \hline R2 &        & 0 =
 R(x) & a = R(x)		\\ \end{tabular} \caption{Sequência de operações válida para
-consistência forte} \label{tab:consistencia_forte_valida_1} \end{center}
+consistência forte.} \label{tab:consistencia_forte_valida_1} \end{center}
 \end{table}
 
 \begin{table}[!h] \begin{center} \begin{tabular}{c|c|c} & T0     & T1       \\
@@ -272,7 +272,7 @@ consistência forte} \label{tab:consistencia_forte_valida_1} \end{center}
 a = R(x) \\ \end{tabular} \hspace{20pt} \begin{tabular}{c|c|c} & T0     & T1 \\
 \hline R1 & W(x,a) & b = R(x) \\ \hline R2 & W(x,b) & b = R(x) \\ \hline R3 & &
 b = R(x) \\ \end{tabular} \caption{Sequências de operações válidas para
-consistência forte} \label{tab:consistencia_forte_valida_2} \end{center}
+consistência forte.} \label{tab:consistencia_forte_valida_2} \end{center}
 \end{table}
 
 Um modelo mais relaxado que consistência forte é a consistência sequencial
@@ -293,7 +293,7 @@ não-distribuído.
 T3			\\ \hline R1 & W(x,a) &          &          &			\\ \hline R2 & &
 W(x,b)   &          &			\\ \hline R3 &        &          & b = R(x) & a = R(x)
 \\ \end{tabular} \caption{Sequência de operações válida para consistência
-sequencial} \label{tab:consistencia_sequencial_valida} \end{center} \end{table}
+sequencial.} \label{tab:consistencia_sequencial_valida} \end{center} \end{table}
 
 A consistência causal \cite{Ahamad1995} define que escritas que potencialmente
 possuem causas relacionadas devem ser executadas em todas as réplicas na mesma
@@ -310,15 +310,15 @@ valores diferentes dependendo da réplica acessada.
 T3			\\ \hline R1 & W(x,a) &          &          &			\\ \hline R2 & &
 W(x,b)   & a = R(x) & b = R(x)	\\ \hline R3 &        &          & b = R(x) & a
 = R(x)	\\ \end{tabular} \caption{Sequência de operações válida para
-consistência causal} \label{tab:consistencia_causal_valida} \end{center}
+consistência causal.} \label{tab:consistencia_causal_valida} \end{center}
 \end{table}
 
 \begin{table}[!h] \begin{center} \begin{tabular}{c|c|c|c|c|c} & T0     & T1 & T2
 & T3       &	T4			\\ \hline R1 & W(x,a) &          &          & &				\\
-\hline R2 &        & a = R(x) & W(x,b)   &          &				\\ \hline R3 & &
-&          & b = R(x) & a = R(x)	\\ \end{tabular} \caption{Sequência de
-operações inválida para consistência causal}
-\label{tab:consistencia_causal_invalida} \end{center} \end{table}
+\hline R2 &        & a = R(x) & W(x,b)   &          &				\\ \hline R3 & & &
+& b = R(x) & a = R(x)	\\ \end{tabular} \caption{Sequência de operações inválida
+para consistência causal} \label{tab:consistencia_causal_invalida.} \end{center}
+\end{table}
 
 A consistência em momento indeterminado\footnote{O termo \emph{eventual
 consistency} em inglês às vezes é erroneamente traduzido para o português como
@@ -341,7 +341,7 @@ implementar um mecanismo de resolução de conflitos.
 = R(x)	\\ \hline R2 &        & W(x,b)   & a = R(x) &          &	b = R(x)	\\
 \hline R3 &        &          & b = R(x) & a = R(x) & b = R(x)	\\ \end{tabular}
 \caption{Sequência de operações válida para consistência em momento
-indeterminado} \label{tab:consistencia_em_momento_indeterminado_valida}
+indeterminado.} \label{tab:consistencia_em_momento_indeterminado_valida}
 \end{center} \end{table}
 
 Por último, a consistência na linha do tempo \cite{Cooper2008,Alsberg1976}

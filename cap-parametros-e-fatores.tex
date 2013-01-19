@@ -378,11 +378,13 @@ Tabela \ref{tab:aglomerados_do_grid5000}.
 
 \begin{tabular}{|c|c|c|c|c|} \hline
 
-Aglomerado & CPU & Memória & Disco & Quantidade de nós \\ \hline
+Aglomerado & CPU & Memória & Disco & Nós \\ \hline
 
-parapide & & & & \\ \hline
+parapluie & AMD Opteron 6164 HE 1.7 Ghz & 48 GB & SATA / 250 GB & 40\\ \hline
 
-paradent & & & & \\ \hline
+sol & AMD Opteron 2218 2.6 GHz & 4 GB & SATA / 250 GB & 50\\ \hline
+
+suno & Intel Xeon E5520 2.26 GHz & 32 GB & SAS/RAID-0 / 2x300 GB & 45\\ \hline
 
 \end{tabular}
 
@@ -403,27 +405,25 @@ medição do desempenho, os experimentos usaram o hdparm para acesso sequencial e
 o
 seeker\footnote{url{http://www.linuxinsight.com/how\_fast\_is\_your\_disk.html}}
 para acesso aleatório. Os resultados estão na Tabela
-\ref{tab:comparacao_de_desempenho_dos_discos_entre_aglomerados}.
+\ref{tab:comparacao_de_desempenho_de_acessos_dos_discos_entre_aglomerados}.
 
 \begin{table}[!h] \begin{center}
 
 \begin{tabular}{|c|c|c|c|c|c|} \hline
 
-Aglomerado & Tipo & Tamanho & Acesso sequencial (MB/s) & Acesso aleatório
-(seeks/s) & Acesso aleatório (tempo de resposta em ms) \\ \hline
+Aglomerado & Sequencial (MB/s) & Aleatório (seeks/s) & Aleatório (em ms) \\
+\hline
 
-sol & & & 59,8 & 78 & 12,7 \\ \hline
+parapluie & 103,9 & 77 & 13,0 \\ \hline
 
-suno & & & 242,7 & 131 & 7,6 \\ \hline
+sol & 59,8 & 78 & 12,7 \\ \hline
 
-griffon & & & 73,9 & 56 & 17,6 \\ \hline
-
-parapluie & & & 103,9 & 77 & 13,0 \\ \hline
+suno & 242,7 & 131 & 7,6 \\ \hline
 
 \end{tabular}
 
-\caption{Comparação de desempenho dos discos entre aglomerados}
-\label{tab:comparacao_de_desempenho_dos_discos_entre_aglomerados}
+\caption{Comparação de desempenho de acessos dos discos entre aglomerados.}
+\label{tab:comparacao_de_desempenho_de_acessos_dos_discos_entre_aglomerados}
 
 \end{center} \end{table}
 
@@ -777,10 +777,18 @@ balanceada de leituras e escritas locais e remotas. O resultado do estudo está
 na Tabela \ref{tab:estudo_para_quantidade_de_nos_do_sistema}.
 
 \begin{table}[!h] \begin{center} \begin{tabular}{|c|c|c|c|c|c|c|c|c|} \hline
-Operação & Percentil & N & A & T & NA & NT & AT & NAT\\ \hline leitura & 10 & 30
-& 18 & 22 & 10 & 8 & 7 & 4 \\ \hline leitura & 90 & 65 & 13 & 15 & 3 & 4 & 0 & 0
-\\ \hline escrita & 10 & 96 & 2 & 1 & 0 & 0 & 0 & 0 \\ \hline escrita & 90 & 65
-& 15 & 13 & 3 & 3 & 0 & 0 \\ \hline \end{tabular} \caption{Estudo para
+
+Operação & Percentil & N & A & T & NA & NT & AT & NAT\\ \hline
+
+leitura & 10 & 30 & 18 & 22 & 10 & 8 & 7 & 4 \\ \hline
+
+leitura & 90 & 65 & 13 & 15 & 3 & 4 & 0 & 0 \\ \hline
+
+escrita & 10 & 96 & 2 & 1 & 0 & 0 & 0 & 0 \\ \hline
+
+escrita & 90 & 65 & 15 & 13 & 3 & 3 & 0 & 0 \\ \hline
+
+\end{tabular} \caption[Estudo para quantidade de nós do sistema.]{Estudo para
 quantidade de nós do sistema. N representa a quantidade de nós do sistema, A
 representa a quantidade de instâncias do benchmark e T representa a quantidade
 de threads usadas em cada instânca do benchmark.}
@@ -843,13 +851,21 @@ escritas locais e remotas. O resultado do estudo está na Tabela
 \ref{tab:estudo_para_quantidade_e_tamanho_dos_objetos_armazenados}.
 
 \begin{table}[!h] \begin{center} \begin{tabular}{|c|c|c|c|c|c|c|c|c|} \hline
-Operação & Percentil & Q & T & L & QT & QL & TL & QTL\\ \hline leitura & 10 & 0
-& 100 & 0 & 0 & 0 & 0 & 0 \\ \hline leitura & 90 & 0 & 0 & 100 & 0 & 0 & 0 & 0
-\\ \hline escrita & 10 & 0 & 100 & 0 & 0 & 0 & 0 & 0 \\ \hline escrita & 90 & 0
-& 0 & 100 & 0 & 0 & 0 & 0 \\ \hline \end{tabular} \caption{Estudo para
-quantidade e tamanho dos objetos armazenados. Q representa a quantidade de
-objetos armazenados, T representa o tamanho dos objetos armazenados e L
-representa a latência.}
+
+Operação & Percentil & Q & T & L & QT & QL & TL & QTL\\ \hline
+
+leitura & 10 & 0 & 100 & 0 & 0 & 0 & 0 & 0 \\ \hline
+
+leitura & 90 & 0 & 0 & 100 & 0 & 0 & 0 & 0 \\ \hline
+
+escrita & 10 & 0 & 100 & 0 & 0 & 0 & 0 & 0 \\ \hline
+
+escrita & 90 & 0 & 0 & 100 & 0 & 0 & 0 & 0 \\ \hline
+
+\end{tabular} \caption[Estudo para quantidade e tamanho dos objetos
+armazenados.]{Estudo para quantidade e tamanho dos objetos armazenados. Q
+representa a quantidade de objetos armazenados, T representa o tamanho dos
+objetos armazenados e L representa a latência.}
 \label{tab:estudo_para_quantidade_e_tamanho_dos_objetos_armazenados}.
 \end{center} \end{table}
 
@@ -912,13 +928,23 @@ transmissão e recepção. O resultado do estudo está na Tabela
 \ref{tab:estudo_para_tamanho_dos_buffers_de_transmissao_e_recepcao}.
 
 \begin{table}[!h] \begin{center} \begin{tabular}{|c|c|c|c|c|c|c|c|c|} \hline
-Operação & Percentil & L & O & B & LO & LB & OB & LOB\\ \hline leitura & 10 & 92
-& 0 & 3 & 0 & 0 & 2 & 3\\ \hline leitura & 90 & 98 & 0 & 1 & 0 & 0 & 0 & 0\\
-\hline escrita & 10 & 87 & 11 & 0 & 1 & 1 & 0 & 0\\ \hline escrita & 90 & 99 & 0
-& 0 & 0 & 0 & 0 & 0\\ \hline \end{tabular} \caption{Estudo para tamanho dos
-buffers de transmissão e recepção. L representa a latência, R representa a taxa
-de pacotes fora de ordem e B representa o tamanho dos buffers.}
+
+Operação & Percentil & L & O & B & LO & LB & OB & LOB\\ \hline
+
+leitura & 10 & 92 & 0 & 3 & 0 & 0 & 2 & 3\\ \hline
+
+leitura & 90 & 98 & 0 & 1 & 0 & 0 & 0 & 0\\ \hline
+
+escrita & 10 & 87 & 11 & 0 & 1 & 1 & 0 & 0\\ \hline
+
+escrita & 90 & 99 & 0 & 0 & 0 & 0 & 0 & 0\\ \hline
+
+\end{tabular} \caption[Estudo para tamanho dos buffers de transmissão e
+recepção.]{Estudo para tamanho dos buffers de transmissão e recepção. L
+representa a latência, R representa a taxa de pacotes fora de ordem e B
+representa o tamanho dos buffers.}
 \label{tab:estudo_para_tamanho_dos_buffers_de_transmissao_e_recepcao}.
+
 \end{center} \end{table}
 
 Como o tamanho dos buffers não afetou o desempenho, a opção foi por
@@ -959,18 +985,45 @@ fatores de rede foram:
 
 %TODO: falar sobre cubic e htcp
 
-O resultado do estudo está na Tabela \ref{tab:estudo_para_fatores_de_rede}
-(devido ao grande números de colunas da tabela apenas colunas com ao menos um
-valor diferente de 0 são apresentadas).
+O resultado do estudo está na Tabela \ref{tab:estudo_para_fatores_de_rede}.  Com
+exceção dos fatores e da interação entre latência e variação de latência, todas
+as outras colunas apresentavam valores nulos e foram suprimidas.
 
-\begin{table}[!h] \begin{center}
-\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|} \hline Operação & Percentil \\
-\hline leitura & 10 \\ \hline leitura & 90 \\ \hline escrita & 10 \\ \hline
-escrita & 90 \\ \hline \end{tabular} \caption{Estudo para fatores de rede. L
-representa a latência, V representa a variação da latência, P representa as taxa
-de perdas, D representa a taxa de pacotes duplicados, O representa a taxa de
-pacotes fora de ordem e C representa o algoritmo de congestionamento.}
-\label{tab:estudo_para_fatores_de_rede}.  \end{center} \end{table}
+\begin{table}[!h] \begin{center} \begin{tabular}{|c|c|c|c|c|c|c|c|c|} \hline
+
+Operação & Percentil & L & V & P & D & O & C & LV\\ \hline
+
+leitura & 90 & 77 & 18 & 0 & 0 & 0 & 0 & 5\\ \hline
+
+escrita & 90 & 70 & 24 & 0 & 0 & 0 & 0 & 6\\ \hline
+
+\end{tabular}
+
+\caption[Estudo para fatores de rede.]{Estudo para fatores de rede. L representa
+a latência, V representa a variação da latência, P representa as taxa de perdas,
+D representa a taxa de pacotes duplicados, O representa a taxa de pacotes fora
+de ordem e C representa o algoritmo de congestionamento.}
+\label{tab:estudo_para_fatores_de_rede}
+
+\end{center} \end{table}
+
+% Factors: delay delay_var loss dupl reorder congest 
+
+% get - p10 : 54 1 1 7 1 2 14 0 6 1 0 0 4 1 0 0 0 0 0 0 0 0 5 1 0 0 0 0 0 0 0 0
+% 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0   | CV =
+% 0.007921385 
+
+% get - p90 : 77 18 0 0 0 0 5 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+% 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0   | CV =
+% 0.5825256 
+
+% upd - p10 : 67 3 0 6 0 2 7 0 4 1 0 0 3 0 0 0 0 0 0 0 0 0 3 0 0 0 0 0 0 0 0 0 0
+% 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0   | CV =
+% 0.006834625 
+
+% upd - p90 : 70 24 0 0 0 0 6 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+% 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0   | CV =
+% 0.6184648 
 
 Como esperado, fatores relacionados a WAN afetam pouco as requisições locais,
 que apresentaram CVs de 1\% tanto para leituras quanto para escritas. O mesmo
@@ -1099,16 +1152,24 @@ nunca teria influência. O resultado do estudo está na Tabela
 \ref{tab:estudo_para_fatores_de_carga_de_trabalho}
 
 \begin{table}[!h] \begin{center}
-\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|} \hline Modo & R & X & P & L &
-RX & RP & RL & XP & XL & PL & RXP & RXL & RPL & XPL & RXPL\\ \hline ind1 & 19 &
-12 & 2 & 31 & 0 & 3 & 2 & 4 & 6 & 6 & 4 & 0 & 0 & 8 & 1\\ \hline ind2 & 50 & 0 &
-0 & 39 & 0 & 0 & 11 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0\\ \hline lt\_qqer & 25 & 30
-& 0 & 19 & 9 & 0 & 6 & 0 & 8 & 0 & 0 & 3 & 0 & 0 & 0\\ \hline lt\_rec & 0 & 53 &
-0 & 34 & 0 & 0 & 0 & 0 & 13 & 0 & 0 & 0 & 0 & 0 & 0\\ \hline \end{tabular}
-\caption{Estudo para fatores de carga de trabalho para ind1. R representa a
-relação leitura/escrita, X representa a localidade, P representa a popularidade
-e L representa a latência de rede.}
-\label{tab:estudo_para_fatores_de_carga_de_trabalho}.  \end{center} \end{table}
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|} \hline
+
+Modo & R & X & P & L & RX & RP & RL & XP & XL & PL & RXP & RXL & RPL & XPL &
+RXPL\\ \hline
+
+ind1 & 19 & 12 & 2 & 31 & 0 & 3 & 2 & 4 & 6 & 6 & 4 & 0 & 0 & 8 & 1\\ \hline
+
+ind2 & 50 & 0 & 0 & 39 & 0 & 0 & 11 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0\\ \hline
+
+lt\_qqer & 25 & 30 & 0 & 19 & 9 & 0 & 6 & 0 & 8 & 0 & 0 & 3 & 0 & 0 & 0\\ \hline
+
+lt\_rec & 0 & 53 & 0 & 34 & 0 & 0 & 0 & 0 & 13 & 0 & 0 & 0 & 0 & 0 & 0\\ \hline
+
+\end{tabular} \caption[Estudo para fatores de carga de trabalho.]{Estudo para
+fatores de carga de trabalho. R representa a relação leitura/escrita, X
+representa a localidade, P representa a popularidade e L representa a latência
+de rede.} \label{tab:estudo_para_fatores_de_carga_de_trabalho}.  \end{center}
+\end{table}
 
 Como esperado, localidade e latência impactam os modos em geral. Uma observação
 é o fato de inclusive ind1 ser afetada por latência. Isso provavelmente
