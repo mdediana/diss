@@ -353,6 +353,7 @@ foram alterados, um script para ajuste da pilha TCP foi usado. A principal
 otimização desse script era ajustar os tamanhos dos buffers de transmissão e
 recepção ao BDP (para mais detalhes, ver seção \ref{sec:fatores_de_rede}).
 
+%% ------------------------------------------------------------------------- %%
 \subsubsection{Centros de dados}
 
 Os experimentos foram planejados para usar dois centros de dados simulados (ver
@@ -383,30 +384,38 @@ o mesmo centro de dados saíam inalteradas.
 %TODO: dummynet: Marta Carbone and Luigi Rizzo, Dummynet Revisited, ACM SIGCOMM
 %Computer Communication Review, 40(2) pg.12-20, March 2010
 
+%% ------------------------------------------------------------------------- %%
+\subsection{Scripts de execução e análise dos experimentos}
+\label{sec:scripts_de_execucao_e_analise_dos_experimentos}
+
+A automatização das etapas dos experimentos foi feita em dois conjuntos de
+scripts. O primeiro (cmb) foi usado para gerenciamento e execução dos
+experimentos -- reserva de nós, implantação da imagem, gerenciamento do sistema
+de armazenamento, configuração e execução do benchmark e coleta dos resultados.
+Os scripts se localizavam no frontend do Grid5000 e foram escritos em bash.  O
+fluxo de trabalho de um estudo, dado por esses scripts, está descrito a seguir.
+O segundo conjunto (cmb-local) foi usado na análise dos dados, se localizava no
+computador do autor e era composto por scripts em bash, Ruby e R.
 
 %% ------------------------------------------------------------------------- %%
-\subsection{Fluxo de trabalho dos experimentos}
-\label{sec:fluxo_de_trabalho_dos_experimentos}
+\subsubsection{Fluxo de trabalho dos experimentos}
 
-O fluxo de trabalho dos experimentos foi dado por dois conjuntos de scripts.  O
-primeiro (cmb) se localizava no frontend do Grid5000 e era usado para reserva de
-nós, instalação da imagem, gerenciamento do sistema de armazenamento,
-configuração e execução do benchmark e coleta dos resultados. Os scripts foram
-escritos em bash. O segundo conjunto (cmb-local) foi usado na análise dos dados
-e se localizava no computador do autor. Esses scripts foram escritos em bash,
-Ruby e R.
+A execução de um estudo compreendia diversas etapas, um script correspondendo a
+cada uma delas. O fluxo de trabalho em si também estava definido em um script,
+que invocava os outros na sequência apresentada na Figura
+\ref{fig:fluxo_de_trabalho_da_execucao_do_estudo}. As etapas estão descritas a
+seguir, entre parênteses está o nome do script responsável por ela.
 
-Uma vez feita a reserva de nós, a execução de um estudo consistia dos seguintes
-passos:
-
-\begin{figure}[p] \centering
+\begin{figure}[!htb] \centering
 
 \begin{tikzpicture}[node distance = 2cm, auto]
     % Place nodes
-    \node [block] (deploy) {Implantação da imagem nos nós};
+    \node [block] (reserve) {Reserva dos nós};
 
-    \node [block, right of=deploy, node distance=8em] (srvs) {Configuração dos
-nós};
+    \node [block, right of=reserve, node distance=8em] (deploy) {Implantação da
+imagem nos nós};
+
+    \node [block, below of=deploy] (srvs) {Configuração dos nós};
 
     \node [block, below of=srvs] (riak) {Configuração do Riak};
 
@@ -425,11 +434,15 @@ experimento?};
     \node [decision, above of=loop, node distance=10em] (reconf) {Modo ou
 localidade mudaram?};
 
-    \node [block, right of=loop, node distance=10em] (stop) {Término do Riak};
+    \node [block, right of=loop, node distance=10em] (stop1) {Término do Riak};
 
-    \node [block, right of=stop, node distance=8em] (end) {Fim};
+    \node [block, right of=riak, node distance=10em] (stop2) {Término do Riak};
+
+    \node [block, right of=stop1, node distance=8em] (end) {Fim};
 
     % Draw edges
+    \path [line] (reserve) -- (deploy);
+
     \path [line] (deploy) -- (srvs);
 
     \path [line] (srvs) -- (riak);
@@ -446,28 +459,62 @@ localidade mudaram?};
 
     \path [line] (loop) -- node [near start] {não} (reconf);
 
-    \path [line] (loop) -- node [near start] {sim}(stop);
+    \path [line] (loop) -- node [near start] {sim}(stop1);
 
     \path [line] (reconf) -- node [near start] {não} (wan);
 
-    \path [line] (reconf) |- node [near start] {sim}(riak);
+    \path [line] (reconf) -- node [near start] {sim}(stop2);
 
-    \path [line] (stop) -- (end);
+    \path [line] (stop2) -- (riak);
+
+    \path [line] (stop1) -- (end);
 
 \end{tikzpicture}
 
 \caption{Fluxo de trabalho da execução do estudo.}
 \label{fig:fluxo_de_trabalho_da_execucao_do_estudo} \end{figure}
 
-%%\item Configuração da WAN emulada -- incluindo ajuste da pilha TCP/IP
-%%
-%%\item Execução do benchmark
-%%
-%%\item Finalização do Riak
-%
-%\end{tikzpicture}
+\paragraph{Reserva dos nós (reserve)}Nessa etapa, escolhe-se o aglomerado, a
+quantidade de nós, o período da reserva e o instante em que ela ocorrerá (pode
+ser imediatamente ou em algum momento futuro). O script basicamente é uma forma
+mais simples de executar o oarsub, ferramenta de reserva de nós do Grid5000. O
+Grid5000 disponibiliza uma aplicação web em que é possível ver as reservas de
+nós atuais em cada aglomerado.
 
-Cada um desses passos corresponde a um script. Os passos estavam definidos em um
-outro script (run-all), responsável pelo fluxo de trabalho.
+\paragraph{Implantação da imagem nos nós (deploy)}Essa etapa usa a lista de nós
+definida na reserva e lida com situações em que os nós não foram corretamente
+implantados, algo relativamente comum. Se não fosse esse tratamento, o script
+seria apenas uma forma mais simples de usar o kadeploy, ferramenta para
+implantação de imagens do Grid5000.
 
-% Comentar sanity checks
+\paragraph{Configuração dos nós (srvs)}Essa etapa consiste em separar os nós com
+imagens implantadas entre nós de Riak e instâncias do benchmark, a partir das
+quantidades de cada definidas para o estudo. Nesse momento, os nós de Riak
+também são dividos entre os centros de dados a serem usados e os IPs das
+sub-redes são alocados (script net).
+
+\paragraph{Configuração do Riak (riak)}Essa etapa consiste no envio dos arquivos
+de configuração do Riak para cada nó. É nesse momento que o modelo de
+consistência que o Riak vai usar é definido.
+
+\paragraph{Inicialização do Riak (start)}Essa etapa corresponde à inicialização
+das instâncias de Riak em cada nó e criação do aglomerado de Riak, quando as
+partições do anel consistente são distribuídas entre as instâncias.
+
+\paragraph{Carga do sistema (load)}Essa é uma das etapas mais longas e complexas
+do fluxo de trabalho. A primeira parte da carga do sistema é popular o banco de
+dados do Riak. Para consistência na linha do tempo existe uma segunda parte, que
+é o aquecimento do sistema (detalhes dessa parte estão na subseção
+\ref{sec:aquecimento}).
+
+\paragraph{Configuração da WAN emulada}Nessa etapa as interfaces de rede dos nós
+são configuradas com latência de rede, perda de pacotes, etc como descrito em
+\ref{sec:rede}.
+
+\paragraph{Execução de um experimento}Essa etapa começa pela aquisição de
+informações dos nós, como as condições de memória e disco dos nós e testes de
+ping entre nós. Após isso, a execução do benchmark propriamente dita ocorre. Por
+fim, arquivos com os resultados dos experimentos, logs e arquivos de
+configuração são salvos para serem usados na análise dos resultados depois.
+
+\paragraph{Término do Riak}Essa etapa é responsável por encerrar o Riak.

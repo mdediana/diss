@@ -374,10 +374,21 @@ Os aglomerados do Grid5000 considerados foram paradent, parapide, sol e suno. A
 descrição do hardware e a quantidade de nós de cada um deles se encontra na
 Tabela \ref{tab:aglomerados_do_grid5000}.
 
-\begin{table}[!h] \begin{center} \begin{tabular}{|c|c|c|c|c|} \hline Aglomerado
-& CPU & Memória & Disco & Quantidade de nós \\ \hline parapide & & & & \\ \hline
-paradent & & & & \\ \hline \end{tabular} \caption{Aglomerados do Grid5000}
-\label{tab:aglomerados_do_grid5000} \end{center} \end{table}
+\begin{table}[!h] \begin{center}
+
+\begin{tabular}{|c|c|c|c|c|} \hline
+
+Aglomerado & CPU & Memória & Disco & Quantidade de nós \\ \hline
+
+parapide & & & & \\ \hline
+
+paradent & & & & \\ \hline
+
+\end{tabular}
+
+\caption{Aglomerados do Grid5000.} \label{tab:aglomerados_do_grid5000}
+
+\end{center} \end{table}
 
 Os experimentos feitos para o mecanismo de armazenamento mostraram diferenças
 consideráveis no desempenho do Riak em aglomerados diferentes. Considerando que
@@ -394,14 +405,27 @@ seeker\footnote{url{http://www.linuxinsight.com/how\_fast\_is\_your\_disk.html}}
 para acesso aleatório. Os resultados estão na Tabela
 \ref{tab:comparacao_de_desempenho_dos_discos_entre_aglomerados}.
 
-\begin{table}[!h] \begin{center} \begin{tabular}{|c|c|c|c|c|c|} \hline
+\begin{table}[!h] \begin{center}
+
+\begin{tabular}{|c|c|c|c|c|c|} \hline
+
 Aglomerado & Tipo & Tamanho & Acesso sequencial (MB/s) & Acesso aleatório
-(seeks/s) & Acesso aleatório (tempo de resposta em ms) \\ \hline sol & & & 59,8
-& 78 & 12,7 \\ \hline suno & & & 242,7 & 131 & 7,6 \\ \hline griffon & & & 73,9
-& 56 & 17,6 \\ \hline parapluie & & & 103,9 & 77 & 13,0 \\ \hline \end{tabular}
+(seeks/s) & Acesso aleatório (tempo de resposta em ms) \\ \hline
+
+sol & & & 59,8 & 78 & 12,7 \\ \hline
+
+suno & & & 242,7 & 131 & 7,6 \\ \hline
+
+griffon & & & 73,9 & 56 & 17,6 \\ \hline
+
+parapluie & & & 103,9 & 77 & 13,0 \\ \hline
+
+\end{tabular}
+
 \caption{Comparação de desempenho dos discos entre aglomerados}
-\label{tab:comparacao_de_desempenho_dos_discos_entre_aglomerados} \end{center}
-\end{table}
+\label{tab:comparacao_de_desempenho_dos_discos_entre_aglomerados}
+
+\end{center} \end{table}
 
 Além  do tipo de disco, um outro ponto que precisava ser considerado foi o cache
 de disco. Em sistemas Linux, todo a memória livre é automaticamente usada como
@@ -521,7 +545,6 @@ nos experimentos finais. A quantidade de fatores inicialmente considerada nesse
 ponto era grande, portanto experimentos foram realizados para diminuir essa
 lista. A descrição dos experimentos, dos fatores e seus níveis se encontra na
 seção \ref{sec:selecao_dos_fatores}.
-
 
 %% ------------------------------------------------------------------------- %%
 \section{Seleção dos Fatores} \label{sec:selecao_dos_fatores}
@@ -675,9 +698,53 @@ durabilidade, que para ind2 é mais alta do que para os outros casos, em que a
 confirmação de escrita de uma única réplica é suficiente.
 
 %% ------------------------------------------------------------------------- %%
-\subsection{Quantidade de nós do sistema, quantidade de instâncias do benchmark
-e quantidade de threads por instância do benchmark}
-\label{sec:quantidade_de_nos_do_sistema_quantidade_de_instancias_do_benchmark_e_quantidade_de_threads_por_instancia_do_benchmark}
+\subsection{Aquecimento} \label{sec:aquecimento}
+
+Como localidade e popularidade eram fatores, apenas a inserção de objetos na
+etapa de carga (seção \ref{sec:scripts_de_execucao_e_analise_dos_experimentos})
+não era suficiente para que o sistema operasse em regime durante os experimentos
+para a consistência na linha do tempo. Isso porque ao final da inserção, cada
+objeto no banco de dados tinha recebido apenas um acesso de cada centro de
+dados, nenhuma réplica mestre teria migrado por efeito da localidade até esse
+momento. Por isso, o aquecimento era necessário durante a etapa de carga para a
+consistência na linha do tempo.
+
+O aquecimento era dado por uma quantidade de passos, cada passo fazendo uma
+quantidade de acessos igual a quantidade de objetos armazenados no banco de
+dados. Para saber quantos passos seriam necessários para cada combinação de
+localidade e popularidade, um estudo foi realizado. O estudo executou diversos
+passos e ao final de cada um mediu a quantidade de migrações ocorridas. O estudo
+foi feito com 20000 objetos, mas quantidades maiores de objetos precisariam da
+mesma quantidade de passos, a diferença é que eles seriam compostos por mais
+requisições e, portanto, demorariam mais. Os resultados desse estudo estão na
+Figura \ref{fig:aquecimento_do_sistema}.
+
+\begin{figure}[!htb] \centering
+
+\includegraphics[width=0.8\textwidth]{warmup.png}
+
+\caption{Aquecimento do sistema.} \label{fig:aquecimento_do_sistema}
+\end{figure}
+
+A quantidade de migrações aumenta nos primeiros passos. Para localidade 0,5, a
+quantidade de migrações estabiliza após o 3\textsuperscript{o} passo e a
+popularidade não influencia. Já para localidade 0,9, a estabilização demora
+cerca de 15 passos e as curvas são diferentes para popularidade apenas nos
+primeiros passos. Com isso, a etapa de aquecimento nos estudos foi configurada
+para usar uma quantidade de passos de acordo com a localidade. Os valores para
+quantidade de passos configurados foram:
+
+\begin{itemize}
+
+\item Localidade 0,5: 3
+
+\item Localidade 0,9: 17
+
+\end{itemize}
+
+%% ------------------------------------------------------------------------- %%
+\subsection{Fatores de tamanho do sistema e benchmark}
+\label{sec:fatores_de_tamanho_do_sistema_e_benchmark}
 
 Este estudo foi feito para dimensionar o tamanho do sistema e do benchmark.
 Esses valores não só teriam impacto nos experimentos, mas também afetavam
@@ -754,8 +821,7 @@ aglomerado multiplicada por 2 horas. Dessa forma, experimentos que precisassem
 de 40 nós seriam mais difíceis de ser executados.
 
 %% ------------------------------------------------------------------------- %%
-\subsection{Quantidade de objetos armazenados e tamanho dos objetos armazenados}
-\label{sec:quantidade_de_objetos_armazenados_e_tamanho_dos_objetos_armazenados}
+\subsection{Fatores de banco de dados} \label{sec:fatores_de_banco_de_dados}
 
 Este estudo foi feito para dimensionar o tamanho do banco de dados, que afeta o
 uso de memória e de banda. Os experimentos também consideraram a latência como
