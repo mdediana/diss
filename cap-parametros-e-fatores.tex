@@ -107,7 +107,6 @@ $FSQX = SQX / STQ$
 Comparando todos os $FSQX$s é possível descobrir quais são os fatores e
 interações entre eles que mais afetam os resultados dos experimentos.
 
-
 %% ------------------------------------------------------------------------- %%
 \section{Lista de Parâmetros} \label{sec:lista_de_parametros}
 
@@ -427,7 +426,7 @@ suno & 242,7 & 131 & 7,6 \\ \hline
 
 \end{center} \end{table}
 
-Além  do tipo de disco, um outro ponto que precisava ser considerado foi o cache
+Além do tipo de disco, um outro ponto que precisava ser considerado foi o cache
 de disco. Em sistemas Linux, todo a memória livre é automaticamente usada como
 cache de disco. Dado isso, existiam três opções para a execução dos experimentos
 com relação ao mecanismo de armazenamento, considerando que um tamanho do banco
@@ -979,11 +978,14 @@ fatores de rede foram:
 
 \item Proporção de pacotes fora de ordem na WAN (\%): 0,05 e 5
 
-\item Algoritmo de congestionamento: cubic e htcp
+\item Algoritmo de congestionamento: TCP CUBIC e H-TCP
 
 \end{itemize}
 
-%TODO: falar sobre cubic e htcp
+Ambos os algoritmos de congestionamento testados são específicos para redes com
+largura de banda e latências grandes. Ambos já estavam disponíveis no Linux
+usado nos experimentos, sendo que TCP CUBIC é a configuração padrão. O H-TCP foi
+citado em duas referências sobre otimização para WANs da pilha TCP.
 
 O resultado do estudo está na Tabela \ref{tab:estudo_para_fatores_de_rede}.  Com
 exceção dos fatores e da interação entre latência e variação de latência, todas
