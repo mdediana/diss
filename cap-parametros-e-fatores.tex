@@ -224,6 +224,7 @@ diminui. Esse exemplo ilustra outra característica de variações de latência, que
 do tempo.
 %TODO: citar paper mdcc sobre variação de latência e
 %http://amplab.cs.berkeley.edu/2011/10/20/latencies-gone-wild/
+% Effect of Delays on TCP Performance
 
 \paragraph{Latência da WAN}Mesma justificativa que para latência da LAN. Um
 agravante é que latências em WANs são ordens de grandeza maiores que em LANs já
@@ -345,8 +346,8 @@ desempenho do sistema, o parâmetro é pouco relevante para o estudo em questão --
 caso contrário, ele seria considerado um fator.
 
 Favorecer simetria e homogeneidade nos experimentos foi um princípio que guiou
-algumas das decisões abaixo, pois isso simplificou a implementação e a análise
-dos experimentos. A desvantagem disso é a possibilidade de perda de realismo,
+algumas das decisões, pois isso simplificou a implementação e a análise
+dos experimentos. A desvantagem é a possível perda de realismo,
 dado que sistemas distribuídos de larga escala não costumam ser totalmente
 simétricos nem homogêneos.
 
@@ -552,13 +553,15 @@ fator, a taxa de chegada foi fixada.
 \section{Seleção dos Fatores} \label{sec:selecao_dos_fatores}
 
 Os parâmetros que não foram fixados consequentemente eram candidatos a fatores
-nos experimentos finais. Como a lista de fatores ainda continha muitos deles,
-precisava ser reduzida, o que foi feito através de experimentos fatoriais
-fracionados. Eles foram divididos em dois grupo, o primeiro constituído por
-fatores de sistema, que teriam baixa prioridade para entrar nos experimentos
-finais, e o segundo constituído pelos fatores restantes, de alta prioridade.
+nos experimentos finais. Como a lista precisava ser reduzida pois ainda era
+grande, experimentos fatoriais fracionados foram realizados. Dada a meta do estudo, fatores de rede e de carga de trabalho foram
+priorizados, portanto havia intenção de desconsiderar os fatores de sistema
+desde o início. Mesmo assim, estudos fatoriais foram feitos para eles por dois motivos.
+Primeiro, para verificar quais fatores eram mais influentes e portanto representavam
+ameaças à validade se desconsiderados. Depois, para ter mais informações
+sobre os valores a serem usados para eles.
 
-Os fatores do grupo de baixa prioridade eram:
+Os fatores de sistema eram:
 
 \begin{itemize}
 
@@ -574,7 +577,7 @@ Os fatores do grupo de baixa prioridade eram:
 
 \end{itemize}
 
-Os fatores do grupo de alta prioridade eram:
+Os fatores de rede eram:
 
 \begin{itemize}
 
@@ -596,6 +599,12 @@ Os fatores do grupo de alta prioridade eram:
 
 \item Produto Banda-Latência (\emph{Bandwidth Delay Product} -- BDP)
 
+\end{itemize}
+
+Os fatores de carga de trabalho eram:
+
+\begin{itemize}
+
 \item Relação leitura/escrita
 
 \item Popularidade dos objetos
@@ -606,46 +615,47 @@ Os fatores do grupo de alta prioridade eram:
 
 Uma abordagem possível para a seleção final de fatores seria agrupar todos os
 fatores levantados em um único projeto de experimentos fatoriais
-2\textsuperscript{k}. O problema é que mesmo com apenas 2 níveis por fator, a
+2\textsuperscript{k}. O problema é que mesmo com apenas dois níveis por fator, a
 quantidade final de experimentos seria proibitiva, dado que a quantidade de
 fatores era 17.
 
-A opção adotada para lidar com o excesso de fatores foi dividi-los em grupos
+A opção adotada para lidar com o excesso de fatores foi dividí-los em grupos
 menores e realizar experimentos para cada grupo. O principal problema de fazer
-essa separação é o fato de a comparação da importância entre fatores de grupos
-diferentes ser perdida. Por exemplo, se houvesse interação entre localidade e
-quantidade de nós do sistema e eles não fizessem parte do mesmo estudo, essa
-informação seria perdida. Além disso, mesmo que um grupo fosse constituído
-apenas por fatores pouco influentes, um ou mais deles apareceriam com valores de
-influência altos, o que praticamente invalidaria o processo de seleção.
-Analisando os casos suscetíveis a esse problema, percebeu-se que o maior risco
-era ignorar comparações e/ou interações com fatores de rede. Dado isso, a
-abordagem adotada foi usar a latência, fator que já era sabido ser influente (e
-comprovado experimentalmente depois), como um representante da rede. A partir
-dessa abordagem foi possível concluir, por exemplo, que apesar de o tamanho dos
+essa separação é o fato de a comparação da influência de fatores de grupos
+diferentes ser perdida. Por exemplo, localidade e quantidade de nós de sistema
+foram tratados em estudos diferentes e cada um apareceu como o fator mais
+influente do estudo de que fez parte. Como eles não fizeram parte do mesmo
+estudo, a informação de qual deles é o mais influente foi perdida, bem como a
+informação sobre a influência da interação entre eles. Se um
+fosse muito mais influente do que o outro e a interação entre eles fosse baixa,
+a decisão de fixar o menos influente não teria consequências. Mas sem essa
+informação, fixar um deles representava ameaça à validade do estudo.
+
+A maioria desses fatores eram suscetíveis a interação com fatores de rede, como
+o tamanho dos objetos armazenados, por exemplo. A latência de rede em particular
+havia se mostrado muito influente em estudos exploratórios, fato
+confirmado posteriormente pelo estudo para fatores de rede. Dado isso, a
+abordagem adotada foi usar a latência como um representante da rede nos outros
+estudos fatoriais. A partir
+disso foi possível concluir, por exemplo, que apesar de o tamanho dos
 objetos armazenados aparecer como fator influente no estudo fatorial para ele,
-desconsiderá-lo no estudo final não era uma grande ameaça à validade pois a
-latência de rede era um fator bem mais relevante.
+desconsiderá-lo no estudo final não era uma ameaça à validade pois a
+latência era um fator bem mais influente.
 
 Existem outras situações em que desconsiderar um fator que aparece como
-influente não implica necessariamente em ameaça à validade. Experimentos
-fatoriais mostram a influência relativa de cada fator e cada interação entre
-fatores. Nesse tipo de análise, o total de todas as influências relativas deve
-ser sempre 100\%. Por isso, mesmo que todos os fatores afetem pouco a resposta,
-um ou mais vão aparecer nos experimentos fatoriais com influência alta. Assim,
-também foram calculados os coeficientes de variabilidade\footnote{O coeficiente
-de variação é a divisão do desvio padrão pela média e é uma maneira de
-representar a variabilidade dos dados desconsiderando sua ordem de grandeza}
-(CVs) para cada resultado de forma a estimar qual a importância daquele conjunto
-de fatores e interações como um todo. Se o CV é baixo ao final de um estudo
-fatorial, isso implica que nenhum daqueles fatores é influente, dado que todas
-as combinações entre eles foram testadas e o desempenho variou pouco de um
-experimento para o outro.
+influente não implica necessariamente em ameaça à validade. Como em um estudo
+fatorial fracionado 2\textsuperscript{k} a soma das influências dos fatores e interações entre eles é 100\%,
+mesmo que todos os fatores afetem pouco a resposta, um ou mais deles aparecem
+como influentes. Por isso, também foram calculados os coeficientes de
+variabilidade\footnote{O coeficiente de variação é a divisão do desvio padrão
+pela média e é uma maneira de representar a variabilidade dos dados
+desconsiderando sua ordem de grandeza} (CVs) das respostas para estimar
+qual a influência daquele conjunto de fatores e interações como um todo. Assim,
+nenhum dos fatores usados em um estudo é influente se o CV da resposta é baixo,
+já que todas as combinações de níveis resultam em pouca variação na resposta.
 
-O tempo de resposta de requisições locais é da ordem de poucos milissegundos,
-enquanto das requisições remotas é da ordem de centenas de milissegundos. Dessa
-forma, as requisições remotas dominam a média já que são em geral duas ordens de
-grandeza maiores que as locais. Por isso, a análise da maioria dos estudos é
+Os tempos de resposta das requisições remotas dominam a média dos tempos de
+resposta pois são ordens de grandeza maiores que os das requisições locais. Por isso, a análise da maioria dos estudos é
 feita por percentis em vez de médias -- percentis baixos representam requisições
 locais e percentis altos representam requisições remotas. Também é feita a
 distinção entre escritas e leituras dada a diferença de natureza dessas
@@ -654,11 +664,19 @@ operações.
 Três fatores receberam um tratamento diferente ao longo do experimento: modelo
 de consistência, configuração de replicação (para consistência em momento
 indeterminado) e versão requisitada nas leituras (para consistência na linha do
-tempo). Isso foi feito pois seus níveis influenciam na proporção de requisições
-locais e remotas, fundamental para este estudo. Por isso, esses fatores foram
-tratados como um único, chamado modo (subseção seguinte). Projetos de
+tempo). Isso foi feito pois as combinações entre esses fatores definem
+configurações do sistema de armazenamento que resultam em proporções de
+requisições locais e remotas diferentes. Assim, esses fatores foram tratados
+como um único fator chamado modo, descrito na subseção \ref{sec:modo}. Os fatores
+localidade e popularidade na consistência na linha do tempo impuseram a
+necessidade de uma etapa de aquecimento após a carga do sistema, o processo é
+explicado na subseção \ref{sec:aquecimento}. Projetos de
 experimentos fatoriais fracionados 2\textsuperscript{k} foram realizados para
-cada um dos fatores restantes e estão descritos nas subseções subsequentes.
+cada um dos fatores restantes e estão descritos nas subseções subsequentes:
+fatores de tamanho do sistema e benchmark na subseção
+\ref{sec:fatores_de_tamanho_do_sistema_e_benchmark}, fatores de banco de dados
+na subseção \ref{sec:fatores_de_banco_de_dados}, fatores de rede na subseção
+\ref{sec:fatores_de_rede} e fatores de carga de trabalho na subseção \ref{sec:fatores_de_carga_de_trabalho}.
 
 %% ------------------------------------------------------------------------- %%
 \subsection{Modo} \label{sec:modo}
@@ -682,11 +700,12 @@ Todas as configurações usam $N = 3$ (ver seção \ref{sec:parametros_fixados}). O
 algoritmo de particionamento garante que existe ao menos uma réplica em cada
 centro de dados (ver subseção \ref{sec:sistema_de_armazenamento}). Assim,
 existem sempre duas situações possíveis com relação à localização das réplicas
-do ponto de vista do coordenador: uma local e duas remota ou duas locais e uma
-remota. Dado isso, ind1 resulta em todas as leituras e escritas locais. ind2
+do ponto de vista do coordenador: uma local e duas remotas ou duas locais e uma
+remota. Dado isso, o modo ind1 resulta em todas as leituras e escritas locais. O
+modo ind2
 resulta em todas as leituras locais e metade das escritas locais e a outra
-metade remotas. lt\_qqer resulta em todas as leituras locais e a quantidade de
-escritas dependente da localidade dos acessos. Finalmente, lt\_rec resulta tanto
+metade remotas. O modo lt\_qqer resulta em todas as leituras locais e a quantidade de
+escritas dependente da localidade dos acessos. Finalmente, o modo lt\_rec resulta tanto
 em leituras quanto escritas dependentes da localidade.
 
 Os modos foram escolhidos de forma a representar situações encontradas em
@@ -706,23 +725,26 @@ confirmação de escrita de uma única réplica é suficiente.
 %% ------------------------------------------------------------------------- %%
 \subsection{Aquecimento} \label{sec:aquecimento}
 
-Como localidade e popularidade eram fatores, apenas a inserção de objetos na
-etapa de carga (seção \ref{sec:scripts_de_execucao_e_analise_dos_experimentos})
+Como localidade era um fator, apenas a inserção de objetos na
+etapa de carga (seção \ref{sec:execucao_e_analise_dos_experimentos})
 não era suficiente para que o sistema operasse em regime durante os experimentos
-para a consistência na linha do tempo. Isso porque ao final da inserção, cada
+para a consistência na linha do tempo. Isso porque ao final da carga, cada
 objeto no banco de dados tinha recebido apenas um acesso de cada centro de
 dados, nenhuma réplica mestre teria migrado por efeito da localidade até esse
-momento. Por isso, o aquecimento era necessário durante a etapa de carga para a
-consistência na linha do tempo.
+momento. Por isso, o aquecimento era necessário após a carga para a
+consistência na linha do tempo. Já a consistência em momento indeterminado não
+era sujeita à influência direta de localidade, portanto não precisava de
+aquecimento.
 
-O aquecimento era dado por uma quantidade de passos, cada passo fazendo uma
-quantidade de acessos igual a quantidade de objetos armazenados no banco de
-dados. Para saber quantos passos seriam necessários para cada combinação de
-localidade e popularidade, um estudo foi realizado. O estudo executou diversos
-passos e ao final de cada um mediu a quantidade de migrações ocorridas. O estudo
-foi feito com 20000 objetos, mas quantidades maiores de objetos precisariam da
-mesma quantidade de passos, a diferença é que eles seriam compostos por mais
-requisições e, portanto, demorariam mais. Os resultados desse estudo estão na
+O aquecimento era dado por uma determinada quantidade de passos. Em cada passo,
+eram realizadas uma quantidade de atualizações igual a quantidade de objetos
+armazenados no banco de dados. O uso de passos foi uma maneira de tornar a fase
+de aquecimento independente da quantidade de objetos armazenados.
+
+A influência da popularidade também foi considerada pois ela afetava a probabilidade de um determinado objeto ser
+acessado. Dado isso, um estudo foi realizado para saber quantos passos seriam necessários para cada combinação de
+localidade e popularidade. O estudo com 20000 objetos executou 30 passos, medindo a quantidade de
+migrações ocorridas em cada um deles. Os resultados desse estudo estão na
 Figura \ref{fig:aquecimento_do_sistema}.
 
 \begin{figure}[!htb] \centering
@@ -732,19 +754,19 @@ Figura \ref{fig:aquecimento_do_sistema}.
 \caption{Aquecimento do sistema.} \label{fig:aquecimento_do_sistema}
 \end{figure}
 
-A quantidade de migrações aumenta nos primeiros passos. Para localidade 0,5, a
+A quantidade de migrações aumenta nos primeiros passos. Para localidade 50\%, a
 quantidade de migrações estabiliza após o 3\textsuperscript{o} passo e a
-popularidade não influencia. Já para localidade 0,9, a estabilização demora
-cerca de 15 passos e as curvas são diferentes para popularidade apenas nos
-primeiros passos. Com isso, a etapa de aquecimento nos estudos foi configurada
+popularidade não influencia. Já para localidade 90\%, a estabilização demora
+cerca de 17 passos e as curvas são diferentes para popularidade apenas nos
+primeiros passos. Com isso, a fase de aquecimento nos estudos foi configurada
 para usar uma quantidade de passos de acordo com a localidade. Os valores para
 quantidade de passos configurados foram:
 
 \begin{itemize}
 
-\item Localidade 0,5: 3
+\item Localidade 50\%: 3
 
-\item Localidade 0,9: 17
+\item Localidade 90\%: 17
 
 \end{itemize}
 
@@ -752,12 +774,11 @@ quantidade de passos configurados foram:
 \subsection{Fatores de tamanho do sistema e benchmark}
 \label{sec:fatores_de_tamanho_do_sistema_e_benchmark}
 
-Este estudo foi feito para dimensionar o tamanho do sistema e do benchmark.
-Esses valores não só teriam impacto nos experimentos, mas também afetavam
+As quantidade de nós de sistema e benchmark não só podiam influenciar as respostas, como também afetavam
 questões operacionais, dado que quanto mais nós fossem usados, maiores as
-dificuldades de conseguir reserv-a-los no Grid5000.
+dificuldades de conseguir reservá-los no Grid5000.
 
-Os níveis inicialmente selecionados para o estudo foram:
+Os níveis selecionados para o estudo foram:
 
 \begin{itemize}
 
@@ -770,14 +791,14 @@ Os níveis inicialmente selecionados para o estudo foram:
 \end{itemize}
 
 A quantidade de partições usadas pelo Riak deve ser uma potência de 2 (ver seção
-\ref{sec:parametros_fixados}). Uma forma simples de manter a simetria do sistema
-foi adotar potências de 2 para os níveis da quantidade de nós no sistema,
-garantindo assim a mesma quantidade de partições por nó. Na mesma linha, fazer o
-mesmo para quantidade de instâncias da do benchmark e quantidade de threads por
+\ref{sec:parametros_fixados}). Uma forma de manter a simetria do sistema
+foi adotar potências de 2 para os níveis da quantidade de nós do sistema,
+garantindo assim a mesma quantidade de partições por nó. Fazer o
+mesmo para quantidade de instâncias do benchmark e quantidade de threads por
 instância foi uma forma de balancear a carga média tanto por nó quanto por
 partição.
 
-Este estudo usou modo lt\_rec, localidade de 50\% e latência de rede de 100 ms.
+O estudo usou modo lt\_rec, localidade de 50\% e latência de rede de 100 ms.
 Esses valores foram escolhidos pois através deles obtém-se uma quantidade
 balanceada de leituras e escritas locais e remotas. O resultado do estudo está
 na Tabela \ref{tab:estudo_para_quantidade_de_nos_do_sistema}.
@@ -803,7 +824,7 @@ de threads usadas em cada instânca do benchmark.}
 Na maioria dos casos, o tamanho do sistema tem a maior influência nos resultados
 e a quantidade de instâncias do benchmark e a quantidade de threads não são
 desprezíveis, ainda mais ao se considerar as interações entre elas. Apesar
-disso, esses fatores foram desconsiderados nos estudo final devido ao excesso de
+disso, esses fatores foram desconsiderados devido ao excesso de
 fatores. Dessa forma, os valores fixados foram:
 
 \begin{itemize}
@@ -838,10 +859,10 @@ de 40 nós seriam mais difíceis de ser executados.
 \subsection{Fatores de banco de dados} \label{sec:fatores_de_banco_de_dados}
 
 Este estudo foi feito para dimensionar o tamanho do banco de dados, que afeta o
-uso de memória e de banda. Os experimentos também consideraram a latência como
+uso de memória e de banda. Os experimentos consideraram a latência como
 fator para verificar a importância relativa entre esses fatores e a rede.
 
-Os níveis inicialmente selecionados foram:
+Os níveis selecionados foram:
 
 \begin{itemize}
 
@@ -851,7 +872,7 @@ Os níveis inicialmente selecionados foram:
 
 \end{itemize}
 
-Este estudo usou modo lt\_rec e localidade de 50\%.  Esses valores foram
+O estudo usou modo lt\_rec e localidade de 50\%. Esses valores foram
 escolhidos pois através deles obtém-se uma quantidade balanceada de leituras e
 escritas locais e remotas. O resultado do estudo está na Tabela
 \ref{tab:estudo_para_quantidade_e_tamanho_dos_objetos_armazenados}.
@@ -893,10 +914,10 @@ valores fixados foram:
 
 Como o tempo de aquecimento depende da quantidade de objetos armazenados, quanto
 menor essa quantidade, mais rápida é a execução dos experimentos. Por outro
-lado, optou-se por um número não tão baixo de forma a evitar um excesso de
+lado, a opção foi por um número intermediário de forma a evitar um excesso de
 conflitos. Já no caso do tamanho dos objetos armazenados, o valor foi escolhido
 baseado em estudo dos sistemas de caching distribuído no Facebook, que relata
-que 90\% dos objetos nesses sistemas é menor do que 500 bytes.
+que 90\% dos objetos nesses sistemas são menores do que 500 bytes.
 
 %TODO: comentar conflitos, resultados são estranhos confl : 5 44 44 1 2 5 1   |
 %CV =  0.6548619 TODO: citar Workload Analysis of a Large-Scale Key-Value Store
@@ -914,7 +935,7 @@ ganhos de desempenho para buffers até quatro vezes maiores que o BDP. O estudo
 usou latência e pacotes fora de ordem para criar cenários que pressionassem os
 buffers de forma diferente.
 
-Os níveis inicialmente selecionados foram:
+Os níveis selecionados foram:
 
 \begin{itemize}
 
@@ -947,7 +968,7 @@ escrita & 90 & 99 & 0 & 0 & 0 & 0 & 0 & 0\\ \hline
 
 \end{tabular} \caption[Estudo para tamanho dos buffers de transmissão e
 recepção.]{Estudo para tamanho dos buffers de transmissão e recepção. L
-representa a latência, R representa a taxa de pacotes fora de ordem e B
+representa a latência, O representa a taxa de pacotes fora de ordem e B
 representa o tamanho dos buffers.}
 \label{tab:estudo_para_tamanho_dos_buffers_de_transmissao_e_recepcao}.
 
@@ -965,9 +986,10 @@ configurá-los seguindo as recomendações, assim o valor fixado foi:
 Feito isso, o procedimento de otimização da WAN estava finalizado e os
 experimentos para rede foram executados. A taxa de pacotes corrompidos não foi
 considerada neste estudo pois experimentos preliminares fizeram com que nós do
-Riak falhassem por problemas de comunicação. Como não foi encontrada nenhuma
-referência indicando que a taxa de pacotes corrompidos é um fator fundamental em
-WANs, a opção foi ignorar esse fator.
+Riak falhassem por problemas de comunicação. Como pacotes corrompidos são
+simplesmente descartados no receptor, desconsiderar corrupção de pacotes não representou
+uma ameaça à validade, já que corrupção e perda se manifestam da
+mesma maneira no TCP e portanto são redundantes do ponto de vista de desempenho.
 
 Este estudo usou a mesma configuração de modo e localidade que o estudo para
 tamanho de buffers, pelo mesmo motivo. Os níveis inicialmente selecionados para
@@ -990,15 +1012,49 @@ fatores de rede foram:
 \end{itemize}
 %TODO: ref sobre perdas Considera-se que perdas acima de x\% tornam a
 %comunicação impraticável.  A Study of Internet Packet Reordering
+% http://www.slac.stanford.edu/comp/net/wan-mon/thru-vs-loss.html
 
-Ambos os algoritmos de congestionamento testados são específicos para redes com
+Os níveis da latências foram baseados em estudo que relata as latências entre os
+centros de dados dos Amazon Web Services \cite{Sovran2011}. Os centros de dados
+considerados são Califórnia (EUA -- Costa Oeste), Virginia (EUA -- Costa Leste),
+Irlanda e Singapura. A menor latência observada foi 82 ms entre os centros de
+dados dos EUA e a maior foi 277 ms entre Irlanda e Singapura. O valor de 50\% de
+variação da latência é aproximado, ele foi baseado em um gráfico do mesmo
+estudo, mas não está claramente descrito.
+
+As taxas de perda foram escolhidas com base em medidas feitas pelo projeto
+PingER, que mede desempenho de conexões fim-a-fim na Internet. A mediana das
+perdas medidas em janeiro de 2013 foi 0,119\% e a mediana do último ano foi
+0,178\%. O mesmo relatório mostra perdas bem mais altas em medições específicas,
+mas este trabalho considerou que a WAN entre os dois centros de dados é de
+boa qualidade, portanto não apresentaria taxas de perda muito altas.
+%http://www-iepm.slac.stanford.edu/pinger/
+
+% http://www-wanmon.slac.stanford.edu/cgi-wrap/pingtable.pl?file=duplicate_packets&by=by-node&size=100&tick=monthly&from=EDU.SLAC.STANFORD.N3&to=WORLD&ex=none&only=all&dataset=hep&percentage=any
+
+O mesmo estudo mostra taxas de duplicação de pacotes muitos baixas (0\%). Embora
+os valores usados neste estudo tenham sido muito grandes, duplicação de pacotes não
+influenciou a resposta (ver abaixo).
+
+Duas referências para pacotes fora de ordem foram encontradas. A primeira, já
+citada, mostra taxas muito baixas -- em janeiro de 2013, média de 0,006\% e
+mediana de 0\%. Estudo realizado em 2003 entre sítios na China mostra taxas de
+pacotes fora de ordem de 3,187\%. Os valores usados no experimento foram
+maiores, mas mesmo assim pacotes fora de ordem não influenciaram a resposta (ver abaixo).
+%http://www-wanmon.slac.stanford.edu/cgi-wrap/pingtable.pl?file=out_of_order_packets&by=by-node&size=100&tick=monthly&from=EDU.SLAC.STANFORD.N3&to=WORLD&ex=none&only=all&dataset=hep&percentage=any
+
+%http://research.microsoft.com/en-us/people/lguohan/reorder-icoin04.pdf
+
+Ambos os algoritmos de congestionamento testados são usados em redes com
 largura de banda e latências grandes. Ambos já estavam disponíveis no Linux
-usado nos experimentos, sendo que TCP CUBIC é a configuração padrão. O H-TCP foi
-citado em duas referências sobre otimização para WANs da pilha TCP.
+usado nos experimentos, sendo que TCP CUBIC é a configuração padrão. Eles foram
+escolhidos pois ambos são citados nas referências sobre otimizações da pilha TCP para WANs.
 
-O resultado do estudo está na Tabela \ref{tab:estudo_para_fatores_de_rede}.  Com
+O resultado do estudo está na Tabela \ref{tab:estudo_para_fatores_de_rede}. Com
 exceção dos fatores e da interação entre latência e variação de latência, todas
-as outras colunas apresentavam valores nulos e foram suprimidas.
+as outras colunas apresentavam valores nulos e foram suprimidas. As respostas
+das requisições locais apresentaram CVs de 1\%, portanto as respectivas linhas
+também foram suprimidas.
 
 \begin{table}[!h] \begin{center} \begin{tabular}{|c|c|c|c|c|c|c|c|c|} \hline
 
@@ -1036,16 +1092,13 @@ de ordem e C representa o algoritmo de congestionamento.}
 % 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0   | CV =
 % 0.6184648 
 
-Como esperado, fatores relacionados a WAN afetam pouco as requisições locais,
-que apresentaram CVs de 1\% tanto para leituras quanto para escritas. O mesmo
-não acontece para requisições remotas, cujos CVs são 58\% e 62\% para leituras e
-escritas, respectivamente.
+%requisições remotas: CVs 58\% (leituras) e 62\% (escritas)
 
-O mesmo estudo havia sido realizado anteriormente com níveis de perda de pacotes
-0,01\% e 1\%. Nesse estudo, a perda de pacotes era mais influente até do que a
-variação da latência. Mas como redes normalmente não apresentam taxas de perda
-de pacotes tão altas quanto 1\%, o estudo foi refeito com nível máximo de 0,1\%
-e a perda de pacotes não afetou o resultado nesse caso.
+%O mesmo estudo havia sido realizado anteriormente com níveis de perda de pacotes
+%0,01\% e 1\%. Nesse estudo, a perda de pacotes era mais influente até do que a
+%variação da latência. Mas como redes normalmente não apresentam taxas de perda
+%de pacotes tão altas quanto 1\%, o estudo foi refeito com nível máximo de 0,1\%
+%e a perda de pacotes não afetou o resultado nesse caso.
 
 A latência, a variação de latência e a interação de primeira ordem entre elas
 respondem por 100\% dos resultados. Assim, os níveis escolhidos para esses
@@ -1062,14 +1115,6 @@ operando em uma rede local. Os resultados obtidos para esses casos foram usados
 como auxílio na interpretação dos resultados, mas não foram considerados na
 análise final dado que sistemas geo-replicados, por definição, não operam nessas
 condições.
-
-Os níveis da latências são baseados em estudo que relata as latências entre os
-centros de dados dos Amazon Web Services \cite{Sovran2011}. Os centros de dados
-considerados são Califórnia (EUA -- Costa Oeste), Virginia (EUA -- Costa Leste),
-Irlanda e Singapura. A menor latência observada foi 82 ms entre os centros de
-dados dos EUA e a maior foi 277 ms entre Irlanda e Singapura. O valor de 50\% de
-variação da latência é aproximado, ele foi baseado em um gráfico do mesmo
-estudo, mas não está claramente descrito.
 
 Os valores fixados dos fatores desconsiderados foram:
 
@@ -1103,10 +1148,10 @@ latência usando distribuição normal.
 \subsection{Fatores de carga de trabalho}
 \label{sec:fatores_de_carga_de_trabalho}
 
-Juntamente com o estudo para fatores de rede, este estudo era um dos estudos
+Juntamente com o estudo para fatores de rede, este era um dos estudos
 mais importantes, dado o objetivo deste trabalho. Os experimentos também
 consideraram a latência como fator para verificar a importância relativa entre
-esses fatores e a rede.
+os fatores de carga de trabalho e a rede.
 
 A consistência na linha do tempo pode tornar um sistema sob cargas com um maior
 número de escritas inviável pois as escritas se tornam indisponíveis em caso de
@@ -1114,26 +1159,24 @@ falha. Assim, este estudo considera situações em que ela é competitiva quando
 comparada com a consistência em momento indeterminado, por isso as relações
 leitura/escrita usadas resultavam em mais leituras que escritas. Além disso, ao
 atualizar um objeto na consistência em momento indeterminado, é necessário o
-envio do relógio-vetor. Por isso, antes de qualquer atualização existe uma
+envio do relógio-vetor, por isso uma
 leitura\footnote{É possível fazer atualizações sem relógio-vetor, mas isso cria
-versões paralelas do mesmo objeto.}. Isso restringe a quantidade de escritas a
+versões concorrentes do mesmo objeto.} é realizada pelo benchmark antes de toda
+atualização. Isso restringe a quantidade de escritas a
 um máximo de 50\% da carga de trabalho.
 
-A partir disso, os níveis inicialmente selecionados para carga de trabalho
+A partir disso, os níveis selecionados para carga de trabalho
 foram:
 
 \begin{itemize}
 
 \item Relação leitura/escrita: 2:1 e 10:1
 
-\item Popularidade dos objetos: uniforme (a quantidade de requisições para cada
-objeto em um dado período é a mesma em média) e concentrada (os acessos obedecem
-a uma distribuição Pareto)
+\item Popularidade dos objetos: uniforme (a taxa de chegada de requisições média
+para cada objeto é a mesma) e concentrada (a taxa de chegada segue uma
+distribuição Pareto)
 
-\item Localidade: 0,5 (origem dos acessos para cada objeto distribuídos
-igualmente entre centros de dados) e 0,9 (90\% dos acessos para cada objeto
-originado em um centro de dados e os 10\% restantes originados no outro centro
-de dados.
+\item Localidade (\%): 50 e 90
 
 \end{itemize}
 
@@ -1147,7 +1190,7 @@ Como os modos possuem comportamentos diferentes para requisições locais e
 remotas, os experimentos foram executados para cada modo. O resultado para
 requisições locais apresentaram CVs em torno de 0,02 para todos os modos. Isso
 indica que requisições locais não sofrem influência de nenhum dos fatores. Já
-requisições remotas apresentaram CVs de aproximadamente 0,5 e influência da
+requisições remotas apresentaram CVs de aproximadamente 50\% e influência da
 latência de 100\% para ind2, tl\_qqer e tl\_rec (ind1 não tem requisições
 remotas).
 
@@ -1156,8 +1199,8 @@ média do tempo de resposta de todas as requisições (leituras e escritas). Isso
 porque o primeiro fator diz respeito à composição entre leituras e escritas e o
 segundo à composição entre requisições locais e remotas, portanto esses fatores
 não fazem sentido nos percentis separados por tipo de requisição. Por exemplo,
-com localidade 0,5 percebe-se que o percentil 70 representa requisições remotas,
-enquanto com localidade 0,9 o mesmo percentil representa requisições locais. Se
+com localidade 50\% percebe-se que o percentil 70 representa requisições remotas,
+enquanto com localidade 90\% o mesmo percentil representa requisições locais. Se
 a análise fosse feita por percentis, essa informação se perderia e localidade
 nunca teria influência. O resultado do estudo está na Tabela
 \ref{tab:estudo_para_fatores_de_carga_de_trabalho}
@@ -1182,13 +1225,14 @@ representa a localidade, P representa a popularidade e L representa a latência
 de rede.} \label{tab:estudo_para_fatores_de_carga_de_trabalho}.  \end{center}
 \end{table}
 
-Como esperado, localidade e latência impactam os modos em geral. Uma observação
+Como esperado, localidade e latência influenciam as respostas em geral. Uma observação
 é o fato de inclusive ind1 ser afetada por latência. Isso provavelmente
-éresultado dos mecanismos de replicação e correção de leituras serem afetados.
+é resultado dos mecanismos de replicação e correção de leituras serem afetados
+pela latência.
 
 O impacto de popularidade dos objetos é praticamente nulo. Talvez em uma
 situação em que o sistema recebesse uma carga maior, como no caso de um teste de
-stress, esse fator passasse a ser relevante. Como não é o caso, ele foi
+stress, esse fator passasse a ser influente. Como não é o caso, ele foi
 desconsiderado e fixado no valor que simplifica o entendimento dos resultados.
 Em trabalhos futuros, experimentos podem ser realizados com o sistema sob carga
 mais alta para verificar se a influência de popularidade aumenta.
@@ -1217,12 +1261,12 @@ Dessa forma, só foram escolhidos níveis para localidade:
 
 \begin{itemize}
 
-\item Localidade: 0,5 e 0,9
+\item Localidade (\%): 50 e 90
 
 \end{itemize}
 
 Os níveis de localidade foram escolhidos de forma a ter situações sem influência
-de localidade (0,5) e com localidade alta (0,9). O valor de localidade alta é
+de localidade (50\%) e com localidade alta (90\%). O valor de localidade alta é
 baseado no relatado em estudo feito pelo Yahoo! em seus sistemas de produção
 \cite{Cooper2008}.
 
@@ -1236,6 +1280,6 @@ Os valores fixados dos fatores desconsiderados foram:
 
 \end{itemize}
 
-O valor da relação leitura/escrita é uma balanço razoável entre leituras e
+O valor da relação leitura/escrita é um balanço razoável entre leituras e
 escritas. O valor de popularidade é o mais simples para a interpretação dos
 resultados.

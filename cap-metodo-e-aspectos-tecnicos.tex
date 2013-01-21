@@ -318,12 +318,14 @@ de espalhamento consistente, que se baseia no valor da chave do objeto. O Riak
 foi projetado para ser implantado em um único centro de dados\footnote{A versão
 Enterprise do Riak implementa replicação entre centros de dados, mas é paga.},
 portanto o algoritmo não leva em consideração os centros de dados no momento de
-decidir para qual das réplicas a requisição deve seguir.  Dessa forma, algumas
+decidir para qual das réplicas a requisição deve seguir. Dessa forma, algumas
 modificações foram necessárias no riak\_core para que ele priorizasse nós do
-mesmo centro de dados em que a requisição chegou. A implementação é muito
-simples e pouco versátil, funcionando apenas para o cenário do estudo, de apenas
-dois centros de dados (ver seção \ref{sec:parametros_fixados}) e baseada nos
-nomes dos nós para saber em qual centro de dados cada um deles se encontra.
+mesmo centro de dados em que a requisição chegou. Além disso, modificações foram
+feitas para garantir que existisse ao menos uma réplica de cada objeto em cada
+centro de dados. A implementação é muito simples e pouco versátil, funcionando
+apenas para o cenário do estudo, de apenas dois centros de dados (ver seção
+\ref{sec:parametros_fixados}) e baseada nos nomes dos nós para saber em qual
+centro de dados cada um deles se encontra.
 
 Outras alterações menores foram o tratamento de parâmetros extras na interface
 HTTP, necessários para a consistência na linha do tempo, e a implementação de
@@ -496,7 +498,7 @@ imagem nos nós};
 
     \node [block, below of=riak] (start) {Inicialização do Riak};
 
-    \node [block, below of=start] (load) {Carga do sistema};
+    \node [block, below of=start] (load) {Carga e aquecimento do sistema};
 
     \node [block, below of=load] (wan) {Configuração da WAN emulada};
 
@@ -576,10 +578,9 @@ modelo de consistência a ser usado em um dado experimento.
 das instâncias de Riak em cada nó e à entrada de cada uma no aglomerado de
 Riaks.
 
-\paragraph{Carga do sistema (load)}Essa é uma das etapas mais longas e complexas
-do fluxo de trabalho. A primeira parte da carga do sistema é popular o banco de
-dados do Riak. Existe uma segunda parte para a consistência na linha do tempo,
-que é o aquecimento do sistema (detalhes na subseção \ref{sec:aquecimento}).
+\paragraph{Carga e aquecimento do sistema (load)}Essa etapa consiste em popular o banco de
+dados do Riak antes dos experimentos. Para a consistência na linha do tempo,
+a fase de aquecimento do sistema é necessária (detalhes na subseção \ref{sec:aquecimento}).
 
 \paragraph{Configuração da WAN emulada}Nessa etapa as interfaces de rede dos nós
 são configuradas com latência de rede, perda de pacotes, etc. Além disso, as
