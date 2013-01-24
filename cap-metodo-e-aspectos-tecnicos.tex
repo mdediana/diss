@@ -88,17 +88,6 @@ milissegundos). O modelo usado neste estudo possibilitou diferentes combinações
 entre requisições locais e remotas dependendo do modelo de consistência usado e
 da sua configuração (ver subseção \ref{sec:modo}).
 
-% Definição do TCP, no summary do TCP em Stevens. TODO: citar
-Para entender a dinâmica do sistema geo-replicado é necessário entender as
-características da rede sobre a qual ele opera. Este estudo considerou um
-sistema operando sobre TCP/IP, pilha de protocolos comumente utilizada nesse
-tipo de sistema.  O protocolo IP provê os mecanismos de endereçamento e
-roteamento. O protocolo TCP provê conexão ponto-a-ponto confiável, reconhecendo
-os dados recebidos, enviando-os novamente caso o reconhecimento não seja
-recebido dentro de um determinado período de tempo, reordenando pacotes
-recebidos fora de ordem, descartando pacotes duplicados, verificando pacotes
-corrompidos e provendo controle de fluxo.
-
 Por limitações de escopo e recurso, este estudo analisa o sistema apenas do
 ponto de vista do desempenho. Isso significa que o estudo não considera outros
 atributos de qualidade como disponibilidade e manutenibilidade. Assim, o escopo

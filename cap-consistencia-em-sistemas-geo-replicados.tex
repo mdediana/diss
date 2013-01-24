@@ -8,6 +8,114 @@ resultantes. Embora alguns conceitos e princípios descritos não sejam exclusivos
 de sistemas geo-replicados, eles são necessários para um entendimento mais
 profundo do projeto e desenvolvimento desse tipo de sistema.
 
+Muitas das dificuldades de geo-replicação são evidenciadas ao se analisar os
+mecanismos que o TCP oferece para comunicação ponto-a-ponto confiável,
+explicados na seção \ref{sec:tcp_e_comunicacao_confiavel}. TODO seções
+
+%% ------------------------------------------------------------------------- %%
+\section{TCP e Comunicação Confiável} \label{sec:tcp_e_comunicacao_confiavel}
+
+Uma das principais diferenças entre redes de longa distância (WANs) e redes
+locais (LANs), além da área atendida pela rede, diz respeito a confiabilidade do
+meio. LAN costumam usar topologias simples com poucos dispositivos de redes e
+segmentos entre os nós que a compõem, enquanto o contrário acontece com WANs.
+Além disso, LANs costumam ser mais homogêneas e terem um único administrador. No
+caso de WANs, é esperado que um pacote de dados atravesse diversas redes
+compostas por dispositivos e administradores diferentes. Do ponto de vista deste
+trabalho, um centro de dado corresponde a uma LAN, enquanto a geo-replicação
+ocorre na WAN.
+
+TCP/IP é a pilha de protocolos comumente utilizada em sistemas geo-replicados. O
+protocolo IP provê os mecanismos de endereçamento e roteamento.  O TCP provê
+diversos mecanismos relacionados e dependentes entre si para lidar com perdas,
+corrupção, reordenação, duplicação de pacotes e controle de fluxo.
+
+Perdas acontecem quando um dispositivo na rede descarta pacotes, o que pode ser
+causado por corrupção de pacotes ou congestionamento da rede, como buffers
+esgotados em um roteador, por exemplo. Os principais mecanismos de controle de
+congestionamento são início lento, prevenção de congestionamento, retransmissão
+rápida e recuperação rápida. Reordenação ocorre quando pacotes de uma mesma
+conexão TCP enviados nos instantes T1 e T2 seguem caminhos diferentes na rede, e
+o pacote enviado em T2 chega ao receptor antes. Duplicação normalmente está
+relacionada a retransmissões do TCP (a seguir), mas também acontece devido a
+balanceamento de carga ou problemas de hardware ou software em dispositivos
+intermediários. Controle de fluxo diz respeito a mecanismos usados nas pontas de
+uma conexão usar a rede de forma eficiente e evitar o envio de mais dados do que
+podem ser tratados no receptor.
+
+Os principais mecanismos adotados no TCP para prover comunicação confiável são
+descritos a seguir [CongContr]:
+% [CongContr] http://tools.ietf.org/html/rfc5681
+
+\paragraph{Reconhecimento positivo com retransmissão}O TCP garante a entrega de
+dados pelo uso de um número de sequência e de mensagens de reconhecimento. Cada
+pacote enviado pelo transmissor carrega um número de sequência que representa a
+posição do primeiro byte de dados desse pacote no fluxo de dados. Ao receber um
+pacote, o receptor envia para o transmissor um pacote ACK com número de
+reconhecimento informando qual é o próximo byte que espera receber. Por exemplo,
+se um transmissor envia um segmento com número de sequência 1 e 10 bytes de
+dados de carga, o receptor enviará um ACK com número de reconhecimento 11. Um
+temporizador de transmissão é ativado para cada pacote enviado com um
+determinado período de tempo. Se o temporizador expirar antes do recebimento do
+ACK, o pacote é reenviado.
+
+\paragraph{Controle de fluxo}A janela de recebimento é a quantidade de bytes que
+o receptor está disposto a receber, baseado no espaço livre de seu buffer de
+recepção. O receptor envia o valor da janela em todas as suas respostas para o
+transmissor. Esse mecanismo evita que o transmissor envie mais dados do que o
+receptor pode tratar.
+
+\paragraph{Início lento}Ao contrário da janela de recebimento, a  janela de
+congestionamento é mantida pelo transmissor, e é uma estimativa do
+congestionamento da rede. O transmissor calcula o tamanho da janela (cwnd) a
+partir dos ACKs recebidos. O mecanismo de início lento atua no início de uma
+conexão, quando o transmissor ainda não recebeu ACKs. No primeiro pacote, cwnd é
+igual a 1 ou 2 vezes o tamanho máximo de segmento TCP (MSS). Para cada ACK
+recebido, ela é incrementada em 1 MSS. Assim, a janela dobra de tamanho a cada
+tempo de ida e volta até que atinja o tamanho da janela de recebimento ou uma
+perda aconteça. Quando uma perda acontece, metade do tamanho da janela é
+considerado o limiar do início lento (ssthresh) e o processo começa de novo, com
+cwnd igual a 1 ou 2 MSS, até atingir esse limiar. A partir desse ponto, o TCP
+entra em modo de prevenção de congestionamento.
+
+\paragraph{Prevenção de congestionamento}As diferentes variações do TCP usam
+diferentes algoritmos de prevenção de congestionamento. O algoritmo padrão de
+prevenção de congestionamento aumenta a janela de congestionamento em $1 / cwnd$
+a cada ACK recebido. Assim, o aumento é linear, não mais exponencial como no
+início lento.  TODO: cubic e htcp.
+
+\paragraph{Retransmissão rápida}O receptor envia um ACK para todo pacote
+recebido, mesmo que fora de ordem. Por exemplo, se os pacotes de 10 bytes com
+número de sequência 1, 21 e 31 chegam ao receptor, ele envia três ACKs
+informando que espera o pacote com número de sequência 11. O transmissor trata
+os primeiros ACKs em duplicata como pacotes fora de ordem. Mas ao receber o
+terceiro, ele considera que um pacote (o de número 21 no exemplo) foi perdido.
+Ao invés de esperar o temporizador, o mecanismo de retransmissão rápida
+retransmite o pacote imediatamente.
+
+\paragraph{Recuperação rápida}O mecanismo de retransmissão rápida ter sido
+acionado indica que uma perda aconteceu, portanto algum mecanismo de prevenção
+de congestionamento deve atuar. Mas o recebimento de ACKs de pacotes posteriores
+ao perdido indica que o congestionamento foi uma situação pontual, portanto usar
+o início lento provavelmente implicaria em perda de vazão desnecessária. Assim,
+a recuperação rápida atua juntamente com a retransmissão rápida. Quando o
+terceiro ACK em duplicata é recebido, ssthresh assume o valor de $cwnd / 2$, o
+pacote é retransmitido e a janela de congestionamento assume o valor $cwnd =
+ssthresh + 3 * MSS$. Se outros ACKs chegam em duplicata, a janela é incrementada
+em 1 MSS. Quando um ACK diferente chega, a janela assume o valor $cwnd =
+ssthresh$ -- metade do seu tamanho no momento em que o terceiro ACK em duplicata
+foi recebido. Esse último ACK deve reconhecer todos os outros pacotes recebidos
+após o pacote perdido (o de número 41 no exemplo).
+
+\paragraph{Pacotes duplicados}Pacotes duplicados são simplesmente descartados no
+receptor [RFC 793].
+% RFC 793 - Transmission Control Protocol, Section 1.5
+
+\paragraph{Pacotes corrompidos}O TCP tem um campo com uma soma de verificação
+que é usada no receptor para checar se o pacote foi corrompido em trânsito. Em
+caso positivo, ele é descartado. Do ponto de vista do transmissor, o pacote foi
+perdido e os mecanismos usuais entram em ação. 
+
 %% ------------------------------------------------------------------------- %%
 \section{Estratégias para escalabilidade de aplicações web}
 \label{sec:estrategias_para_escalabilidade_de_aplicacoes_web}
@@ -315,8 +423,8 @@ consistência causal.} \label{tab:consistencia_causal_valida} \end{center}
 
 \begin{table}[!h] \begin{center} \begin{tabular}{c|c|c|c|c|c} & T0     & T1 & T2
 & T3       &	T4			\\ \hline R1 & W(x,a) &          &          & &				\\
-\hline R2 &        & a = R(x) & W(x,b)   &          &				\\ \hline R3 & & &
-& b = R(x) & a = R(x)	\\ \end{tabular} \caption{Sequência de operações inválida
+\hline R2 &        & a = R(x) & W(x,b)   &          &				\\ \hline R3 & & & &
+b = R(x) & a = R(x)	\\ \end{tabular} \caption{Sequência de operações inválida
 para consistência causal} \label{tab:consistencia_causal_invalida.} \end{center}
 \end{table}
 
