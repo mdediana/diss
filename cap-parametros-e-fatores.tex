@@ -4,7 +4,7 @@
 A etapa seguinte à definição do estudo e dos aspectos técnicos tratou dos
 parâmetros e fatores usados nos experimentos finais. Primeiramente, a lista de
 parâmetros foi levantada. Dessa lista, alguns parâmetros já foram imediatamente
-fixados por por limitação de recursos ou por não serem foco do estudo. A seleção
+fixados por limitação de recursos ou por não serem foco do estudo. A seleção
 inicial de fatores foi formada pelos parâmetros restantes. Como essa seleção era
 grande, experimentos foram usados para identificar os fatores mais influentes
 para o estudo. Os fatores menos influentes foram tratados como parâmetros e
@@ -34,8 +34,8 @@ experimento que compõe o estudo. Existem dois tipos principais de projetos de
 experimentos fatoriais: completo e fracionado \cite{Jain1991}.
 
 Um projeto de experimentos fatoriais completo é constituído por experimentos com
-todas as combinações possíveis de todos os níveis de todos os fatores. Assim, a
-quantidade total de experimentos é dada por:
+todas as combinações possíveis de fatores e seus níveis. Assim, a quantidade
+total de experimentos é dada por:
 
 $n = \prod_{i=1}^k{n_i}$,
 
@@ -49,25 +49,21 @@ maior a quantidade de recursos necessários para sua execução. Normalmente os
 fatores não afetam igualmente as variáveis de resposta, pelo contrário, é comum
 alguns poucos fatores explicarem a maior parte dos efeitos na resposta.
 
-Para esses casos, utiliza-se o projeto de experimentos fatoriais fracionado para
-fazer uma triagem dos fatores, identificando quais deles são os mais influentes.
-Nesse tipo de experimento, utiliza-se apenas uma parte de todos os experimentos
-definidos no projeto de experimentos fatoriais completo. Um tipo particular de
-projeto de experimentos fatoriais fracionado é o 2\textsuperscript{k}. Nesse
-tipo, todos os fatores inicialmente selecionados são usados, mas apenas com dois
-níveis cada (normalmente o mínimo e o máximo), resultando em um total de
-2\textsuperscript{k} experimentos.
+Para esses casos, um projeto de experimentos fatoriais fracionado é utilizado
+para fazer uma triagem dos fatores, identificando quais deles são os mais
+influentes.  Nesse tipo de experimento, utiliza-se apenas uma parte de todos os
+experimentos definidos no projeto de experimentos fatoriais completo. Um tipo
+particular de projeto de experimentos fatoriais fracionado é o
+2\textsuperscript{k}.
 
-Este trabalho usou alguns projetos de experimentos fatoriais fracionados para
-seleção de fatores e níveis e um projeto de experimentos fatoriais completo para
-o estudo final. O procedimento da seleção de fatores a partir de um projeto de
-experimentos fatoriais fracionados 2\textsuperscript{k} é descrito a seguir.
+%% ------------------------------------------------------------------------- %%
+\subsection{Projeto de experimentos fatoriais fracionado 2\textsuperscript{k}}
+\label{sec:projeto_de_experimentos_fatoriais_fracionado_2k}
 
-\subsubsection{Projeto de experimentos fatoriais fracionados
-2\textsuperscript{k}}
-
-Um projeto de experimentos fatoriais fracionados 2\textsuperscript{k} é composto
-por 2\textsuperscript{k} experimentos que por sua vez resultam em
+Em um projeto de experimentos fatoriais fracionado 2\textsuperscript{k}, todos
+os fatores inicialmente selecionados são usados, mas apenas com dois níveis cada
+(normalmente o mínimo e o máximo), resultando em um total de
+2\textsuperscript{k} experimentos, que por sua vez resultam em
 2\textsuperscript{k} medições de desempenho. Dadas essas medições, o desempenho
 é expresso por um modelo de regressão não-linear da forma:
 
@@ -79,11 +75,11 @@ modelo e $x_A$, $x_B$, $x_C$, etc representam respectivamente os níveis dos
 fatores A, B, C, etc. Os termos compostos pela multiplicação de dois ou mais
 fatores representam as interações entre os fatores em questão.
 
-Feito o modelo, define-se para cada fator uma relação entre seus níveis e os
-valores -1 ou 1. Por exemplo, pode-se definir que a latência de 100 ms valerá -1
-e a latência de 300 ms valerá 1. Fazendo a substituição dos níveis por esses
-valores, tem-se um sistema de 2\textsuperscript{k} equações e
-2\textsuperscript{k} variáveis (os coeficientes).
+Para cada fator, define-se uma relação entre seus níveis e os valores -1 ou 1.
+Por exemplo, pode-se definir que a latência de 100 ms valerá -1 e a latência de
+300 ms valerá 1. Fazendo a substituição dos níveis por esses valores, tem-se um
+sistema de 2\textsuperscript{k} equações e 2\textsuperscript{k} variáveis (os
+coeficientes).
 
 Com os coeficientes, calcula-se a variação total de y (ou soma total dos
 quadrados) a partir da equação:
@@ -135,7 +131,7 @@ desempenho por nó.
 
 \paragraph{Quantidade de centros de dados}A menos que as redes que ligam os
 centros de dados tomados dois a dois tenham as mesmas características, o tempo
-de resposta de uma dada requisição é dependente de sua origem e destino.
+de resposta de uma dada requisição depende de sua origem e destino.
 
 \paragraph{Capacidade dos centro de dados}A menos que todos os centros de dados
 possuam as mesmas capacidades agregadas de processamento, armazenamento e
@@ -185,7 +181,7 @@ leituras são locais para R = 1 e remotas para R = 2. Dessa forma, a configuração
 de replicação afeta o tempo de resposta das requisições.
 
 \paragraph{Limiar de migração (para consistência na linha do tempo)}O limiar de
-migração é o valor no qual uma réplica mestra migra de um centro de dados para
+migração é o valor no qual uma réplica mestre migra de um centro de dados para
 outro. Dependendo da carga de trabalho, valores diferentes do limiar resultam em
 proporções entre requisições locais e remotas diferentes, afetando assim o tempo
 de resposta médio das requisições.
@@ -201,14 +197,13 @@ Os parâmetros de rede levantados foram:
 \paragraph{Configuração de hardware dos dispositivos de rede intermediários
 (switches, roteadores, etc)}A configuração dos dispositivos de rede
 intermediários relaciona-se à largura de banda disponível, tamanho dos buffers
-de entrada e saída, capacidade de processamento de requisições, entre outros.
-Dessa forma, sistemas se comunicando através desses dispositivos têm seu
-desempenho afetado por eles.
+de transmissão e recepção, capacidade de processamento de requisições, entre
+outros.  Dessa forma, gargalos nesses dispositivos causam congestionamento na
+rede, com perda de desempenho do sistema.
 
 \paragraph{Topologia da rede}Várias características da topologia de rede afetam
 o desempenho do sistema, por exemplo, a quantidade de segmentos de rede pelos
-quais uma requisição precisa passar para chegar ao destino afeta o seu tempo de
-resposta.
+quais uma requisição passa para chegar ao destino afeta o seu tempo de resposta.
 
 \paragraph{Largura de banda da LAN}A largura de banda limita a vazão máxima do
 sistema em bits/s.
@@ -219,8 +214,8 @@ afeta os tempos de envio e recebimento.
 
 \paragraph{Variação da latência da LAN}A latência em uma rede não é constante,
 dado que dentre suas causas está a dinâmica da rede. Por exemplo, rajadas de
-tráfego podem aumentar a fila de pacotes a ser processados em um roteador, o que
-se manifesta como aumento de latência nas conexões passando por ele. Quando o
+tráfego aumentam a fila de pacotes a ser processados em um roteador, o que se
+manifesta como aumento de latência nas conexões passando por ele. Quando o
 roteador volta a sua operação normal, a latência diminui. Esse exemplo ilustra
 outra característica de variações de latência, que é a existência de correlação
 entre os valores de latência observados ao longo do tempo.
@@ -228,8 +223,8 @@ entre os valores de latência observados ao longo do tempo.
 %http://amplab.cs.berkeley.edu/2011/10/20/latencies-gone-wild/ Effect of Delays
 %on TCP Performance
 
-\paragraph{Largura de banda da WAN}Mesma justificativa que par a largura de
-banda da LAN.
+\paragraph{Largura de banda da WAN}Mesma justificativa que para largura de banda
+da LAN.
 
 \paragraph{Latência da WAN}Mesma justificativa que para latência da LAN. Um
 agravante é que latências em WANs são ordens de grandeza maiores que em LANs já
@@ -239,38 +234,38 @@ que as distâncias percorridas pelos pacotes são muito maiores.
 latência na LAN. Um agravante é que requisições em uma WAN atravessam mais
 segmentos de rede e dispositivos intermediários, portanto são mais suscetíveis à
 variação da latência. Quando a variação é muita e a latência torna-se maior que
-o tempo de timeout nos transmissores, estes interpretam a demora na recepção de
-ACKs como perda de pacotes, o que diminui a vazão do sistema (a seguir).
+o tempo de expiração do temporizador de transmissão, o transmissor interpreta a
+demora na recepção de ACKs como perda de pacotes, o que diminui a vazão do
+sistema (a seguir).
 
-\paragraph{Taxa de perda de pacotes na WAN}\footnote{Perdas acontecem por
-corrupção de pacotes ou congestionamento. A ocorrência de corrupção de pacotes é
-um fenômeno mais frequente em redes sem fio ou via satélite, [Stevens] cita que
-esse valor é muito menor que 1\% normalmente. Além disso, o tratamento dado pelo
-TCP para perda de pacotes é o mesmo independente do motivo da perda.  Assim,
-este trabalho considera perdas por congestionamento, mesmo que o netem seja
-capaz de emular ambas as situações.} Após o timeout de retransmissão, o
-transmissor reenvia o pacote perdido e o mecanismo de início lento do TCP entra
-em ação para diminuir janela de transmissão, com consequente diminuição da
-vazão. Além disso, ocorre aumento no tempo de resposta das requisições, pois o
-TCP aumenta exponencialmente o tempo entre retransmissões até que o ACK seja
-recebido [Stevens].
+\paragraph{Taxa de perda de pacotes na WAN}Após uma perda\footnote{Perdas
+acontecem por corrupção de pacotes ou congestionamento. A ocorrência de
+corrupção de pacotes é um fenômeno mais frequente em redes sem fio ou via
+satélite, [Stevens] cita que esse valor é muito menor que 1\% normalmente. Além
+disso, o tratamento dado pelo TCP para perda de pacotes é o mesmo independente
+do motivo da perda.  Assim, este trabalho considera perdas por congestionamento,
+mesmo que o netem seja capaz de emular ambas as situações.}, o transmissor
+aciona o mecanismo de início lento (no caso de expiração do temporizador de
+transmissão) ou o mecanismo de prevenção de congestionamento (no caso do
+recebimento de ACKS em duplicata). Com isso, a janela de transmissão é
+diminuída, com consequente diminuição da vazão.
 
 \paragraph{Taxa de duplicação de pacotes na WAN}Duplicação de pacotes gera
-tráfico e processamento desnecessários, o que pode causar diminuição de vazão
+tráfego e processamento desnecessários, o que pode causar diminuição de vazão
 e/ou aumento do tempo de resposta das requisições.
 
-\paragraph{Taxa de pacotes fora de ordem na WAN}Pacotes fora de ordem acionam o
+\paragraph{Taxa de reordenação de pacotes na WAN}Pacotes fora de ordem acionam o
 mecanismo de recuperação rápida, com consequente diminuição da janela de
 transmissão. Além disso, pacotes fora de ordem ocupam espaço no buffer do
 receptor, o que pode afetar seu desempenho [StudyReordering].
 % A Study of Internet Packet Reordering
 
-\paragraph{Algoritmo de controle de congestionamento}O algoritmo de controle de
-congestionamento é responsável pelo dimensionamento da janela de transmissão.
+\paragraph{Algoritmo de prevenção de congestionamento}O algoritmo de prevenção
+de congestionamento é responsável pelo dimensionamento da janela de transmissão.
 Quanto maior a janela de transmissão, maior a quantidade dados em trânsito e
 maior a vazão do sistema.
 
-Taxas de perda, de duplicação e de pacotes fora de ordem não foram consideradas
+Taxas de perda, de duplicação e reordenação de pacotes não foram consideradas
 para LAN pois ocorrem com menor frequência e geram pouco impacto nesse tipo de
 rede. Em WANs, esses fenômenos estão relacionados a uma maior quantidade de nós
 intermediários (incluindo roteadores e proxies) e redes heterogêneas que os
@@ -285,7 +280,7 @@ requisições (seção \ref{sec:metricas}), que é mais facilmente comparável
 diretamente com a latência da rede. Além disso, foi considerado para estudo um
 cenário de implantação em que uma nuvem semelhante ao EC2 da Amazon fosse usada,
 então a largura de banda foi fixada nos estudos com base em valores relatados
-por praticantes (ver seção \ref{sec:parametros_fixados}). 
+(ver seção \ref{sec:parametros_fixados}). 
 
 Os parâmetros de carga de trabalho levantados foram:
 
@@ -310,7 +305,7 @@ linha do tempo, em que a réplica mestre pode se tornar um gargalo nas escritas.
 acessos aos objetos dos sistemas no Yahoo! \cite{Cooper2008}. Em uma análise
 feita no período de uma semana, foi observado que em média 85\% das escritas a
 determinado objeto vinham do mesmo centro de dados. Isso acontece por exemplo em
-uma rede social, em que os usuários costumam tanto acessar a aplicação e quanto
+uma rede social, em que os usuários costumam tanto acessar a aplicação quanto
 ter a maior parte de seus contatos na mesma localização geográfica -- usuários
 brasileiros tendem a acessar o sistema do Brasil e a maioria de seus contatos é
 brasileira. Nesse caso, é possível evitar requisições entre centros de dados se
@@ -348,14 +343,14 @@ experimentos. A desvantagem é a possível perda de realismo, dado que sistemas
 distribuídos de larga escala não costumam ser totalmente simétricos nem
 homogêneos.
 
-Como o foco do estudo era a operação do sistema sobre WAN, fatores relacionados
-a rede e carga de trabalho eram prioridade. Por isso, sempre que possível,
-parâmetros de sistema foram fixados, mesmo quando se sabia que eles afetavam o
-desempenho.
+Como o foco do estudo era a operação do sistema sobre uma WAN, fatores
+relacionados a rede e carga de trabalho eram prioridade. Por isso, sempre que
+possível, parâmetros de sistema foram fixados, mesmo quando se sabia que eles
+afetavam o desempenho.
 
 A configuração de hardware e o mecanismo de armazenamento são os únicos
 parâmetros cuja decisão envolveu experimentos, descritos na subseção
-\ref{sec:aglomerado_e_mecanismo_de_armazenamento}.  Os outros parâmetros estão
+\ref{sec:aglomerado_e_mecanismo_de_armazenamento}. Os outros parâmetros estão
 descritos na subseção \ref{sec:parametros_restantes}.
 
 %% ------------------------------------------------------------------------- %%
@@ -481,14 +476,14 @@ Dessa forma, os valores fixados foram:
 
 \end{itemize}
 
-A topologia do aglomerado escolhido é constituída por cada um dos nós ligado
-diretamente a um switch Foundry FastIron Super X.
+O aglomerado escolhido usa topologia em estrela com cada nó ligado diretamente a
+um switch Foundry FastIron Super X.
 
 %% ------------------------------------------------------------------------- %%
 \subsection{Parâmetros restantes} \label{sec:parametros_restantes}
 
 Os parâmetros inicialmente levantados que não foram considerados fatores foram
-fixados nos seguintes valores:
+fixados. O valores definidos foram:
 
 \paragraph{Quantidade de centros de dados:}2. Esse valor simplificou a análise
 pois resultou em apenas um segmento de WAN nos experimentos. Além disso, ele
@@ -529,38 +524,43 @@ estudo era um switch (ver subseção
 \ref{sec:aglomerado_e_mecanismo_de_armazenamento}). Testes mostraram que não
 existiam gargalos no switch mesmo nos experimentos com maior consumo de banda.
 
-\paragraph{Topologia da rede:}Topologia da rede do aglomerado usado no estudo,
-consistindo apenas de nós ligados diretamente a um switch (topologia em
-estrela).
+\paragraph{Topologia da rede:}Topologia da rede em estrela do aglomerado usado
+nos experimentos.
 
-\paragraph{Largura de banda da LAN}: 1 Gb/s. Essa é a largura de banda
+\paragraph{Largura de banda da LAN:} 1 Gb/s. Essa é a largura de banda
 disponível nas placas de rede dos nós do aglomerado e não foram encontrados
-indícios de que o switch seria um gargalo. Esse valor é adequado se comparado
-com uma instância com perfil de E/S ``Alto'' do AWS (por exemplo, uma instância
-M1 Grande), já que estudos informais indicam que é essa a largura de banda
-observada dentro do mesmo centro de dados. [Redis Repl, Net perf].
+indícios de que o switch seria um gargalo. Tomando o AWS como base, estudos
+informais indicam que é essa a largura de banda observada dentro de um mesmo
+centro de dados por instâncias com perfil de E/S ``Alto'' (por exemplo, uma
+instância M1 Grande). [Redis Repl, Net perf].
 % http://blog.rightscale.com/2007/10/28/network-performance-within-amazon-ec2-and-to-amazon-s3/
 % http://3scale.github.com/2012/07/25/fun-with-redis-replication/
 
-\paragraph{Latência da LAN:}Latência do aglomerado utilizado no estudo. Uma
-medição com 60 amostras espaçadas em 5 s no aglomerado mostrou 167 $\mu$s.
+\paragraph{Latência da LAN:}Latência do aglomerado utilizado no estudo. Um teste
+com ping com 60 amostras espaçadas em 5 s no aglomerado mediu 167 $\mu$s de
+latência média.
 % ping -i 5 -c 60 sol-20
 
 \paragraph{Variação de latência da LAN:}Variação de latência do aglomerado
 utilizado no estudo. A mesma medição feita para a latência mostrou desvio padrão
 de 90 $\mu$s.
 
-\paragraph{Largura de banda da WAN}: 100 Mb/s. Um estudo informal entre os
+\paragraph{Largura de banda da WAN:} 100 Mb/s. Um estudo informal entre os
 serviços EC2 e S3 da Amazon com 9 segmentos de rede entre eles (indício de que
 estão em centros de dados diferentes) mediu 400 Mb/s [Net Perf]. Outro estudo
-cita 100 Mb/s como um limite seguro entre zonas de disponibilidade. [Redis
-Repl].
+cita que é comum medir 100 Mb/s como largura de banda entre zonas de
+disponibilidade. [Redis Repl].
 
 \paragraph{Taxa de chegada de requisições}15 operações/s para cada thread de
 cada instância do benchmark. Esse valor foi usado pois esse parâmetro se
 relaciona diretamente com a quantidade de threads por instância do benchmark.
 Assim, considerando que threads por instância foi inicialmente considerado um
 fator, a taxa de chegada foi fixada.
+
+Vale notar que a LAN nos experimentos era definida pela infraestrutura do
+Grid5000 usada, mas a WAN foi emulada. Dessa forma, os parâmetros da LAN estavam
+limitados pela infraestrutura do estudo, enquanto os da WAN foram usados como
+configuração do emulador.
 
 %% ------------------------------------------------------------------------- %%
 \section{Seleção dos Fatores} \label{sec:selecao_dos_fatores}
@@ -607,9 +607,7 @@ Os fatores de rede eram:
 
 \item Taxa de pacotes fora de ordem na WAN
 
-\item Algoritmo de congestionamento
-
-\item Produto Banda-Latência (\emph{Bandwidth Delay Product} -- BDP)
+\item Algoritmo de prevenção congestionamento
 
 \end{itemize}
 
@@ -629,7 +627,7 @@ Uma abordagem possível para a seleção final de fatores seria agrupar todos os
 fatores levantados em um único projeto de experimentos fatoriais
 2\textsuperscript{k}. O problema é que mesmo com apenas dois níveis por fator, a
 quantidade final de experimentos seria proibitiva, dado que a quantidade de
-fatores era 16.
+fatores era 15.
 
 A opção adotada para lidar com o excesso de fatores foi dividi-los em grupos
 menores e realizar experimentos para cada grupo. O principal problema de fazer
@@ -662,9 +660,9 @@ calculados os coeficientes de variabilidade\footnote{O coeficiente de variação é
 a divisão do desvio padrão pela média e é uma maneira de representar a
 variabilidade dos dados desconsiderando sua ordem de grandeza} (CVs) das
 respostas para estimar qual a influência daquele conjunto de fatores e
-interações como um todo. Assim, nenhum dos fatores usados em um estudo é
-influente se o CV da resposta é baixo, já que todas as combinações de níveis
-resultam em pouca variação na resposta.
+interações como um todo. Assim, quando o CV era baixo (1\%, por exemplo), nenhum
+dos fatores usados no estudo era influente, já que nenhuma combinação de fatores
+e níveis resultou em variação significativa da resposta.
 
 Os tempos de resposta das requisições remotas dominam a média dos tempos de
 resposta pois são ordens de grandeza maiores que os das requisições locais. Por
@@ -739,13 +737,13 @@ confirmação de escrita de uma única réplica é suficiente.
 
 Como localidade era um fator, apenas a inserção de objetos na etapa de carga
 (seção \ref{sec:execucao_e_analise_dos_experimentos}) não era suficiente para
-que o sistema operasse em regime durante os experimentos para a consistência na
-linha do tempo. Isso porque ao final da carga, cada objeto no banco de dados
-tinha recebido apenas um acesso de cada centro de dados, nenhuma réplica mestre
-teria migrado por efeito da localidade até esse momento. Por isso, o aquecimento
-era necessário após a carga para a consistência na linha do tempo. Já a
-consistência em momento indeterminado não era sujeita à influência direta de
-localidade, portanto não precisava de aquecimento.
+que o sistema operasse no seu estado estacionário durante os experimentos para a
+consistência na linha do tempo. Isso porque ao final da carga, cada objeto no
+banco de dados tinha recebido apenas um acesso de cada centro de dados, nenhuma
+réplica mestre teria migrado por efeito da localidade até esse momento. Por
+isso, o aquecimento era necessário após a carga para a consistência na linha do
+tempo. Já a consistência em momento indeterminado não era sujeita à influência
+direta de localidade, portanto não precisava de aquecimento.
 
 O aquecimento era dado por uma determinada quantidade de passos. Em cada passo,
 eram realizadas uma quantidade de atualizações igual a quantidade de objetos
@@ -1076,17 +1074,17 @@ também foram suprimidas.
 
 Operação & Percentil & L & V & P & D & O & C & LV\\ \hline
 
-leitura & 90 & 77 & 18 & 0 & 0 & 0 & 0 & 5\\ \hline
+leitura & 90 & 72 & 21 & 1 & 0 & 0 & 0 & 6\\ \hline
 
-escrita & 90 & 70 & 24 & 0 & 0 & 0 & 0 & 6\\ \hline
+escrita & 90 & 69 & 23 & 1 & 0 & 0 & 0 & 6\\ \hline
 
 \end{tabular}
 
 \caption[Estudo para fatores de rede.]{Estudo para fatores de rede. L representa
 a latência, V representa a variação da latência, P representa as taxa de perdas,
 D representa a taxa de pacotes duplicados, O representa a taxa de pacotes fora
-de ordem e C representa o algoritmo de congestionamento.}
-\label{tab:estudo_para_fatores_de_rede}
+de ordem e C representa o algoritmo de congestionamento. A soma para escritas
+não é 100\% devido a arredondamento.} \label{tab:estudo_para_fatores_de_rede}
 
 \end{center} \end{table}
 
