@@ -605,7 +605,7 @@ Os fatores de rede eram:
 
 \item Taxa de duplicação de pacotes na WAN
 
-\item Taxa de pacotes fora de ordem na WAN
+\item Taxa de reordenação de pacotes na WAN
 
 \item Algoritmo de prevenção congestionamento
 
@@ -947,7 +947,7 @@ a configuração de buffers com tamanho em bytes igual ao dobro do BDP. Em
 princípio essa otimização seria aplicada aos estudos, mas experimentos com iperf
 mostraram ganhos de desempenho para buffers de até quatro vezes o BDP, portanto
 um estudo fatorial foi feito para verificar esse fato. O estudo usou latência e
-pacotes fora de ordem para criar cenários que pressionassem os buffers de forma
+reordenação de pacotes para criar cenários que pressionassem os buffers de forma
 diferente.
 
 Os níveis selecionados foram:
@@ -958,7 +958,7 @@ Os níveis selecionados foram:
 
 \item Latência da WAN (ms): 100 e 300
 
-\item Proporção de pacotes fora de ordem na WAN (\%): 0 e 5
+\item Taxa de reordenação de pacotes na WAN (\%): 0 e 5
 
 \end{itemize}
 
@@ -983,7 +983,7 @@ escrita & 90 & 99 & 0 & 0 & 0 & 0 & 0 & 0\\ \hline
 
 \end{tabular} \caption[Estudo para tamanho dos buffers de transmissão e
 recepção.]{Estudo para tamanho dos buffers de transmissão e recepção. L
-representa a latência, O representa a taxa de pacotes fora de ordem e B
+representa a latência, O representa a taxa de reordenação de pacotes e B
 representa o tamanho dos buffers.}
 \label{tab:estudo_para_tamanho_dos_buffers_de_transmissao_e_recepcao}.
 
@@ -1013,7 +1013,7 @@ níveis inicialmente selecionados para fatores de rede foram:
 
 \item Taxa de duplicação de pacotes na WAN (\%): 0,05 e 5
 
-\item Proporção de pacotes fora de ordem na WAN (\%): 0,05 e 5
+\item Taxa de reordenação de pacotes na WAN (\%): 0,05 e 5
 
 \item Algoritmo de congestionamento: TCP CUBIC e H-TCP
 
@@ -1048,11 +1048,11 @@ O mesmo estudo mostra taxas de duplicação de pacotes muitos baixas (0\%). Embora
 os valores usados neste estudo tenham sido muito grandes, duplicação de pacotes
 não influenciou a resposta (ver abaixo).
 
-Duas referências para pacotes fora de ordem foram encontradas. A primeira, já
+Duas referências sobre reordenação de pacotes foram encontradas. A primeira, já
 citada, mostra taxas muito baixas -- em janeiro de 2013, média de 0,006\% e
 mediana de 0\%. Estudo realizado em 2003 entre sítios na China mostra taxas de
-pacotes fora de ordem de 3,187\%. Os valores usados no experimento foram
-maiores, mas mesmo assim pacotes fora de ordem não influenciaram a resposta (ver
+reordenação de pacotes de 3,187\%. Os valores usados no experimento foram
+maiores, mas mesmo assim reordenação de pacotes não influenciou a resposta (ver
 abaixo).
 %http://www-wanmon.slac.stanford.edu/cgi-wrap/pingtable.pl?file=out_of_order_packets&by=by-node&size=100&tick=monthly&from=EDU.SLAC.STANFORD.N3&to=WORLD&ex=none&only=all&dataset=hep&percentage=any
 
@@ -1138,18 +1138,17 @@ Os valores fixados dos fatores desconsiderados foram:
 
 \item Taxa de duplicação de pacotes na WAN (\%): 0
 
-\item Proporção de pacotes fora de ordem na WAN (\%): 0
+\item Taxa de reordenaçã de pacotes na WAN (\%): 0
 
 \item Algoritmo de congestionamento: cubic
 
 \end{itemize}
 
-Taxas de perda de pacotes, taxa de duplicação de pacotes e proporção de pacotes
-fora de ordem foram ignorados no estudo final. O algoritmo de congestionamento
+Taxas de perda, duplicação e reordenação  de pacotes foram ignoradas no estudo final. O algoritmo de congestionamento
 foi fixado como ``cubic'', pois esse é o padrão no sistema Linux utilizado nos
 experimentos.
 
-Apesar de a taxa de pacotes fora de ordem ser fixada, a ocorrência de alguns
+Apesar da taxa de reordenação de pacotes ser fixada, a ocorrência de alguns
 pacotes fora de ordem é possível dada a variação da latência. Por exemplo, com
 uma latência de 100 ms e uma variação de 50\%, é possível que o emulador aplique
 atrasos de 120ms para um pacote e 80 ms para um outro no mesmo milissegundo, o
