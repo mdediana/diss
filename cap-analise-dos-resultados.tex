@@ -2,9 +2,9 @@
 \chapter{Análise dos Resultados} \label{cap:analise_dos_resultados}
 
 O estudo final foi um estudo fatorial completo (seção
-\ref{sec:tipos_de_experimentos}). A sua execução foi bastante simples, rápida e
+\ref{sec:tipos_de_experimentos}). A sua execução foi rápida e
 usou poucos recursos devido aos estudos fatoriais fracionados feitos para
-triagem dos fatores. O estudo final usou os fatores e níveis descritos na Tabela
+triagem dos fatores -- a execução de uma repetição do estudo final demorava 6,5 horas. O estudo final usou os fatores e níveis descritos na Tabela
 \ref{tab:fatores_e_niveis_do_estudo_final}, em um total de 64 experimentos.
 
 \begin{table}[!h] \begin{center} \begin{tabular}{|l|c|c|} \hline
@@ -16,7 +16,7 @@ Modo & ind1, ind2, lt\_qqer e lt\_rec & 4\\ \hline
 
 Latência da WAN (ms) & 0, 100, 200 e 300 & 4\\ \hline
 
-Variação da latência da WAN (\%) & 0 e 50 & 2\\ \hline
+Variação da latência da WAN (\%) & 0 e 60 & 2\\ \hline
 
 Localidade & 0,5 e 0,9 & 2\\ \hline
 
@@ -28,12 +28,73 @@ Localidade & 0,5 e 0,9 & 2\\ \hline
 \end{center} \end{table}
 
 O pequeno número de fatores e níveis foi importante para uma análise consistente
-dos resultados. Isso é enfatizado pela principal referência metodológica usada
-neste trabalho \cite{Jain1991}. Esse fato também foi sugerido para o autor em
-conversa com o pesquisador visitante no IME Jean-Marc Vincent, que possui longa
+dos resultados. Esse fato é enfatizado pela principal referência metodológica usada
+neste trabalho \cite{Jain1991} e também foi sugerido para o autor em
+conversa com o pesquisador visitante no IME Jean-Marc Vincent, que possui grande
 experiência em estudos de desempenho.
 
 TODO: seções
+
+%% ------------------------------------------------------------------------- %%
+\section{Descrição dos Experimentos} \label{sec:descricao_dos_experimentos}
+
+%% ------------------------------------------------------------------------- %%
+\subsection{Hipóteses} \label{sec:hipoteses}
+
+A principal hipótese deste trabalho era que um sistema geo-replicado usando consistência na
+linha do tempo apresentaria um desempenho competitivo com a consistência em
+momento indeterminado para algumas cargas de trabalho, como uma que apresentasse
+localidade alta, por exemplo. Essa hipótese se baseava em uma
+segunda hipótese, a de que os tempos de resposta das requisições para o sistema
+seriam dominadas pela latência (e variação da latência) da WAN. Um exemplo de fenômeno
+que poderia invalidar a hipótese seria a réplica mestre se comportar como
+gargalo na consistência na linha do tempo. Essa hipótese é verificada pela
+distribuição acumulada dos tempos de resposta para cada modo usado no estudo.
+
+Outra hipótese é que as proporções de conflitos identificados durante as
+leituras em ambos os
+modelos de consistência seriam próximas. Conflitos na consistência na linha do tempo aparecem pois
+atualizações são enfileiradas na réplica mestre. Existe um intervalo de tempo em
+que a atualização foi aplicada na réplica mestre mas ainda não foi enviada para
+as outras réplicas, esse intervalo é a janela de inconsistência. A
+consistência em momento indeterminado apresenta conflitos por motivo semelhante,
+com a diferença que a atualização pode ser aplicada em qualquer réplica. Uma
+segunda diferença relacionada a esse fato é que ela permite atualizações
+simultâneas e divergentes, o que não é permitido pela consistência na linha do
+tempo. Assim, os conflitos no caso da consitência em momento indeterminado são
+mais graves.
+
+%% ------------------------------------------------------------------------- %%
+\subsection{Tamanho das amostras e replicações} \label{sec:}
+
+%O tratamento estatístico dado para os experimentos consistiu basicamente na
+%definição do tempo de execução de cada experimento de forma a ter amostras
+%suficientes para garantir o nível de confiabilidade procurado.
+%
+%A quantidade de amostras necessárias é dada por:
+%
+%$n = (\frac{100 * z * s}{r * \bar{x}})^2$,
+%
+%onde z é o valor z relativo do nível de confiança desejado, s é o desvio padrão amostral, r é a
+%precisão desejada e $\bar{x}$ é a média.
+%
+%Para fazer a estimativa, foi usado o experimento com maior desvio padrão, que é
+%aquele em que a quantidade de requisições locais e remotas é balanceada
+%e a variação da rede é a maior. Esse experimento é o que tem modo lt\_rec e
+%localidade 50\%, latência de rede 300 ms e variação da latência de 60\%. O
+%cálculo foi feito considerando o nível de confiança de 95\% ($z = 1.960$) e
+%precisão de 1\%. A principal referência metodológica usada para o estudo
+%considera níveis de confiança de 90\% ou 95\% altos \cite{Jain1991}. Os valores da média e desvio padrão foram calculados a partir
+%dos percentis e eram em $\bar{x} = 0,2533949$ s e $s = 0,2878649$ s.
+%
+%A partir desses valores a quantidade de amostras necessárias é 49579. Esse experimento sendo executado ao longo de 3 min resultou em um total de 50828
+%amostras, e é o experimento com menor número de amostras do estudo. Como a
+%configuração padrão do \emph{benchmark} era baseada em tempo e não em quantidade de
+%requisições, os experimentos usaram 3 min como tempo. Vale notar que o nível de confiança
+%de 95\% é o mínimo atingido, os outros experimentos adquiriram  mais amostras e portanto oferecem uma confiança maior que os 95\%.
+%
+%min=1000000; for f in res.1/*/summary.csv; do n=$(tail -1 $f | cut -d, -f3);
+%echo $n; [[ $min -gt $n ]] && min=$n; done; echo $min
 
 %% ------------------------------------------------------------------------- %%
 \section{Análise dos Tempos de Resposta}
@@ -43,10 +104,8 @@ A principal métrica usada neste estudo foi o tempo de resposta. Tomou-se o
 cuidado de evitar sobrecarregar o sistema, de forma que os tempos de resposta
 representassem o comportamento do sistema no estado estacionário. Todas as
 figuras desta seção apresentam duas linhas de grade para auxiliar na
-interpretação: a linha vertical representa a latência de rede para aqueles
-gráficos e a horizontal representa a localidade.
+interpretação: a linha vertical indica a latência de rede e a horizontal indica a localidade.
 
-%TODO: refazer graficos
 Os gráficos das FDAs dos tempos de resposta quando a latência é 0 ms está na
 Figura \ref{fig:fda_dos_tempos_de_resposta_para_latencia_de_rede_de_0_ms} Como
 esperado, todas as requisições se comportam como se fossem locais. Um fato a se
@@ -67,27 +126,25 @@ opção foi fazer a análise do valor intermediário. O gráfico para latência de
 rede de 200 ms pode ser visto na Figura
 \ref{fig:fda_dos_tempos_de_resposta_para_latencia_de_rede_de_200_ms}.
 
-No caso de leituras e localidade 0,5, apenas lt\_rec apresenta requisições
-remotas.  Uma porção pequena dessas leituras possui tempo de resposta entre o
-tempo das requisições locais e a latência da rede, o que se explica pela
-variação da latência. A localidade 0,9 beneficia lt\_rec, que continua
-apresentando tempos de resposta mais altos que os outros modos. Em ambos os
-gráficos de leitura o degrau que existia continuar, mas no caso de lt\_rec ele
-surge próximo do percentil equivalente a localidade (percentil 50 para
-localidade 0,5 e percentil 90 para localidade 0,9). Isso sugere que esse e um
-efeito que sempre afeta requisições locais.
+No caso de leituras e localidade 50\%, apenas lt\_rec apresenta requisições
+remotas. Uma porção pequena dessas leituras tem tempo de resposta menor que a
+latência da rede, o que se explica pela variação da latência de até 60\%. A
+localidade 90\% beneficia lt\_rec, que continua
+apresentando tempos de resposta mais altos que os outros modos. O degrau que
+aparecia nos gráficos para latência de 0 ms permanece, mas no caso de lt\_rec ele
+surge próximo do percentil equivalente a localidade (50 ou 90). Isso sugere que esse e um
+efeito que sempre afeta requisições locais, independente da proporção que
+representem do total de requisições.
 
-No caso de escritas e localidade 0,5, lt\_rec apresenta um desempenho um pouco
+No caso de escritas e localidade 50\%, lt\_rec apresenta um desempenho um pouco
 melhor que ev2 e lt\_qqer. A explicação provável para isso é o fato de o sistema
-como um todo estar menos carregado para esse modo do que os outros. Isso
-acontece pois as leituras de lt\_rec são mais lentas. Esse fato pode ser
-comprovado pela vazão dos modos lt\_rec, ev2 e lt\_qqer, respectivamente, 387,
-664, 600 operações/s.  Já no caso de localidade 0,9, lt\_rec e lt\_qqer se
+estar menos carregado para esse modo do que os outros, o que acontece pois as leituras de lt\_rec são mais lentas. Esse fato pode ser
+comprovado pela vazão dos modos lt\_rec, ev2 e lt\_qqer, respectivamente, 594,
+1072, 941 operações/s. Já no caso de localidade 0,9, lt\_rec e lt\_qqer se
 beneficiam da localidade, enquanto ev2 não e continua com o mesmo perfil
 apresentado para localidade 0,5.
 
-%TODO: refazer vazão subset(t, loc == 0.5 & delay == 200 & delay_var == 150 &
-%loss == 0) 
+% grep 0.5,uni,2:1,200,60 res.1/summary.csv | cut -d, -f1,11
 
 \begin{figure}[p] \centering
 
@@ -97,11 +154,13 @@ apresentado para localidade 0,5.
 \label{fig:fda_dos_tempos_de_resposta_para_latencia_de_rede_de_200_ms}
 \end{figure}
 
-Com exceção dos degraus que aparecem nos gráficos, todos os modos apresentam
-comportamento como o esperado.
+Com exceção dos degraus que aparecem nos gráficos, todos os modos apresentaram
+o comportamento esperado.
 
 %% ------------------------------------------------------------------------- %%
 \section{Análise dos Conflitos} \label{sec:analise_dos_conflitos}
+
+A análise dos conflitos
 
 %% ------------------------------------------------------------------------- %%
 \section{Análise das Migrações} \label{sec:analise_das_migracoes}
@@ -198,4 +257,4 @@ nos resultados.
 Os experimentos consideram que todos os nós sempre operam sem falhas. Os
 resultados de experimentos com o sistema operando em algum modo de falha (desde
 a falha de um nó até de um centro de dados inteiro) devem ser diferentes dos
-obtidos nesse estudo.
+btidos nesse estudo.

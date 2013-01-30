@@ -10,7 +10,7 @@ profundo do projeto e desenvolvimento desse tipo de sistema.
 
 Muitas das dificuldades de geo-replicação são evidenciadas ao se analisar os
 mecanismos que o TCP oferece para comunicação ponto-a-ponto confiável,
-explicados na seção \ref{sec:tcp_e_comunicacao_confiavel}. TODO seções
+explicados na Seção~\ref{sec:tcp_e_comunicacao_confiavel}. TODO Seções
 
 %% ------------------------------------------------------------------------- %%
 \section{TCP e Comunicação Confiável} \label{sec:tcp_e_comunicacao_confiavel}
@@ -34,7 +34,7 @@ O controle de fluxo é feito por mecanismos usados nas pontas de uma conexão com
 o objetivo de usar a rede de forma eficiente e evitar o envio de mais dados do
 que o receptor pode tratar.  Perdas acontecem quando um dispositivo na rede
 descarta pacotes, o que pode ser causado por corrupção de pacotes ou
-congestionamento da rede, como buffers esgotados em um roteador, por exemplo.
+congestionamento da rede, como \emph{buffers} esgotados em um roteador, por exemplo.
 Reordenação ocorre quando pacotes de uma mesma conexão TCP enviados nos
 instantes T1 e T2 seguem caminhos diferentes na rede, e o pacote enviado em T2
 chega ao receptor antes do enviado em T1. Duplicação normalmente está
@@ -58,7 +58,7 @@ transmissão é ativado para cada pacote enviado. Se o temporizador expirar antes
 do recebimento do ACK, o pacote é reenviado.
 
 \paragraph{Controle de fluxo}A janela de recebimento é a quantidade de bytes que
-o receptor está disposto a receber, baseada no espaço livre de seu buffer de
+o receptor está disposto a receber, baseada no espaço livre de seu \emph{buffer} de
 recepção. O receptor envia o valor da janela em todas as suas respostas para o
 transmissor. Esse mecanismo evita que o transmissor envie mais dados do que o
 receptor pode tratar.
@@ -119,7 +119,7 @@ perdido, então os mecanismos usuais de controle de congestionamento são
 acionados. 
 
 %% ------------------------------------------------------------------------- %%
-\section{Estratégias para escalabilidade de aplicações web}
+\section{Estratégias para Escalabilidade de Aplicações Web}
 \label{sec:estrategias_para_escalabilidade_de_aplicacoes_web}
 
 Uma aplicação web potencialmente precisa ser capaz de lidar com quantidades
@@ -183,7 +183,7 @@ outra técnica importante é a replicação de dados. As diferentes estratégias de
 replicação, suas vantagens e consequências são apresentadas na seção seguinte.
 
 %% ------------------------------------------------------------------------- %%
-\section{Replicação de dados e seus compromissos}
+\section{Replicação de Dados e Seus Compromissos}
 \label{sec:replicacao_de_dados_e_seus_compromissos}
 
 Replicação de dados é o processo de criar cópias de uma coleção de dados
@@ -233,13 +233,13 @@ na presença de falhas, como por exemplo continuar permitindo operações de
 leitura, recusando apenas as de escrita. Existem soluções, como o uso de
 quóruns, que proporcionam um aumento da disponibilidade de um sistema replicado
 \cite{Gifford1979,Thomas1979,Enez-peris2003}. Uma discussão mais aprofundada dos
-problemas de disponibilidade da replicação pessimista pode ser vista na seção
+problemas de disponibilidade da replicação pessimista pode ser vista na Seção
 \ref{sec:consistencia_desempenho_e_disponibilidade_em_sistemas_geo_replicados}.
 
 Outra desvantagem de replicação pessimista é o seu desempenho, especialmente em
 WANs. Esse tipo de rede pode causar um aumento no tempo de resposta de
 requisições devido a alta latência, limitações na largura de banda disponível,
-congestionamento, perda de pacotes e explosões de tráfego
+congestionamento, perda de pacotes e rajadas de tráfego
 \cite{Fall2005,Freedman2010,Jiang2005}. Caso replicação pessimista seja usada
 nesse cenário, qualquer escrita fica sujeita a latências da ordem de dezenas ou
 centenas de milissegundos. Isso é inaceitável em aplicações web, já que muitas
@@ -303,7 +303,7 @@ oferece são dadas por seu modelo de consistência, assunto discutido na próxima
 seção.
 
 %% ------------------------------------------------------------------------- %%
-\section{Modelos de consistência para replicação}
+\section{Modelos de Consistência para Replicação}
 \label{sec:modelos_de_consistencia_para_replicacao}
 
 Um modelo de consistência define o momento em que determinada escrita será vista
@@ -477,7 +477,7 @@ entender as trocas entre consistência, desempenho e disponibilidade. A seção
 seguinte discute esses padrões.
 
 %% ------------------------------------------------------------------------- %%
-\section{Consistência, desempenho e disponibilidade em sistemas geo-replicados}
+\section{Consistência, Desempenho e Disponibilidade em Sistemas Geo-replicados}
 \label{sec:consistencia_desempenho_e_disponibilidade_em_sistemas_geo_replicados}
 
 A maioria dos sistemas geo-replicados têm fortes requisitos de escalabilidade,
@@ -573,7 +573,7 @@ se recuperar de uma falha ou o particionamento da rede ser resolvido. Um exemplo
 de algoritmo de detecção de conflitos é a correção na leitura
 \cite{DeCandia2007}. Por esse algoritmo, todas as réplicas de um objeto são
 lidas em todas as leituras desse objeto, e ao perceber divergência entre elas, o
-sistema ativa mecanismos de resolução de conflitos (comentados na subseção
+sistema ativa mecanismos de resolução de conflitos (comentados na Subseção
 \ref{sec:replicacao_otimista}).
 
 Os compromissos apresentados pelo teorema CAP são complexos, não representando

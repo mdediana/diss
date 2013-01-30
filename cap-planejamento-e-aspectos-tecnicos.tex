@@ -14,9 +14,9 @@ Intro %TODO
 %encontra no capítulo \ref{cap:analise_dos_resultados}.
 
 As definições das metas, métricas e técnica de avaliação do estudo se encontram
-na seção \ref{sec:definicao_do_estudo}. As descrições do sistema de
-armazenamento e do benchmark usados, bem como do ambiente em que operaram nos
-experimentos, se encontram na seção \ref{sec:aspectos_tecnicos}. Por fim, os
+na Seção~\ref{sec:definicao_do_estudo}. As descrições do sistema de
+armazenamento e do \emph{benchmark} usados, bem como do ambiente em que operaram nos
+experimentos, se encontram na Seção~\ref{sec:aspectos_tecnicos}. Por fim, os
 tipos de experimentos usados neste trabalho são explicados na seção
 \ref{sec:tipos_de_experimentos}.
 
@@ -32,13 +32,13 @@ abordagem sistemática para fazer um estudo experimental. Neste trabalho seguimos
 os passos dessa abordagem, com exceção do levantamento de parâmetros e a seleção
 de fatores, que ocorreram após a definição da técnica de avaliação.  Isso foi
 feito pois essa foi a fase maior complexidade do estudo, inclusive estando
-descritos em um capítulo à parte (capítulo \ref{cap:parametros_e_fatores}) por
+descritos em um capítulo à parte (Capítulo~\ref{cap:parametros_e_fatores}) por
 esse motivo.
 
-A subseção \ref{sec:nomenclatura} define termos usados ao longo deste trabalho.
-A subseção \ref{sec:metas_do_estudo} descreve as metas e o contexto do estudo. A
-subseção \ref{sec:metricas} define quais os critérios usados na avaliação de
-desempenho. A seguir, a subseção \ref{sec:tecnica_de_avaliacao} apresenta a
+A Subseção~\ref{sec:nomenclatura} define termos usados ao longo deste trabalho.
+A Subseção~\ref{sec:metas_do_estudo} descreve as metas e o contexto do estudo. A
+Subseção~\ref{sec:metricas} define quais os critérios usados na avaliação de
+desempenho. A seguir, a Subseção~\ref{sec:tecnica_de_avaliacao} apresenta a
 técnica escolhida para o estudo.
  
 %% ------------------------------------------------------------------------- %%
@@ -108,7 +108,7 @@ tempo de resposta, melhor é o desempenho de um modelo de consistência.
 Além do tempo de resposta, outras métricas observadas foram vazão (em
 operações/s), quantidade de migrações e quantidade de conflitos (ambas dadas
 pela porcentagem com relação ao total de operações do experimento). Vazão não é
-considerada uma meta principal pois o benchmark usa uma taxa de requisições
+considerada uma meta principal pois o \emph{benchmark} usa uma taxa de requisições
 fixada em vez de usar a máxima possível, de forma a diminuir possíveis
 influências de sobrecarga do sistema. A quantidade de migrações, exclusiva da
 consistência na linha do tempo, oferece uma visão da dinâmica de um sistema que
@@ -153,12 +153,12 @@ de sistemas, como implementação da consistência na linha do tempo e preparação
 de scripts para a execução dos experimentos.
 
 O sistema de armazenamento usado como objeto de estudo nos experimentos é
-descrito na subseção \ref{sec:sistema_de_armazenamento}. A carga sobre o sistema
-é definida pelo benchmark, descrito na subseção \ref{sec:benchmark}. O ambiente
+descrito na Subseção~\ref{sec:sistema_de_armazenamento}. A carga sobre o sistema
+é definida pelo \emph{benchmark}, descrito na Subseção~\ref{sec:benchmark}. O ambiente
 dos experimentos é definido pela plataforma escolhida para executá-los, descrita
-na subseção \ref{sec:ambiente}. A forma como a WAN é emulada é descrita na
-subseção \ref{sec:rede}. A estrutura para execução e análise dos experimentos é
-descrita na subseção \ref{sec:execucao_e_analise_dos_experimentos}.
+na Subseção~\ref{sec:ambiente}. A forma como a WAN é emulada é descrita na
+Subseção~\ref{sec:rede}. A estrutura para execução e análise dos experimentos é
+descrita na Subseção~\ref{sec:execucao_e_analise_dos_experimentos}.
 
 %% ------------------------------------------------------------------------- %%
 \subsection{Sistema de armazenamento} \label{sec:sistema_de_armazenamento}
@@ -226,7 +226,7 @@ princípio poderia ser tratada localmente. Esse procedimento eliminou a
 necessidade de implementação de um mecanismo para evitar conflitos de inserção.
 Apesar de inserções serem ineficientes, isso não afetou os resultados, dado que
 os experimentos usam inserção apenas na carga do sistema (ver o fluxo de
-trabalho na subseção \ref{sec:execucao_e_analise_dos_experimentos}). Remoções
+trabalho na Subseção~\ref{sec:execucao_e_analise_dos_experimentos}). Remoções
 não foram implementadas.
 
 O PNUTS conta com uma heurística que explora a localidade de requisições,
@@ -264,22 +264,18 @@ estatísticas de migrações.
 
 
 %% ------------------------------------------------------------------------- %%
-\subsection{Benchmark} \label{sec:benchmark}
+\subsection{\emph{Benchmark}} \label{sec:benchmark}
 
-% artigos que usam o termo benchmark, em itálico
-% http://sbrc2012.dcc.ufmg.br/app/pdfs/p-05/wcga/WCGA-ST3-2.pdf
-% http://www2.dbd.puc-rio.br/pergamum/tesesabertas/0521501_10_cap_04.pdf
-
-O benchmark usado foi o Basho Bench \cite{Basho}, específico para o Riak. Ele
+O \emph{benchmark} usado foi o Basho Bench \cite{Basho}, específico para o Riak. Ele
 provê configurações para quantidade de clientes concorrentes (threads), relação
-leitura/escrita, popularidade dos objetos acessados, entre outras. O benchmark
+leitura/escrita, popularidade dos objetos acessados, entre outras. O \emph{benchmark}
 originalmente não é distribuído, portanto foi modificado pois mais de uma
 instância dele precisava ser executada simultaneamente nos experimentos. Além de
-evitar gargalos no benchmark, isso era importante para a implementação de
+evitar gargalos no \emph{benchmark}, isso era importante para a implementação de
 localidade. Além disso, foi necessária a implementação de um script para a
 consolidação dos dados obtidos pelas diversas instâncias do Basho Bench.
 
-Outro benchmark considerado foi o YCSB \cite{Cooper2010}.  Apesar de possuir
+Outro \emph{benchmark} considerado foi o YCSB \cite{Cooper2010}.  Apesar de possuir
 mais flexibilidade que o Basho Bench nas suas configurações, ele não estava
 preparado para acessar o Riak, acesso esse que precisaria ser implementado. Além
 disso, ele também não oferecia muitas das funcionalidades necessárias para os
@@ -312,7 +308,7 @@ infraestrutura. Como o Grid5000 é compartilhado por diversos pesquisadores, ele
 oferece um conjunto de ferramentas (OAR\footnote{\url{http://oar.imag.fr/}}) e
 regras para que um pesquisador reserve nós exclusivamente para ele por um
 determinado período de tempo. Além dos nós, é possível reservar IPs para compor
-sub-redes, recurso utilizado nos experimentos (ver subseção \ref{sec:rede}).
+sub-redes, recurso utilizado nos experimentos (ver Subseção~\ref{sec:rede}).
 Outra ferramenta bastante utilizada é o
 kadeploy\footnote{\url{http://kadeploy.imag.fr/}}, responsável pela implantação
 de imagens nos nós reservados pelo usuário.
@@ -358,13 +354,13 @@ requisitos funcionais dos experimentos.
 Existem recomendações sobre otimizações de sistemas Linux para quando esses se
 comunicam através de WANs. Durante os experimentos, sempre que os parâmetros da
 WAN foram alterados, um script para ajuste da pilha TCP foi usado (para mais
-detalhes, ver seção \ref{sec:fatores_de_rede}).
+detalhes, ver Seção~\ref{sec:fatores_de_rede}).
 
 %% ------------------------------------------------------------------------- %%
 \subsubsection{Centros de dados}
 
 Os experimentos foram planejados para usar dois centros de dados simulados (ver
-seção \ref{sec:parametros_fixados}). Para simular os centros de dados, os nós
+Seção~\ref{sec:parametros_fixados}). Para simular os centros de dados, os nós
 que compunham o sistema eram divididos em dois conjuntos CD1 e CD2, cada um
 representando um centro de dados. Além dos nós, duas sub-redes SR1 e SR2 eram
 reservadas. Cada nó de CD1 recebia, além de seu IP da rede do Grid5000, um IP de
@@ -398,7 +394,7 @@ o mesmo centro de dados saíam inalteradas.
 A automatização dos experimentos foi feita em dois conjuntos de scripts. O
 primeiro (cmb) foi usado para gerenciamento e execução dos experimentos --
 reserva de nós, implantação da imagem, gerenciamento do sistema de
-armazenamento, configuração e execução do benchmark e coleta dos resultados. Os
+armazenamento, configuração e execução do \emph{benchmark} e coleta dos resultados. Os
 scripts se localizavam no frontend do Grid5000 e foram escritos em bash.  Esses
 scripts definem o fluxo de trabalho do estudo, descrito a seguir.  O segundo
 conjunto (cmb-local) foi usado na análise dos dados, se localizava no computador
@@ -496,7 +492,7 @@ seria apenas uma forma mais simples de usar o kadeploy, ferramenta para
 implantação de imagens do Grid5000.
 
 \paragraph{Configuração dos nós (srvs)}Essa etapa consiste em separar os nós
-reservados entre nós de Riak e instâncias do benchmark, a partir das quantidades
+reservados entre nós de Riak e instâncias do \emph{benchmark}, a partir das quantidades
 de cada um definidas para o estudo. Nesse momento, os nós de Riak também são
 dividos entre os centros de dados a serem usados e os IPs das sub-redes são
 alocados (script net).
@@ -520,7 +516,7 @@ disso, as otimizações para WAN são aplicadas (script tune-tcp).
 
 \paragraph{Execução de um experimento (run)}Essa etapa começa pela aquisição de
 informações do sistema, como as condições de memória e disco dos nós e latência
-da LAN. Após isso, a execução do benchmark propriamente dita ocorre. Por fim,
+da LAN. Após isso, a execução do \emph{benchmark} propriamente dita ocorre. Por fim,
 arquivos com os resultados dos experimentos, logs e arquivos de configuração são
 salvos para serem usados na análise dos resultados depois.
 
@@ -575,8 +571,8 @@ os fatores inicialmente selecionados são usados, mas apenas com dois níveis cada
 $y = q_0 + q_Ax_A + q_Bx_B + q_Cx_C + ... + q_{AB}x_Ax_B + q_{AC}x_Ax_C +
 q_{BC}x_Bx_C... + q_{ABC}x_Ax_Bx_C + ...$,
 
-onde $y$ é o desempenho medido, $q_0$, $q_A$, $q_B$, etc são os coeficientes do
-modelo e $x_A$, $x_B$, $x_C$, etc representam respectivamente os níveis dos
+onde $y$ é o desempenho medido, $q_0$, $q_A$, $q_B$, etc. são os coeficientes do
+modelo e $x_A$, $x_B$, $x_C$, etc. representam respectivamente os níveis dos
 fatores A, B, C, etc. Os termos compostos pela multiplicação de dois ou mais
 fatores representam as interações entre eles.
 
