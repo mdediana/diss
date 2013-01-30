@@ -11,93 +11,10 @@ para o estudo. Os fatores menos influentes foram tratados como parâmetros e
 tiveram seus valores fixados. Os fatores mais influentes foram usados nos
 experimentos finais. 
 
-Tanto a seleção dos fatores quanto o estudo final usaram tipos de experimentos
-propostos pela literatura, que estão descritos na seção
-\ref{sec:tipos_de_experimentos}. A lista de parâmetros inicialmente levantada é
-apresentada na seção \ref{sec:lista_de_parametros}. Os parâmetros fixados e seus
-valores estão na seção \ref{sec:parametros_fixados}. Por fim, a seleção dos
-fatores e os experimentos que levaram a ela estão na seção
-\ref{sec:selecao_dos_fatores}.
-
-%% ------------------------------------------------------------------------- %%
-\section{Tipos de Experimentos} \label{sec:tipos_de_experimentos}
-
-%TODO: talvez citar o outro livro de performance
-São alguns os tipos de experimentos que podem ser usados em um estudo
-experimental. A escolha entre eles se dá principalmente pelo balanço entre
-recursos utilizados (tempo, dinheiro, energia, etc) e quantidade de informação
-adquirida -- quanto mais recursos são gastos, maior é a quantidade de informação
-adquirida.
-
-Experimentos fatoriais consistem da combinação de dois ou mais fatores em cada
-experimento que compõe o estudo. Existem dois tipos principais de projetos de
-experimentos fatoriais: completo e fracionado \cite{Jain1991}.
-
-Um projeto de experimentos fatoriais completo é constituído por experimentos com
-todas as combinações possíveis de fatores e seus níveis. Assim, a quantidade
-total de experimentos é dada por:
-
-$n = \prod_{i=1}^k{n_i}$,
-
-onde k é o número de fatores e $n_i$ é a quantidade de níveis do
-i$^{\textrm{\'esimo}}$ fator.
-
-Esse tipo de projeto de experimentos tem a vantagem de identificar com precisão
-a influência de todos os fatores e suas interações nas variáveis de resposta.
-Mas quanto maior a quantidade de fatores e de níveis em um estudo experimental,
-maior a quantidade de recursos necessários para sua execução. Normalmente os
-fatores não afetam igualmente as variáveis de resposta, pelo contrário, é comum
-alguns poucos fatores explicarem a maior parte dos efeitos na resposta.
-
-Para esses casos, um projeto de experimentos fatoriais fracionado é utilizado
-para fazer uma triagem dos fatores, identificando quais deles são os mais
-influentes.  Nesse tipo de experimento, utiliza-se apenas uma parte de todos os
-experimentos definidos no projeto de experimentos fatoriais completo. Um tipo
-particular de projeto de experimentos fatoriais fracionado é o
-2\textsuperscript{k}.
-
-%% ------------------------------------------------------------------------- %%
-\subsection{Projeto de experimentos fatoriais fracionado 2\textsuperscript{k}}
-\label{sec:projeto_de_experimentos_fatoriais_fracionado_2k}
-
-Em um projeto de experimentos fatoriais fracionado 2\textsuperscript{k}, todos
-os fatores inicialmente selecionados são usados, mas apenas com dois níveis cada
-(normalmente o mínimo e o máximo), resultando em um total de
-2\textsuperscript{k} experimentos, que por sua vez resultam em
-2\textsuperscript{k} medições de desempenho. Dadas essas medições, o desempenho
-é expresso por um modelo de regressão não-linear da forma:
-
-$y = q_0 + q_Ax_A + q_Bx_B + q_Cx_C + ... + q_{AB}x_Ax_B + q_{AC}x_Ax_C +
-q_{BC}x_Bx_C... + q_{ABC}x_Ax_Bx_C + ...$,
-
-onde $y$ é o desempenho medido, $q_0$, $q_A$, $q_B$, etc são os coeficientes do
-modelo e $x_A$, $x_B$, $x_C$, etc representam respectivamente os níveis dos
-fatores A, B, C, etc. Os termos compostos pela multiplicação de dois ou mais
-fatores representam as interações entre os fatores em questão.
-
-Para cada fator, define-se uma relação entre seus níveis e os valores -1 ou 1.
-Por exemplo, pode-se definir que a latência de 100 ms valerá -1 e a latência de
-300 ms valerá 1. Fazendo a substituição dos níveis por esses valores, tem-se um
-sistema de 2\textsuperscript{k} equações e 2\textsuperscript{k} variáveis (os
-coeficientes).
-
-Com os coeficientes, calcula-se a variação total de y (ou soma total dos
-quadrados) a partir da equação:
-
-$STQ = SQA + SQB + SQC + ... + SQAB + SQAC + SQBC + ... + SQABC + ...$,
-
-onde cada $SQX$ é dado por:
-
-$SQX = 2^kq_X$
-
-Cada $SQX$ é a porção da variação total explicada pelo fator ou pela interação
-entre fatores X. A partir disso, é possível finalmente calcular a fração da
-variação explicada por cada X por:
-
-$FSQX = SQX / STQ$
-
-Ordenando os $FSQX$s é possível descobrir quais são os fatores e interações
-entre eles que mais afetam os resultados dos experimentos.
+A lista de parâmetros inicialmente levantada é apresentada na seção
+\ref{sec:lista_de_parametros}. Os parâmetros fixados e seus valores estão na
+seção \ref{sec:parametros_fixados}. Por fim, a seleção dos fatores e os
+experimentos que levaram a ela estão na seção \ref{sec:selecao_dos_fatores}.
 
 %% ------------------------------------------------------------------------- %%
 \section{Lista de Parâmetros} \label{sec:lista_de_parametros}
@@ -131,7 +48,10 @@ desempenho por nó.
 
 \paragraph{Quantidade de centros de dados}A menos que as redes que ligam os
 centros de dados tomados dois a dois tenham as mesmas características, o tempo
-de resposta de uma dada requisição depende de sua origem e destino.
+de resposta de uma dada requisição depende de sua origem e destino. Por exemplo,
+uma requisição saindo de um centro de dados no Brasil com destino a um centro de
+dados na Argentina não tem o mesmo tempo de resposta que outra saindo do Brasil
+mas com destino ao Japão.
 
 \paragraph{Capacidade dos centro de dados}A menos que todos os centros de dados
 possuam as mesmas capacidades agregadas de processamento, armazenamento e
@@ -159,9 +79,10 @@ armazenamento utilizado. No caso de armazenamento em memória, o tamanho dos
 objetos influencia a fragmentação da memória, o que também afeta o desempenho.
 Além disso, o tamanho dos objetos afeta o comportamento da comunicação TCP, dado
 que objetos muito grandes precisam ser divididos em mais de um pacote e objetos
-muito pequenos resultam em uma carga paga proporcionalmente menor. Isso tende a
-se refletir como diminuição da vazão e/ou aumento do tempo de resposta das
-requisições.
+muito pequenos resultam em uma carga paga\footnote{Um pacote de dados é composto
+por dados e metadados (cabeçalho, por exemplo). Os dados são a carga paga.}
+proporcionalmente menor. Isso tende a se refletir como diminuição da vazão e/ou
+aumento do tempo de resposta das requisições.
 
 \paragraph{Algoritmo de particionamento}O algoritmo de particionamento define a
 distribuição dos objetos pelos nós. No caso de uma distribuição desbalanceada,
@@ -216,9 +137,11 @@ afeta os tempos de envio e recebimento.
 dado que dentre suas causas está a dinâmica da rede. Por exemplo, rajadas de
 tráfego aumentam a fila de pacotes a ser processados em um roteador, o que se
 manifesta como aumento de latência nas conexões passando por ele. Quando o
-roteador volta a sua operação normal, a latência diminui. Esse exemplo ilustra
-outra característica de variações de latência, que é a existência de correlação
-entre os valores de latência observados ao longo do tempo.
+roteador volta a sua operação normal, a latência diminui. A latência não vaira
+aleatoriamente, ela tem períodos de aumento e de diminuição gradual.  No
+exemplo, a latência diminui em função da diminuição da fila no roteador, ela não
+cai imediatamente para o seu valor médio. Esse fato levou ao uso de correlação
+na variação da latência nos experimentos.
 %TODO: citar paper mdcc sobre variação de latência e
 %http://amplab.cs.berkeley.edu/2011/10/20/latencies-gone-wild/ Effect of Delays
 %on TCP Performance
@@ -334,8 +257,7 @@ considerados fatores e o tratamento dado a eles está na seção
 Um motivo para fixar um parâmetro é a limitação de recursos. Por exemplo, um
 estudo pode estar limitado apenas às configurações de hardware disponíveis para
 o pesquisador. Um outro motivo é saber de antemão que, apesar de afetar o
-desempenho do sistema, o parâmetro é pouco relevante para o estudo em questão --
-caso contrário, ele seria considerado um fator.
+desempenho do sistema, o parâmetro é pouco relevante para o estudo.
 
 Favorecer simetria e homogeneidade nos experimentos foi um princípio que guiou
 algumas das decisões, pois isso simplificou a implementação e a análise dos
@@ -452,11 +374,11 @@ tipo de disco e pela relação entre o tamanho do banco de dados e a memória
 livre. Um exemplo é a comparação de suno com parapluie, em que o primeiro
 aglomerado possui discos com taxas de acesso maiores que a largura de banda da
 rede (1 Gb/s) -- o gargalo em um caso seria a rede, em outro caso seria o disco.
-Além disso, efeitos do cache de disco tornariam os resultados ainda mais
-particulares e difíceis de ser generalizados.  Dessa forma, ao adotar memória
-como mecanismo de armazenamento, eliminou-se os efeitos das interações entre
-rede, disco e cache de disco e a análise foi focada apenas na rede. Trabalhos
-futuros podem estudar o efeito de disco e cache de disco no desempenho (seção
+Efeitos do cache de disco tornariam os resultados ainda mais particulares e
+difíceis de ser generalizados.  Dessa forma, ao adotar memória como mecanismo de
+armazenamento, eliminou-se os efeitos das interações entre rede, disco e cache
+de disco e a análise foi focada apenas na rede. Trabalhos futuros podem estudar
+o efeito de disco e cache de disco no desempenho (seção
 \ref{sec:trabalhos_futuros}).
 
 Ao definir que o sistema usaria memória como mecanismo de armazenamento, a
@@ -507,12 +429,12 @@ razoável entre desempenho, disponibilidade e durabilidade em aplicações reais
 \paragraph{Limiar de migração (para consistência na linha do tempo):}3.  Valor
 padrão usado pelo PNUTS \cite{Cooper2008}.
 
-\paragraph{Interface de acesso:}HTTP. O Riak também suporta Protocol
+\paragraph{Interface de acesso:}HTTP. O Riak também dá suporte a Protocol
 Buffers\footnote{\url{http://code.google.com/p/protobuf/}}, mais eficiente que a
 interface HTTP. Apesar disso, a opção foi pelo uso de HTTP pois eficiência da
 interface não era tão relevante para os experimentos dado que a carga sobre o
-sistema era controlada, mas implementar os parâmetros da consistência na linha
-do tempo na interface HTTP era mais simples.
+sistema era controlada, e implementar os parâmetros da consistência na linha do
+tempo na interface HTTP era mais simples.
 
 \paragraph{Nível de log:}WARN. Alguns experimentos exploratórios mostraram perda
 de desempenho quando o  nível de log estava em INFO. De qualquer forma, como a
@@ -558,9 +480,9 @@ Assim, considerando que threads por instância foi inicialmente considerado um
 fator, a taxa de chegada foi fixada.
 
 Vale notar que a LAN nos experimentos era definida pela infraestrutura do
-Grid5000 usada, mas a WAN foi emulada. Dessa forma, os parâmetros da LAN estavam
-limitados pela infraestrutura do estudo, enquanto os da WAN foram usados como
-configuração do emulador.
+Grid5000 usada, mas a WAN foi emulada (ver seção \ref{sec:rede}). Dessa forma,
+os parâmetros da LAN estavam limitados pela infraestrutura do estudo, enquanto
+os da WAN foram usados como configuração do emulador.
 
 %% ------------------------------------------------------------------------- %%
 \section{Seleção dos Fatores} \label{sec:selecao_dos_fatores}
@@ -641,8 +563,8 @@ influente do que o outro e a interação entre eles fosse baixa, a decisão de
 fixar o menos influente não teria consequências. Mas sem essa informação, fixar
 um deles representava ameaça à validade do estudo.
 
-A maioria desses fatores eram suscetíveis a interação com fatores de rede, como
-o tamanho dos objetos armazenados, por exemplo. A latência de rede em particular
+A maioria desses fatores era suscetível a interações com fatores de rede, como o
+tamanho dos objetos armazenados, por exemplo. A latência de rede em particular
 havia se mostrado muito influente em estudos exploratórios, fato confirmado
 posteriormente pelo estudo para fatores de rede. Dado isso, a abordagem adotada
 foi usar a latência como um representante da rede nos outros estudos fatoriais.
@@ -652,17 +574,22 @@ desconsiderá-lo no estudo final não era uma ameaça à validade pois a latência
 era um fator bem mais influente.
 
 Existem outras situações em que desconsiderar um fator que aparece como
-influente não implica necessariamente em ameaça à validade. Como em um estudo
-fatorial fracionado 2\textsuperscript{k} a soma das influências dos fatores e
-interações entre eles é 100\%, mesmo que todos os fatores afetem pouco a
-resposta, um ou mais deles aparecem como influentes. Por isso, também foram
-calculados os coeficientes de variabilidade\footnote{O coeficiente de variação é
-a divisão do desvio padrão pela média e é uma maneira de representar a
-variabilidade dos dados desconsiderando sua ordem de grandeza} (CVs) das
-respostas para estimar qual a influência daquele conjunto de fatores e
-interações como um todo. Assim, quando o CV era baixo (1\%, por exemplo), nenhum
-dos fatores usados no estudo era influente, já que nenhuma combinação de fatores
-e níveis resultou em variação significativa da resposta.
+influente não implica necessariamente em ameaça à validade. O método de análise
+de variação de um estudo fracionado 2\textsuperscript{k} mostra a importância
+relativa de cada fator, o que não significa que esses fatores sejam de fato
+influentes. Por exemplo, ao testar o desempenho de um software com duas CPUs e
+dois tamanhos de memória diferentes (4 experimentos), um estudo fatorial vai
+indicar a influência de um ou dos dois fatores mesmo que a maior diferença entre
+as respostas seja de 0,001\%. Nesse caso, a variação é pouco significativa, mas
+o estudo fatorial vai indicar qual a influência relativa de cada fator nesses
+0,001\% de variação. Para tratar esses casos, também foram calculados os
+coeficientes de variação\footnote{O coeficiente de variação é a divisão do
+desvio padrão pela média e é uma maneira de representar a variabilidade dos
+dados desconsiderando sua ordem de grandeza} (CVs) das respostas para estimar
+qual a influência daquele conjunto de fatores e interações como um todo. Assim,
+quando o CV era baixo (1\%, por exemplo), nenhum dos fatores usados no estudo
+era influente, já que nenhuma combinação de fatores e níveis resultou em
+variação significativa da resposta.
 
 Os tempos de resposta das requisições remotas dominam a média dos tempos de
 resposta pois são ordens de grandeza maiores que os das requisições locais. Por
@@ -679,7 +606,7 @@ configurações do sistema de armazenamento que resultam em proporções de
 requisições locais e remotas diferentes. Assim, esses fatores foram tratados
 como um único fator chamado modo, descrito na subseção \ref{sec:modo}. Os
 fatores localidade e popularidade na consistência na linha do tempo impuseram a
-necessidade de uma etapa de aquecimento após a carga do sistema, o processo é
+necessidade de uma fase de aquecimento após a carga do sistema, o processo é
 explicado na subseção \ref{sec:aquecimento}. Projetos de experimentos fatoriais
 fracionados 2\textsuperscript{k} foram realizados para cada um dos fatores
 restantes e estão descritos nas subseções subsequentes: fatores de tamanho do
@@ -745,10 +672,12 @@ isso, o aquecimento era necessário após a carga para a consistência na linha do
 tempo. Já a consistência em momento indeterminado não era sujeita à influência
 direta de localidade, portanto não precisava de aquecimento.
 
-O aquecimento era dado por uma determinada quantidade de passos. Em cada passo,
-eram realizadas uma quantidade de atualizações igual a quantidade de objetos
-armazenados no banco de dados. O uso de passos foi uma maneira de tornar a fase
-de aquecimento independente da quantidade de objetos armazenados.
+Uma forma de implementar o aquecimento seria usar a quantidade de atualizações
+necessárias para levar o sistema para seu estado estacionário. O problema dessa
+abordagem é a quantidade de requisições iria variar com a quantidade de objetos
+armazenados. Por isso, o aquecimento foi parametrizado por passos, onde cada
+passo correspondia a uma quantidade de atualizações igual a quantidade de
+objetos armazenados.
 
 A influência da popularidade também foi considerada pois ela afetava a
 probabilidade de um determinado objeto ser acessado. Dado isso, um estudo foi
@@ -780,13 +709,21 @@ quantidade de passos configurados foram:
 
 \end{itemize}
 
+O aquecimento só levou em consideração a localização das réplicas pois o
+mecanismo de armazenamento usado foi memória (ver seção
+\ref{sec:aglomerado_e_mecanismo_de_armazenamento}). Caso fosse disco, essa fase
+também seria usada para aquecer o cache de disco.
+
 %% ------------------------------------------------------------------------- %%
 \subsection{Fatores de tamanho do sistema e benchmark}
 \label{sec:fatores_de_tamanho_do_sistema_e_benchmark}
 
-As quantidade de nós de sistema e benchmark não só podiam influenciar as
-respostas, como também afetavam questões operacionais, dado que quanto mais nós
-fossem usados, maiores as dificuldades de conseguir reservá-los no Grid5000.
+As quantidade de nós de sistema e benchmark não só podem influenciar as
+respostas, como também afetam questões operacionais, dado que quanto mais nós
+são usados, maiores as dificuldades de conseguir reservá-los no Grid5000.
+Portanto, um estudo foi feito para definir a influência desses fatores e achar
+valores que representassem um compromisso razoável entre tamanho dos
+experimentos e as questões operacionais.
 
 Os níveis selecionados para o estudo foram:
 
@@ -808,7 +745,7 @@ instâncias do benchmark e quantidade de threads por instância foi uma forma de
 balancear a carga média tanto por nó quanto por partição.
 
 O estudo usou modo lt\_rec, localidade de 50\% e latência de rede de 100 ms.
-Esses valores foram escolhidos pois através deles obtém-se uma quantidade
+Esses valores foram escolhidos pois por meio deles obtém-se uma quantidade
 balanceada de leituras e escritas locais e remotas. O resultado do estudo está
 na Tabela \ref{tab:estudo_para_quantidade_de_nos_do_sistema}.
 
@@ -909,9 +846,9 @@ A quantidade de objetos não afeta o desempenho do sistema. O tamanho dos objetos
 não afeta o desempenho das requisições remotas. E apesar desse fator aparecer
 com 100\% de influência nas requisições locais, o CV dessas requisições indica
 que sua influência na prática não é tão grande -- 19\% para leituras e 16\% para
-escritas. Além disso, o foco deste trabalho estava no comportamento do sistema
-na WAN, onde as requisições são duas ordens de grandeza maiores. Assim, os
-valores fixados foram:
+escritas. Além disso, o foco deste trabalho é o comportamento do sistema na WAN,
+onde as requisições são duas ordens de grandeza maiores. Assim, os valores
+fixados foram:
 
 \begin{itemize}
 
@@ -949,6 +886,7 @@ mostraram ganhos de desempenho para buffers de até quatro vezes o BDP, portanto
 um estudo fatorial foi feito para verificar esse fato. O estudo usou latência e
 reordenação de pacotes para criar cenários que pressionassem os buffers de forma
 diferente.
+%TODO: ref
 
 Os níveis selecionados foram:
 
@@ -1033,6 +971,7 @@ latência, chegando a máximos de até 3 ordens de grandeza em alguns períodos
 curtos. O projeto PingER, por sua vez, mostra em janeiro de 2013 uma média de
 latência de 238,062 ms com desvio padrão de 142,996, o que resulta em uma
 variação de 60\%. Os 11 meses anteriores apresentam valores semelhantes.
+%http://www-iepm.slac.stanford.edu/pinger/
 
 As taxas de perda foram escolhidas com base em medidas feitas pelo projeto
 PingER, que mede desempenho de conexões fim-a-fim na Internet. A mediana das
@@ -1040,7 +979,6 @@ perdas medidas em janeiro de 2013 foi 0,119\% e a mediana do último ano foi
 0,178\%. O mesmo relatório mostra perdas bem mais altas em medições específicas,
 mas este trabalho considerou que a WAN entre os dois centros de dados é de boa
 qualidade, portanto não apresentaria taxas de perda muito altas.
-%http://www-iepm.slac.stanford.edu/pinger/
 
 % http://www-wanmon.slac.stanford.edu/cgi-wrap/pingtable.pl?file=duplicate_packets&by=by-node&size=100&tick=monthly&from=EDU.SLAC.STANFORD.N3&to=WORLD&ex=none&only=all&dataset=hep&percentage=any
 
@@ -1144,9 +1082,9 @@ Os valores fixados dos fatores desconsiderados foram:
 
 \end{itemize}
 
-Taxas de perda, duplicação e reordenação  de pacotes foram ignoradas no estudo final. O algoritmo de congestionamento
-foi fixado como ``cubic'', pois esse é o padrão no sistema Linux utilizado nos
-experimentos.
+Taxas de perda, duplicação e reordenação  de pacotes foram ignoradas no estudo
+final. O algoritmo de congestionamento foi fixado como ``cubic'', pois esse é o
+padrão no sistema Linux utilizado nos experimentos.
 
 Apesar da taxa de reordenação de pacotes ser fixada, a ocorrência de alguns
 pacotes fora de ordem é possível dada a variação da latência. Por exemplo, com
@@ -1243,21 +1181,21 @@ serem afetados pela latência.
 
 O impacto de popularidade dos objetos é praticamente nulo. Talvez em uma
 situação em que o sistema recebesse uma carga maior, como no caso de um teste de
-stress, esse fator passasse a ser influente. Como não é o caso, ele foi
+sobrecarga, esse fator passasse a ser influente. Como não é o caso, ele foi
 desconsiderado e fixado no valor que simplifica o entendimento dos resultados.
 Em trabalhos futuros, experimentos podem ser realizados com o sistema sob carga
 mais alta para verificar se a influência de popularidade aumenta.
 
 Apesar de alguns modos aparentemente sofrerem impacto considerável da relação
-leitura/escrita, esse impacto na verdade é consequência da relação entre
-requisições locais e remotas. Para ind1, tanto leituras quanto escritas são
-locais e a relação leitura/escrita e suas interações com outros fatores impacta
-pouco esse modo. Para lt\_rec, leituras e escritas são locais ou remotas
-dependendo da localidade e a relação leitura/escrita não impacta esse modo. Para
-ind2, todas as leituras são locais e metade das escritas é remota, portanto
-quando a relação leitura/escrita muda, a relação entre requisições locais e
-remotas muda proporcionalmente -- como esperado, esse modo é impactado pela
-relação leitura/escrita. A mesma observação vale para lt\_qqer, que tem todas as
+leitura/escrita, esse impacto é consequência da relação entre requisições locais
+e remotas. Para ind1, tanto leituras quanto escritas são locais e a relação
+leitura/escrita e suas interações com outros fatores impacta pouco esse modo.
+Para lt\_rec, leituras e escritas são locais ou remotas dependendo da localidade
+e a relação leitura/escrita não impacta esse modo. Para ind2, todas as leituras
+são locais e metade das escritas é remota, portanto quando a relação
+leitura/escrita muda, a relação entre requisições locais e remotas muda
+proporcionalmente -- como esperado, esse modo é impactado pela relação
+leitura/escrita. A mesma observação vale para lt\_qqer, que tem todas as
 leituras locais e escritas dependendo da localidade, e também sofre impacto da
 relação leitura/escrita.
 

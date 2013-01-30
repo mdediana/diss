@@ -16,13 +16,16 @@ Intro %TODO
 As definições das metas, métricas e técnica de avaliação do estudo se encontram
 na seção \ref{sec:definicao_do_estudo}. As descrições do sistema de
 armazenamento e do benchmark usados, bem como do ambiente em que operaram nos
-experimentos, se encontram na seção \ref{sec:aspectos_tecnicos}.
+experimentos, se encontram na seção \ref{sec:aspectos_tecnicos}. Por fim, os
+tipos de experimentos usados neste trabalho são explicados na seção
+\ref{sec:tipos_de_experimentos}.
 
 %% ------------------------------------------------------------------------- %%
 \section{Definição do Estudo} \label{sec:definicao_do_estudo}
 
-O método usado neste trabalho usa \cite{Jain1991} como principal referência
-metodológica. Esse livro trata da análise de desempenho de sistemas de software
+Eeste trabalho usa como principal referência metodológica o livro \emph{The Art of Computer Systems Performance Analysis} (A
+Arte da Análise de Desempenho de Sistemas de Computação) \cite{Jain1991}, de Raj
+Jain. Esse livro trata da análise de desempenho de sistemas de software
 e/ou hardware, e apresenta conceitos de estudos experimentais e o ferramental
 estatístico necessário nesse tipo de análise. Além disso, ele propõe uma
 abordagem sistemática para fazer um estudo experimental. Neste trabalho seguimos
@@ -92,7 +95,7 @@ ponto de vista do desempenho. Isso significa que o estudo não considera outros
 atributos de qualidade como disponibilidade e manutenibilidade. Por isso, o
 comportamento do sistema não foi estudado com relação a presença de falhas em
 nós, por exemplo. Além disso, também foi considerada a operação do sistema em
-regime estacionário, sua operação em sobrecarga não foi estudada. Essas outras
+estado estacionário, sua operação em sobrecarga não foi estudada. Essas outras
 condições de operação podem ser estudadas em trabalho futuros (seção
 \ref{sec:trabalhos_futuros}).
 
@@ -522,3 +525,92 @@ arquivos com os resultados dos experimentos, logs e arquivos de configuração são
 salvos para serem usados na análise dos resultados depois.
 
 \paragraph{Término do Riak (stop)}Essa etapa é responsável por encerrar o Riak.
+
+%% ------------------------------------------------------------------------- %%
+\section{Tipos de Experimentos} \label{sec:tipos_de_experimentos}
+
+%TODO: talvez citar o outro livro de performance
+São alguns os tipos de experimentos usados em um estudo
+experimental. A escolha entre eles se dá principalmente pelo balanço entre
+recursos utilizados (tempo, dinheiro, energia, etc.) e quantidade de informação
+adquirida -- quanto mais recursos são gastos, maior é a quantidade de informação
+adquirida.
+
+Experimentos fatoriais consistem da combinação de dois ou mais fatores em cada
+experimento que compõe o estudo. Existem dois tipos principais de projetos de
+experimentos fatoriais: completo e fracionado \cite{Jain1991}.
+
+Um projeto de experimentos fatoriais completo é constituído por experimentos com
+todas as combinações possíveis de fatores e seus níveis. Assim, a quantidade
+total de experimentos é dada por:
+
+$n = \prod_{i=1}^k{n_i}$,
+
+onde k é o número de fatores e $n_i$ é a quantidade de níveis do
+i$^{\textrm{\'esimo}}$ fator.
+
+Esse tipo de projeto de experimentos tem a vantagem de identificar com precisão
+a influência de todos os fatores e suas interações nas variáveis de resposta.
+Mas quanto maior a quantidade de fatores e de níveis em um estudo experimental,
+maior a quantidade de recursos necessários para sua execução. Normalmente os
+fatores não afetam igualmente as variáveis de resposta, pelo contrário, é comum
+alguns poucos fatores explicarem a maior parte dos efeitos na resposta
+\cite{Jain1991}.
+
+Para esses casos, um projeto de experimentos fatoriais fracionado é utilizado
+para fazer uma triagem dos fatores, identificando quais deles são os mais
+influentes.  Nesse tipo de experimento, utiliza-se apenas uma parte de todos os
+experimentos definidos no projeto de experimentos fatoriais completo. Um tipo
+particular de projeto de experimentos fatoriais fracionado é o
+2\textsuperscript{k}.
+%% ------------------------------------------------------------------------- %%
+\subsection{Projeto de experimentos fatoriais fracionado 2\textsuperscript{k}}
+\label{sec:projeto_de_experimentos_fatoriais_fracionado_2k}
+
+Em um projeto de experimentos fatoriais fracionado 2\textsuperscript{k}, todos
+os fatores inicialmente selecionados são usados, mas apenas com dois níveis cada
+(normalmente o mínimo e o máximo), resultando em um total de
+2\textsuperscript{k} experimentos. O desempenho em função dos fatores é expresso por um modelo de regressão não-linear da forma:
+
+$y = q_0 + q_Ax_A + q_Bx_B + q_Cx_C + ... + q_{AB}x_Ax_B + q_{AC}x_Ax_C +
+q_{BC}x_Bx_C... + q_{ABC}x_Ax_Bx_C + ...$,
+
+onde $y$ é o desempenho medido, $q_0$, $q_A$, $q_B$, etc são os coeficientes do
+modelo e $x_A$, $x_B$, $x_C$, etc representam respectivamente os níveis dos
+fatores A, B, C, etc. Os termos compostos pela multiplicação de dois ou mais
+fatores representam as interações entre eles.
+
+Usando as respostas dos 2\textsuperscript{k} experimentos, é possível calcular o
+valor dos coeficientes por meio de um sistema de 2\textsuperscript{k} equações
+em que os 2\textsuperscript{k} coeficientes são as variáveis. Para tal,
+define-se uma relação entre os níveis dos fatores e os valores -1 ou 1.
+Por exemplo, pode-se definir que a latência de 100 ms valerá -1 e a latência de
+300 ms valerá 1.
+
+Com os coeficientes, é possível fazer a alocação de variação dos fatores, que é
+o cálculo da importância de cada um deles na resposta. A importância de cada um
+é dada pela proporção da variação total pela qual ele é responsável. A variação
+total da resposta (ou soma total dos quadrados) é dada por:
+
+$STQ = \sum_{i = 1}^{n} (y_i - \bar{y})^2$,
+
+onde $n$ é a quantidade de respostas, $y_i$ é resposta medida e $\bar{y}$ é a
+média das respostas.
+
+Para um projeto de experimentos 2\textsuperscript{k}, a soma total dos quadrados é dada por
+(para a derivação dessa equação a partir da anterior, ver \cite{Jain1991}):
+
+$STQ = SQA + SQB + SQC + ... + SQAB + SQAC + SQBC + ... + SQABC + ...$,
+
+onde cada $SQX$ é dado por:
+
+$SQX = 2^kq_X$
+
+Cada $SQX$ é a porção da variação total explicada pelo fator ou pela interação
+entre fatores X. A partir disso, é possível finalmente calcular a fração da
+variação explicada por cada X por:
+
+$FSQX = SQX / STQ$
+
+Ordenando os $FSQX$s é possível descobrir quais são os fatores e interações
+entre eles que mais afetam os resultados dos experimentos.
