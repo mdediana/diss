@@ -1,14 +1,17 @@
 %% ------------------------------------------------------------------------- %%
-\chapter{Método e Aspectos Técnicos} \label{cap:metodo_e_aspectos_tecnicos}
+\chapter{Planejamento e Aspectos Técnicos}
+\label{cap:planejamento_e_aspectos_tecnicos}
 
-As atividades envolvidas neste estudo se dividiram em três etapas. A primeira,
-descrita neste capítulo, contemplou a definição do estudo propriamente dita e
-dos aspectos técnicos de implementação dos experimentos. A segunda etapa teve
-por objetivo definir quais características do sistema, do ambiente e da carga de
-trabalho seriam consideradas e quais seriam desconsideradas no estudo e está
-descrita no capítulo \ref{cap:parametros_e_fatores}. A terceira etapa
-compreendeu a execução dos experimentos seguida da análise dos resultados e se
-encontra no capítulo \ref{cap:analise_dos_resultados}.
+Intro %TODO
+
+%As atividades envolvidas neste estudo se dividiram em três etapas. A primeira,
+%descrita neste capítulo, contemplou a definição do estudo propriamente dita e
+%dos aspectos técnicos de implementação dos experimentos. A segunda etapa teve
+%por objetivo definir quais características do sistema, do ambiente e da carga
+%de trabalho seriam consideradas e quais seriam desconsideradas no estudo e está
+%descrita no capítulo \ref{cap:parametros_e_fatores}. A terceira etapa
+%compreendeu a execução dos experimentos seguida da análise dos resultados e se
+%encontra no capítulo \ref{cap:analise_dos_resultados}.
 
 As definições das metas, métricas e técnica de avaliação do estudo se encontram
 na seção \ref{sec:definicao_do_estudo}. As descrições do sistema de
@@ -18,19 +21,22 @@ experimentos, se encontram na seção \ref{sec:aspectos_tecnicos}.
 %% ------------------------------------------------------------------------- %%
 \section{Definição do Estudo} \label{sec:definicao_do_estudo}
 
-Um estudo experimental começa pela definição de metas e procedimentos a serem
-usados. O método usado neste trabalho se baseia na abordagem proposta por Jain
-\cite{Jain1991}. Apesar das seleções de parâmetros e fatores fazerem parte da
-definição do estudo, esses passos estão descritos em um capítulo à parte
-(capítulo \ref{cap:parametros_e_fatores}) dadas suas complexidade e importância.
+O método usado neste trabalho usa \cite{Jain1991} como principal referência
+metodológica. Esse livro trata da análise de desempenho de sistemas de software
+e/ou hardware, e apresenta conceitos de estudos experimentais e o ferramental
+estatístico necessário nesse tipo de análise. Além disso, ele propõe uma
+abordagem sistemática para fazer um estudo experimental. Neste trabalho seguimos
+os passos dessa abordagem, com exceção do levantamento de parâmetros e a seleção
+de fatores, que ocorreram após a definição da técnica de avaliação.  Isso foi
+feito pois essa foi a fase maior complexidade do estudo, inclusive estando
+descritos em um capítulo à parte (capítulo \ref{cap:parametros_e_fatores}) por
+esse motivo.
 
 A subseção \ref{sec:nomenclatura} define termos usados ao longo deste trabalho.
 A subseção \ref{sec:metas_do_estudo} descreve as metas e o contexto do estudo. A
 subseção \ref{sec:metricas} define quais os critérios usados na avaliação de
 desempenho. A seguir, a subseção \ref{sec:tecnica_de_avaliacao} apresenta a
-técnica escolhida para o estudo. Por último, a subseção
-\ref{sec:trabalhos_relacionados} lista outros trabalhos com foco semelhante a
-este.
+técnica escolhida para o estudo.
  
 %% ------------------------------------------------------------------------- %%
 \subsection{Nomenclatura} \label{sec:nomenclatura}
@@ -40,12 +46,12 @@ comunicação de objetivos, procedimentos e resultados. Termos usados
 frequentemente neste e nos próximos capítulos são:
 
 \begin{itemize} \item Variáveis de resposta: Resultados de um experimento
-(variáveis dependentes). Como este estudo é uma análise de desempenho, as
-variáveis de resposta são as métricas, que são os critérios usados em uma
-comparação de desempenho.
+(variáveis dependentes). No caso deste estudo, as variáveis de resposta são as
+métricas de desempenho.
 
-\item Parâmetros: Características do sistema, do ambiente de operação e da carga
-de trabalho que afetam o desempenho do sistema.
+\item Parâmetros: Características do sistema (hardware e software) e da carga de
+trabalho (requisições para o sistema) que afetam o desempenho do sistema.
+Exemplos de parâmetros são CPU, latência da rede e relação leitura/escrita.
 
 \item Fatores: Parâmetros que são variados nos experimentos (variáveis
 independentes) e cujo efeito no desempenho é analisado. Parâmetros que não são
@@ -54,10 +60,13 @@ constantes).
 
 \item Níveis: Valores assumidos pelos fatores nos experimentos.
 
-\item Interação entre fatores: Se o desempenho sempre varia da mesma forma ao se
-alterar o nível de um determinado fator, não há interação entre esse e os demais
-fatores. Mas se o desempenho varia de formas diferentes dependendo do nível de
-outro(s) fator(es), existe interação entre eles.
+\item Interação entre fatores: Dois ou mais fatores interagem se a influência
+que um deles tem no desempenho depende do nível dos outros. Por exemplo, um
+software é testado nas combinações das CPUs A e B e 4 GB e 8 GB de memória. Se
+ao mudar a CPU de A para B o desempenho sempre aumenta em 10\%, por exemplo,
+independente do tamanho da memória, se diz que CPU e memória não interagem. Mas
+se ao mudar a CPU de A para B o desempenho aumenta em 10\% quando o sistema tem
+4 GB, mas e 30\% quando tem 8GB, se diz que CPU e memória interagem.
 
 \item Ordem de uma interação entre fatores: A quantidade de fatores envolvidos
 na interação -- por exemplo, uma interação de terceira ordem é uma interação
@@ -78,37 +87,26 @@ tempo apresenta desempenho igual ou superior a um usando consistência em momento
 indeterminado para cargas de trabalho específicas, apesar de ser um modelo
 baseado em cópia primária.
 
-O modelo usado nos experimentos foi um único sistema distribuído entre centros
-de dados ligados por uma WAN. Nesse cenário, uma requisição local é aquela
-atendida no mesmo centro de dados em que chega e possui baixo tempo de resposta
-(da ordem de poucos milissegundos). Já uma requisição remota é aquela que chega
-em um determinado centro de dados e é encaminhada para ser atendida em outro, e
-normalmente possui tempo de resposta alto (da ordem de dezenas ou centenas de
-milissegundos). O modelo usado neste estudo possibilitou diferentes combinações
-entre requisições locais e remotas dependendo do modelo de consistência usado e
-da sua configuração (ver subseção \ref{sec:modo}).
-
 Por limitações de escopo e recurso, este estudo analisa o sistema apenas do
 ponto de vista do desempenho. Isso significa que o estudo não considera outros
-atributos de qualidade como disponibilidade e manutenibilidade. Assim, o escopo
-está limitado à operação normal do sistema, não levando em consideração
-condições excepcionais, como falha de nós ou sobrecarga do sistema. Essas e
-outras condições podem ser estudadas em trabalho futuros (seção
+atributos de qualidade como disponibilidade e manutenibilidade. Por isso, o
+comportamento do sistema não foi estudado com relação a presença de falhas em
+nós, por exemplo. Além disso, também foi considerada a operação do sistema em
+regime estacionário, sua operação em sobrecarga não foi estudada. Essas outras
+condições de operação podem ser estudadas em trabalho futuros (seção
 \ref{sec:trabalhos_futuros}).
 
 %% ------------------------------------------------------------------------- %%
 \subsection{Métricas} \label{sec:metricas}
 
 A principal métrica é o tempo de resposta das requisições (em s). Quanto menor o
-tempo de resposta, melhor é o desempenho de um modelo de consistência. Como
-requisições locais e remotas apresentam tempos de resposta bem diferentes,
-percentis são usados em vez da média na maior parte das análises.
+tempo de resposta, melhor é o desempenho de um modelo de consistência.
 
 Além do tempo de resposta, outras métricas observadas foram vazão (em
 operações/s), quantidade de migrações e quantidade de conflitos (ambas dadas
 pela porcentagem com relação ao total de operações do experimento). Vazão não é
 considerada uma meta principal pois o benchmark usa uma taxa de requisições
-fixada ao invés de usar a máxima possível, de forma a diminuir possíveis
+fixada em vez de usar a máxima possível, de forma a diminuir possíveis
 influências de sobrecarga do sistema. A quantidade de migrações, exclusiva da
 consistência na linha do tempo, oferece uma visão da dinâmica de um sistema que
 use esse modelo de consistência. A quantidade de conflitos proporciona uma noção
@@ -117,12 +115,21 @@ conflitos nos dois modelos é que na consistência na linha do tempo eles são
 causados apenas por atualizações que ainda não chegaram a todas as réplicas,
 portanto serão automaticamente resolvidos em algum momento no futuro. Já na
 consistência em momento indeterminado eles podem ser mais graves, dado que esse
-modelo permite atualizações concorrentes divergentes.
+modelo permite que duas atualizações simultâneas ocorram em réplicas diferentes,
+criando assim uma situação em que um mecanismo de resolução de conflitos precisa
+atuar.
 
 %% ------------------------------------------------------------------------- %%
 \subsection{Técnica de avaliação} \label{sec:tecnica_de_avaliacao}
 
-Existem três técnicas comumente usadas na análise de desempenho de sistemas:
+A escolha da técnica de avaliação depende em parte dos parâmetros e fatores
+\cite{Jain199}. Apesar de o levantamento de parâmetros e a seleção de fatores
+terem sido completados depois desse passo, nesse momento já existia uma lista
+preliminar. Essa lista era composta por parâmetros diretamente ligados a meta
+deste trabalho, como os relacionados a carga de trabalho e rede. A escolha da
+técnica de avaliação foi feita partir dessa lista.
+
+Três técnicas são comumente usadas na análise de desempenho de sistemas:
 simulação, modelagem analítica e medição \cite{Jain1991}. Dada a complexidade
 dos sistemas considerados neste estudo e do ambiente em que operam, é difícil
 criar simuladores ou modelos que considerem muitos dos parâmetros que afetem seu
@@ -131,80 +138,16 @@ diversas simplificações que afetam a precisão dos resultados do estudo. Por
 outro lado, as principais dificuldades para o uso de medição são a necessidade
 de um sistema pronto para ser usado, o tempo disponível para o estudo e as
 ferramentas disponíveis. No caso deste estudo, nenhum dos três representava
-empecilho, portanto medição foi escolhida como técnica para este estudo.
-
-Dada a técnica de avaliação selecionada, este estudo precisava de um sistema
-implementado para que as medições fossem feitas. Mas considerando que o objetivo
-era comparar dois modelos de consistência e não sistemas que os implementassem,
-os experimentos foram planejados e executados de forma a isolar tanto quanto
-possível questões específicas do sistema. Além disso, era importante testar os
-modelos em diferentes condições da rede, portanto os experimentos usaram uma WAN
-emulada. Os nós do sistema foram agrupados como se estivessem em centros de
-dados diferentes, ligados pela WAN emulada. A carga de trabalho foi executada
-por um benchmark que simulava clientes localizados em cada um dos centros de
-dados. Cada experimento era definido por um modelo de consistência e sua
-configuração, uma configuração de rede (latência, perda de pacotes, etc) e uma
-carga de trabalho (relação leitura/escrita, localidade, etc). Detalhes sobre o
-sistema e o benchmark usados e o ambiente em que eles operaram nos experimentos
-estão na seção \ref{sec:aspectos_tecnicos}.
-
-%% ------------------------------------------------------------------------- %%
-\subsection{Trabalhos relacionados} \label{sec:trabalhos_relacionados}
-
-Uma abordagem comum na literatura de sistemas distribuídos é a proposta de um
-novo conceito e a implementação de um sistema que use esse conceito seguida de
-uma análise de seu desempenho. Tanto o artigo sobre o Dynamo \cite{DeCandia2007}
-quanto o sobre o PNUTS \cite{Cooper2008} apresentam análises de desempenho,
-sendo que apenas o segundo faz uma análise baseada na carga de trabalho. Existe
-uma segunda publicação com experimentos com o PNUTS que analisa o consumo de
-banda de diferentes políticas de replicação em uma WAN \cite{Kadambi2011}.
-
-Existem muitos trabalhos que apresentam análises de desempenho de sistemas de
-armazenamento que usam replicação sobre WANs. Na maior parte dos casos o
-objetivo desses sistemas é provar outros conceitos além da eficiência do modelo
-de consistência escolhido por eles. O COPS usa consistência causal+ e implementa
-transações \cite{Lloyd2011}. O Scatter propõe uma arquitetura ao mesmo tempo
-escalável e com consistência forte \cite{Glendenning2011}. O Zeno usa
-consistência em momento indeterminado e é tolerante a falhas bizantinas
-\cite{Singh2009}. O Windows Azure provê um sistema de armazenamento na nuvem com
-consistência forte \cite{Calder2011}. O Megastore usa Paxos para implementar
-consistência forte \cite{Baker2011}. Nenhum desses trabalhos apresenta
-comparações com outros sistemas ou com outros modelos de consistência. Como eles
-não usam uma aplicação para execução de testes ou ambiente comum, é difícil
-fazer qualquer comparação a partir desses trabalhos.
-
-Beyer et al. realizaram testes para analisar a relação entre as diferentes
-configurações de consistência no Cassandra e sua disponibilidade e desempenho
-\cite{Beyer2011}. Como esperado, eles notam que configurações que oferecem
-consistência mais rígida apresentam pior desempenho.  Renesse e Schneider
-apresentam resultados experimentais comparando desempenho e disponibilidade de
-replicação mestre-escravo e replicação em cadeia, cada uma delas usando
-consistência forte e consistência em momento indeterminado
-\cite{VanRenesse2004}. Nenhum desses dois experimentos leva em consideração
-operação sobre WAN nem diferentes cargas de trabalho. Yu e Vahdat realizaram uma
-análise sobre a relação entre disponibilidade e níveis de consistência em
-sistemas replicados em WANs \cite{Yu2001}. Eles comparam a disponibilidade de um
-sistema usando consistência forte e consistência contínua, usando diferentes
-protocolos de consistência como cópia primária e votação, por exemplo. Esse
-trabalho não testa consistência em momento indeterminado nem consistência na
-linha do tempo e não observa o desempenho dos modelos de consistência
-analisados.
-
-Uma publicação com uma proposta mais próxima da deste trabalho é a comparação
-feita entre Cassandra, HBase, PNUTS e MySQL particionado horizontalmente usando
-diferentes cargas de trabalho \cite{Cooper2010}. Os resultados servem como uma
-comparação entre esses sistemas, mas dizem menos sobre seus modelos de
-consistência, dado que os sistemas apresentam arquiteturas e configurações
-diferentes. Além disso, os testes são feitos em uma rede local, não em uma WAN.
+empecilho, portanto medição foi escolhida.
 
 %% ------------------------------------------------------------------------- %%
 \section{Aspectos Técnicos} \label{sec:aspectos_tecnicos}
 
 Uma vez que medição foi escolhida como técnica de avaliação de desempenho para o
-estudo, o passo seguinte era o planejamento técnico dos experimentos. Esse
-planejamento envolveu predominantemente atividades de programação e
-administração de sistemas, como implementação da consistência na linha do tempo
-e preparação de scripts para a execução dos experimentos.
+estudo, o passo seguinte foi a preparação técnica dos experimentos. Essa
+preparação envolveu predominantemente atividades de programação e administração
+de sistemas, como implementação da consistência na linha do tempo e preparação
+de scripts para a execução dos experimentos.
 
 O sistema de armazenamento usado como objeto de estudo nos experimentos é
 descrito na subseção \ref{sec:sistema_de_armazenamento}. A carga sobre o sistema
@@ -236,23 +179,21 @@ Assim, decidiu-se usar um único sistema para os experimentos. Uma opção para tal
 era implementar um sistema de armazenamento distribuído específico para os
 experimentos. O problema dessa abordagem é que esse tipo de sistema é bastante
 complexo, já que precisa prover funcionalidades como controle de entrada e saída
-dos nós no aglomerado, algoritmos de particionamento, etc. Desenvolver todas
-essas funcionalidades inviabilizaria este trabalho devido ao alto custo em tempo
-para implementação.
+dos nós no aglomerado, algoritmos de particionamento, etc.
 
-Para evitar a implementação completa de um sistema de armazenamento, algumas
-opções de software livre / código aberto foram analisadas. A seleção das opções
-foi feita considerando modelos de consistência, estabilidade da solução e
-simplicidade de desenvolvimento. Como não foram encontrados sistemas de
-armazenamento de software livre / código aberto que implementem consistência na
-linha do tempo, as soluções avaliadas foram aquelas que implementam consistência
-em momento indeterminado. Os sistemas encontrados foram Dynomite
-\cite{Dynomite}, Cassandra \cite{Lakshman2010}, Voldemort \cite{Voldemort} e
-Riak \cite{Riak}. Todos eles usam basicamente a mesma arquitetura do Dynamo,
-provendo gerenciamento de entrada e saída de nós no aglomerado, relógios vetor
-para identificação e resolução de conflitos entre diferentes réplicas dos
-objetos \cite{Lamport1978} e espalhamento consistente para o particionamento dos
-objetos \cite{Karger1997a}.
+Para evitar a implementação completa de um sistema de armazenamento e tornar
+este trabalho mais realista, algumas opções de software livre / código aberto
+foram analisadas. A seleção das opções foi feita considerando modelos de
+consistência, estabilidade da solução e simplicidade de desenvolvimento. Como
+não foram encontrados sistemas de armazenamento de software livre / código
+aberto que implementem consistência na linha do tempo, as soluções avaliadas
+foram aquelas que implementam consistência em momento indeterminado. Os sistemas
+encontrados foram Dynomite \cite{Dynomite}, Cassandra \cite{Lakshman2010},
+Voldemort \cite{Voldemort} e Riak \cite{Riak}. Todos eles usam basicamente a
+mesma arquitetura do Dynamo, provendo gerenciamento de entrada e saída de nós no
+aglomerado, relógios vetor para identificação e resolução de conflitos entre
+diferentes réplicas dos objetos \cite{Lamport1978} e espalhamento consistente
+para o particionamento dos objetos \cite{Karger1997a}.
 
 O Dynomite foi descartado pois o projeto foi abandonado pela comunidade em um
 estado ainda instável. O Cassandra por outro lado possui estabilidade e uma
@@ -264,28 +205,26 @@ distribuídos, apresentando assim maior facilidade para o desenvolvimento do
 modelo de consistência na linha do tempo. Um indício dessa facilidade é que o
 riak\_kv, o módulo do Riak usado na implementação do novo modelo de
 consistência, apresenta aproximadamente 20 mil linhas de código contra
-aproximadamente 85 mil do Voldemort. Além disso, existe um benchmark para o Riak
-bastante completo (ver subseção \ref{sec:benchmark}). O Voldemort também possui
-benchmark semelhante, mas ele oferece menos opções de configuração.
+aproximadamente 85 mil do Voldemort.
 
 %% ------------------------------------------------------------------------- %%
 \subsubsection{Implementação da consistência na linha do tempo no Riak}
 
-A implementação da consistência na linha do tempo é incompleta e está toda no
-módulo riak\_kv. Para os experimentos, a distinção entre leituras e escritas era
-importante. Mas a distinção entre os tipos de escrita (inserção, atualização ou
-remoção) não era tão importante dado que eles se comportam basicamente da mesma
-forma do ponto de vista de tráfego de rede local versus remoto. Assim, apenas
-atualizações foram implementadas de forma completa e eficiente, distinguindo a
-localização de cada nó com relação aos centros de dados. As inserções para uma
-dada chave ocorrem sempre pela mesma réplica, mesmo que isso signifique
-encaminhar para outro centro de dados uma requisição que em princípio poderia
-ser tratada localmente. Esse procedimento eliminou a necessidade de
-implementação de um mecanismo para evitar conflitos de inserção. Apesar de
-inserções serem ineficientes, isso não afetou os resultados, dado que os
-experimentos usam inserção apenas na carga do sistema (ver o fluxo de trabalho
-na subseção \ref{sec:execucao_e_analise_dos_experimentos}). Remoções não foram
-implementadas.
+Consistência na linha do tempo foi implementada no Riak pelo autor, no módulo
+riak\_kv. A implementação é incompleta. Para os experimentos, a distinção entre
+leituras e escritas era importante. Mas a distinção entre os tipos de escrita
+(inserção, atualização ou remoção) não era tão importante dado que eles se
+comportam basicamente da mesma forma do ponto de vista de tráfego de rede local
+versus remoto. Assim, apenas atualizações foram implementadas de forma completa
+e eficiente, distinguindo a localização de cada nó com relação aos centros de
+dados. As inserções para uma dada chave ocorrem sempre pela mesma réplica, mesmo
+que isso signifique encaminhar para outro centro de dados uma requisição que em
+princípio poderia ser tratada localmente. Esse procedimento eliminou a
+necessidade de implementação de um mecanismo para evitar conflitos de inserção.
+Apesar de inserções serem ineficientes, isso não afetou os resultados, dado que
+os experimentos usam inserção apenas na carga do sistema (ver o fluxo de
+trabalho na subseção \ref{sec:execucao_e_analise_dos_experimentos}). Remoções
+não foram implementadas.
 
 O PNUTS conta com uma heurística que explora a localidade de requisições,
 simples mas importante para o desempenho da consistência na linha do tempo: a
@@ -348,9 +287,9 @@ experimentos, que precisariam ser implementadas.
 
 Os experimentos foram executados no
 Grid5000\footnote{\url{http://www.grid5000.fr/}}, uma plataforma para criação,
-execução e monitoramento de experimentos de sistemas paralelos e distribuídos. A
-plataforma possui mais de 5000 cores distribuídos em 9 sítios na França e um no
-Brasil.
+execução e monitoramento de experimentos de sistemas paralelos e distribuídos.
+Em janeiro de 2013, a plataforma possuía mais de 5000 cores distribuídos em 10
+sítios na França e um no Brasil.
 
 Outras plataformas como o OpenCirrus\footnote{\url{http://opencirrus.org/}} e
 PlanetLab\footnote{\url{http://www.planet-lab.org/}} também foram consideradas,
@@ -386,8 +325,8 @@ monitoração e análise de desempenho como
 sysstat\footnote{\url{http://sebastien.godard.pagesperso-orange.fr/}},
 bwm-ng\footnote{\url{http://www.gropp.org/?id=projects&sub=bwm-ng}} e
 iperf\footnote{\url{http://iperf.sourceforge.net/}}. Uma única imagem foi usada,
-a distinção entre nós executando instâncias do Riak ou do Basho Bench foi feita
-através dos scripts que gerenciam os experimentos (subseção
+sendo que a distinção entre nós executando instâncias do Riak ou do Basho Bench
+foi feita através dos scripts que gerenciam os experimentos (subseção
 \ref{sec:execucao_e_analise_dos_experimentos}).
 
 %% ------------------------------------------------------------------------- %%
@@ -400,10 +339,10 @@ WAN. De qualquer forma, mesmo que caracterizassem, ter controle sobre esses
 valores era necessário para medir o desempenho do sistema em diferentes
 condições de rede e possibilitar a reprodutibilidade dos experimentos.
 
-Por isso, os experimentos emulam uma WAN pelo uso da ferramenta traffic control
-(tc). Ela é usada na manipulação das filas de saída de pacotes de uma interface
-de rede em sistemas Linux, priorizando um determinado tipo de tráfego, por
-exemplo. Mais especificamente para emulação da WAN, o
+Por isso, os experimentos emularam uma WAN pelo uso da ferramenta traffic
+control (tc). Essa ferramenta é usada para manipulação das filas de saída de
+pacotes de uma interface de rede em sistemas Linux, priorizando um determinado
+tipo de tráfego, por exemplo. Mais especificamente para emulação da WAN, o
 netem\footnote{\url{http://www.linuxfoundation.org/collaborate/workgroups/networking/}}
 foi usado. Ele provê funcionalidade para inserção de latência de rede, variação
 da latência, perda de pacotes, pacotes duplicados, corrompidos e/ou fora de
@@ -434,7 +373,7 @@ que é a situação mais comum). Todos os nós no Grid5000 possuem um nome
 registrado no DNS que aponta para o seu IP da rede do Grid5000. Nos
 experimentos, dois arquivos hosts1 e hosts2 eram criados e substituíam o
 /etc/hosts dos nós de CD1 e CD2 respectivamente. O conteúdo de hosts1 eram os
-nomes dos nós de CD2 sendo resolvidos para os IPs de SR2, o mesmo valendo parae
+nomes dos nós de CD2 sendo resolvidos para os IPs de SR2, o mesmo valendo para
 hosts2, CD1 e SR1. Com isso, os nós de CD1 resolviam os nomes dos nós de CD2
 para os IPs de SR2 e vice-versa. O resultado dessa configuração é que todas as
 requisições que saíam de um centro de dados para o outro usavam o IP da sub-rede
@@ -465,9 +404,9 @@ do autor e era composto por scripts em bash, Ruby e R.
 %% ------------------------------------------------------------------------- %%
 \subsubsection{Fluxo de trabalho dos experimentos}
 
-A execução de um estudo compreendia diversas etapas, um script correspondendo a
-cada uma delas. O fluxo de trabalho propriamente dito também estava definido em
-um script, que invocava os outros, e é apresentado na Figura
+A execução de um estudo compreendia diversas etapas, com um script
+correspondendo a cada uma delas. O fluxo de trabalho propriamente dito também
+estava definido em um script, que executava os outros, e é apresentado na Figura
 \ref{fig:fluxo_de_trabalho_da_execucao_do_estudo}. Cada etapa presente no
 fluxograma está descrita a seguir com o nome do script responsável entre
 parênteses.
@@ -567,18 +506,19 @@ modelo de consistência a ser usado em um dado experimento.
 das instâncias de Riak em cada nó e à entrada de cada uma no aglomerado de
 Riaks.
 
-\paragraph{Carga e aquecimento do sistema (load)}Essa etapa consiste em popular o banco de
-dados do Riak antes dos experimentos. Para a consistência na linha do tempo,
-a fase de aquecimento do sistema é necessária (detalhes na subseção \ref{sec:aquecimento}).
+\paragraph{Carga e aquecimento do sistema (load)}Essa etapa consiste em popular
+o banco de dados do Riak antes dos experimentos. Para a consistência na linha do
+tempo, a fase de aquecimento do sistema é necessária (detalhes na subseção
+\ref{sec:aquecimento}).
 
-\paragraph{Configuração da WAN emulada}Nessa etapa as interfaces de rede dos nós
-são configuradas com latência de rede, perda de pacotes, etc. Além disso, as
-otimizações para WAN são aplicadas (script tune-tcp).
+\paragraph{Configuração da WAN emulada (wan)}Nessa etapa as interfaces de rede
+dos nós são configuradas com latência de rede, perda de pacotes, etc. Além
+disso, as otimizações para WAN são aplicadas (script tune-tcp).
 
-\paragraph{Execução de um experimento}Essa etapa começa pela aquisição de
+\paragraph{Execução de um experimento (run)}Essa etapa começa pela aquisição de
 informações do sistema, como as condições de memória e disco dos nós e latência
 da LAN. Após isso, a execução do benchmark propriamente dita ocorre. Por fim,
 arquivos com os resultados dos experimentos, logs e arquivos de configuração são
 salvos para serem usados na análise dos resultados depois.
 
-\paragraph{Término do Riak}Essa etapa é responsável por encerrar o Riak.
+\paragraph{Término do Riak (stop)}Essa etapa é responsável por encerrar o Riak.
