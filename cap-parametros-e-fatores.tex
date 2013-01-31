@@ -11,8 +11,9 @@ para o estudo. Os fatores menos influentes foram tratados como parâmetros e
 tiveram seus valores fixados. Os fatores mais influentes foram usados nos
 experimentos finais. 
 
-A lista de parâmetros inicialmente levantada é apresentada na Seção~\ref{sec:lista_de_parametros}. Os parâmetros fixados e seus valores estão na
-Seção~\ref{sec:parametros_fixados}. Por fim, a seleção dos fatores e os
+A lista de parâmetros inicialmente levantada é apresentada na
+Seção~\ref{sec:lista_de_parametros}. Os parâmetros fixados e seus valores estão
+na Seção~\ref{sec:parametros_fixados}. Por fim, a seleção dos fatores e os
 experimentos que levaram a ela estão na Seção~\ref{sec:selecao_dos_fatores}.
 
 %% ------------------------------------------------------------------------- %%
@@ -56,13 +57,14 @@ possuam as mesmas capacidades agregadas de processamento, armazenamento e
 largura de banda, a vazão de cada centro de dados é diferente, o que se reflete
 no desempenho das requisições.
 
-\paragraph{Quantidade de instâncias do \emph{benchmark}}Uma quantidade muito pequena de
-instâncias pode se tornar o gargalo do experimento, uma quantidade muito grande
-pode resultar em sobrecarga do sistema. Em ambos os casos o desempenho medido do
-sistema não corresponde a suas condições normais de operação.
+\paragraph{Quantidade de instâncias do \emph{benchmark}}Uma quantidade muito
+pequena de instâncias pode se tornar o gargalo do experimento, uma quantidade
+muito grande pode resultar em sobrecarga do sistema. Em ambos os casos o
+desempenho medido do sistema não corresponde a suas condições normais de
+operação.
 
-\paragraph{Quantidade de threads por instância do \emph{benchmark}}Mesma justificativa
-que para quantidade de instâncias do \emph{benchmark}.
+\paragraph{Quantidade de threads por instância do \emph{benchmark}}Mesma
+justificativa que para quantidade de instâncias do \emph{benchmark}.
 
 \paragraph{Quantidade de objetos armazenados}A quantidade de objetos armazenados
 influencia o volume de dados no disco e no cache de disco (caso disco seja o
@@ -115,10 +117,10 @@ Os parâmetros de rede levantados foram:
 
 \paragraph{Configuração de hardware dos dispositivos de rede intermediários
 (comutadores, roteadores, etc.)}A configuração dos dispositivos de rede
-intermediários relaciona-se à largura de banda disponível, tamanho dos \emph{buffers}
-de transmissão e recepção, capacidade de processamento de requisições, entre
-outros.  Dessa forma, gargalos nesses dispositivos causam congestionamento na
-rede, com perda de desempenho do sistema.
+intermediários relaciona-se à largura de banda disponível, tamanho dos
+\emph{buffers} de transmissão e recepção, capacidade de processamento de
+requisições, entre outros.  Dessa forma, gargalos nesses dispositivos causam
+congestionamento na rede, com perda de desempenho do sistema.
 
 \paragraph{Topologia da rede}Várias características da topologia de rede afetam
 o desempenho do sistema, por exemplo, a quantidade de segmentos de rede pelos
@@ -133,14 +135,14 @@ afeta os tempos de envio e recebimento.
 
 \paragraph{Variação da latência da LAN}A latência em uma rede não é constante,
 dado que dentre suas causas está a dinâmica da rede
-\cite{Gurtov2002,Kraska2012}. Por exemplo, rajadas de
-tráfego aumentam a fila de pacotes a ser processados em um roteador, o que se
-manifesta como aumento de latência nas conexões passando por ele. Quando o
-roteador volta a sua operação normal, a latência diminui. A latência não vaira
-aleatoriamente, ela tem períodos de aumento e de diminuição gradual. No
-exemplo, a latência diminui em função da diminuição da fila no roteador, ela não
-cai imediatamente para o seu valor médio. Esse fato levou ao uso de correlação
-na variação da latência nos experimentos.
+\cite{Gurtov2002,Kraska2012}. Por exemplo, rajadas de tráfego aumentam a fila de
+pacotes a ser processados em um roteador, o que se manifesta como aumento de
+latência nas conexões passando por ele. Quando o roteador volta a sua operação
+normal, a latência diminui. A latência não vaira aleatoriamente, ela tem
+períodos de aumento e de diminuição gradual. No exemplo, a latência diminui em
+função da diminuição da fila no roteador, ela não cai imediatamente para o seu
+valor médio. Esse fato levou ao uso de correlação na variação da latência nos
+experimentos.
 
 \paragraph{Largura de banda da WAN}Mesma justificativa que para largura de banda
 da LAN.
@@ -436,10 +438,11 @@ de desempenho quando o  nível de log estava em INFO. De qualquer forma, como a
 carga sobre o sistema era controlada, esse parâmetro era pouco relevante.
 
 \paragraph{Configuração de hardware dos dispositivos de rede intermediários
-(comutadores, roteadores, etc.)}O único dispositivo de rede no aglomerado usado no
-estudo era um comutador (ver Subseção
+(comutadores, roteadores, etc.)}O único dispositivo de rede no aglomerado usado
+no estudo era um comutador (ver Subseção
 \ref{sec:aglomerado_e_mecanismo_de_armazenamento}). Testes mostraram que não
-existiam gargalos no comutador mesmo nos experimentos com maior consumo de banda.
+existiam gargalos no comutador mesmo nos experimentos com maior consumo de
+banda.
 
 \paragraph{Topologia da rede:}Topologia da rede em estrela do aglomerado usado
 nos experimentos.
@@ -462,15 +465,15 @@ de 90 $\mu$s.
 
 \paragraph{Largura de banda da WAN:} 100 Mb/s. Um estudo informal entre os
 serviços EC2 e S3 da Amazon com 9 segmentos de rede entre eles (indício de que
-estão em centros de dados diferentes) mediu 400 Mb/s \cite{Thorsten2007}. Outro estudo
-cita que é comum medir 100 Mb/s como largura de banda entre zonas de
+estão em centros de dados diferentes) mediu 400 Mb/s \cite{Thorsten2007}. Outro
+estudo cita que é comum medir 100 Mb/s como largura de banda entre zonas de
 disponibilidade \cite{Pujol2012}.
 
 \paragraph{Taxa de chegada de requisições}15 operações/s para cada thread de
 cada instância do \emph{benchmark}. Esse valor foi usado pois esse parâmetro se
-relaciona diretamente com a quantidade de threads por instância do \emph{benchmark}.
-Assim, considerando que threads por instância foi inicialmente considerado um
-fator, a taxa de chegada foi fixada.
+relaciona diretamente com a quantidade de threads por instância do
+\emph{benchmark}.  Assim, considerando que threads por instância foi
+inicialmente considerado um fator, a taxa de chegada foi fixada.
 
 Vale notar que a LAN nos experimentos era definida pela infraestrutura do
 Grid5000 usada, mas a WAN foi emulada (ver Seção~\ref{sec:rede}). Dessa forma,
@@ -606,7 +609,8 @@ restantes e estão descritos nas subseções subsequentes: fatores de tamanho do
 sistema e \emph{benchmark} na Subseção
 \ref{sec:fatores_de_tamanho_do_sistema_e_benchmark}, fatores de banco de dados
 na Subseção~\ref{sec:fatores_de_banco_de_dados}, fatores de rede na
-Subseção~\ref{sec:fatores_de_rede} e fatores de carga de trabalho na Subseção~\ref{sec:fatores_de_carga_de_trabalho}.
+Subseção~\ref{sec:fatores_de_rede} e fatores de carga de trabalho na
+Subseção~\ref{sec:fatores_de_carga_de_trabalho}.
 
 %% ------------------------------------------------------------------------- %%
 \subsection{Modo} \label{sec:modo}
@@ -733,8 +737,8 @@ A quantidade de partições usadas pelo Riak deve ser uma potência de 2 (ver Seção
 \ref{sec:parametros_fixados}). Uma forma de manter a simetria do sistema foi
 adotar potências de 2 para os níveis da quantidade de nós do sistema, garantindo
 assim a mesma quantidade de partições por nó. Fazer o mesmo para quantidade de
-instâncias do \emph{benchmark} e quantidade de threads por instância foi uma forma de
-balancear a carga média tanto por nó quanto por partição.
+instâncias do \emph{benchmark} e quantidade de threads por instância foi uma
+forma de balancear a carga média tanto por nó quanto por partição.
 
 O estudo usou modo lt\_rec, localidade de 50\% e latência de rede de 100 ms.
 Esses valores foram escolhidos pois por meio deles obtém-se uma quantidade
@@ -755,13 +759,13 @@ escrita & 90 & 65 & 15 & 13 & 3 & 3 & 0 & 0 \\ \hline
 
 \end{tabular} \caption[Estudo para quantidade de nós do sistema.]{Estudo para
 quantidade de nós do sistema. N representa a quantidade de nós do sistema, A
-representa a quantidade de instâncias do \emph{benchmark} e T representa a quantidade
-de threads usadas em cada instânca do \emph{benchmark}.}
+representa a quantidade de instâncias do \emph{benchmark} e T representa a
+quantidade de threads usadas em cada instânca do \emph{benchmark}.}
 \label{tab:estudo_para_quantidade_de_nos_do_sistema} \end{center} \end{table}
 
 Na maioria dos casos, o tamanho do sistema tem a maior influência nos resultados
-e a quantidade de instâncias do \emph{benchmark} e a quantidade de threads não são
-desprezíveis, ainda mais ao se considerar as interações entre elas. Apesar
+e a quantidade de instâncias do \emph{benchmark} e a quantidade de threads não
+são desprezíveis, ainda mais ao se considerar as interações entre elas. Apesar
 disso, esses fatores foram desconsiderados devido ao excesso de fatores. Dessa
 forma, os valores fixados foram:
 
@@ -771,7 +775,8 @@ forma, os valores fixados foram:
 
 \item Quantidade de instâncias do \emph{benchmark}: 4 (maior valor)
 
-\item Quantidade de threads em cada instância do \emph{benchmark}: 32 (menor valor)
+\item Quantidade de threads em cada instância do \emph{benchmark}: 32 (menor
+valor)
 
 \end{itemize}
 
@@ -780,18 +785,18 @@ evitando gargalos de rede e não sobrecarregando o sistema. Ao mesmo tempo, a
 quantidade total de nós necessária para os experimentos se enquadrava nas
 limitações de recursos do aglomerado.
 
-Uma opção semelhante seriam 32 nós do sistema e 8 instâncias do \emph{benchmark},
-resultando em um total de 40 nós. Isso não foi feito por questões operacionais.
-Apesar de o aglomerado ter mais do que 40 nós, é muito comum alguns poucos nós
-já estarem reservados por outros pesquisadores, além de alguns nós apresentarem
-falhas no momento da implantação da imagem. Esse último problema levou o autor a
-sempre reservar alguns nós além dos necessários para garantir a quantidade
-mínima de nós para executar os experimentos. Além disso, alguns limites de uso
-do Grid5000 são relativos ao tamanho do aglomerado usado. Por exemplo, uma das
-regras diz que, entre 9:00 e 19:00, a quantidade de nós reservados multiplicada
-pelo período da reserva deve ser menor ou igual a quantidade total de nós do
-aglomerado multiplicada por 2 horas. Dessa forma, experimentos que precisassem
-de 40 nós seriam mais difíceis de ser executados.
+Uma opção semelhante seriam 32 nós do sistema e 8 instâncias do
+\emph{benchmark}, resultando em um total de 40 nós. Isso não foi feito por
+questões operacionais.  Apesar de o aglomerado ter mais do que 40 nós, é muito
+comum alguns poucos nós já estarem reservados por outros pesquisadores, além de
+alguns nós apresentarem falhas no momento da implantação da imagem. Esse último
+problema levou o autor a sempre reservar alguns nós além dos necessários para
+garantir a quantidade mínima de nós para executar os experimentos. Além disso,
+alguns limites de uso do Grid5000 são relativos ao tamanho do aglomerado usado.
+Por exemplo, uma das regras diz que, entre 9:00 e 19:00, a quantidade de nós
+reservados multiplicada pelo período da reserva deve ser menor ou igual a
+quantidade total de nós do aglomerado multiplicada por 2 horas. Dessa forma,
+experimentos que precisassem de 40 nós seriam mais difíceis de ser executados.
 
 %% ------------------------------------------------------------------------- %%
 \subsection{Fatores de banco de dados} \label{sec:fatores_de_banco_de_dados}
@@ -867,19 +872,18 @@ que 90\% dos objetos nesses sistemas são menores do que 500 bytes
 Dado o objetivo do trabalho, este era um dos estudos mais importantes, dado que
 a partir dele seria possível selecionar os fatores de rede mais influentes.  Mas
 antes do estudo propriamente dito, um estudo preliminar foi feito para verificar
-as recomendações de otimização para WAN do tamanho dos \emph{buffers} de transmissão e
-recepção.
+as recomendações de otimização para WAN do tamanho dos \emph{buffers} de
+transmissão e recepção.
 
 Pelo BDP de um enlace, quanto maior a latência da rede, maior é a quantidade de
 pacotes em trânsito. Um gargalo comum em WANs é o tamanho dos \emph{buffers} de
 transmissão e recepção das pontas serem menores que o BDP. Recomendações sugerem
 a configuração de \emph{buffers} com tamanho em bytes igual ao dobro do BDP
-\cite{Jones2006,ESNet2012}. Em
-princípio essa otimização seria aplicada aos estudos, mas experimentos com iperf
-mostraram ganhos de desempenho para \emph{buffers} de até quatro vezes o BDP, portanto
-um estudo fatorial foi feito para verificar esse fato. O estudo usou latência e
-reordenação de pacotes para criar cenários que pressionassem os \emph{buffers} de forma
-diferente.
+\cite{Jones2006,ESNet2012}. Em princípio essa otimização seria aplicada aos
+estudos, mas experimentos com iperf mostraram ganhos de desempenho para
+\emph{buffers} de até quatro vezes o BDP, portanto um estudo fatorial foi feito
+para verificar esse fato. O estudo usou latência e reordenação de pacotes para
+criar cenários que pressionassem os \emph{buffers} de forma diferente.
 
 Os níveis selecionados foram:
 
@@ -896,8 +900,8 @@ Os níveis selecionados foram:
 O estudo usou modo lt\_rec e localidade de 50\%. Esses valores foram escolhidos
 pois através deles obtém-se uma quantidade balanceada de leituras e escritas
 locais e remotas. Para a rede, a variação de latência foi de 50\%.  A alta
-variabilidade ajuda a criar um cenário que pressiona os \emph{buffers} de transmissão e
-recepção. O resultado do estudo está na Tabela
+variabilidade ajuda a criar um cenário que pressiona os \emph{buffers} de
+transmissão e recepção. O resultado do estudo está na Tabela
 \ref{tab:estudo_para_tamanho_dos_buffers_de_transmissao_e_recepcao}.
 
 \begin{table}[!h] \begin{center} \begin{tabular}{|c|c|c|c|c|c|c|c|c|} \hline
@@ -931,8 +935,8 @@ configurá-los seguindo as recomendações, assim o valor fixado foi:
 
 Feito isso, o procedimento de otimização da WAN estava finalizado e os
 experimentos para rede foram executados. Este estudo usou a mesma configuração
-de modo e localidade que o estudo para tamanho de \emph{buffers}, pelo mesmo motivo. Os
-níveis inicialmente selecionados para fatores de rede foram:
+de modo e localidade que o estudo para tamanho de \emph{buffers}, pelo mesmo
+motivo. Os níveis inicialmente selecionados para fatores de rede foram:
 
 \begin{itemize}
 
@@ -959,10 +963,11 @@ dados dos EUA e a maior foi 277 ms entre Irlanda e Singapura.
 O mesmo estudo usado para latência apresenta um gráfico com grandes variações de
 latência, chegando a máximos de até 3 ordens de grandeza em alguns períodos
 curtos. O projeto PingER\footnote{\emph{Ping End-to-end Reporting} (Relatório de
-Ping Fim-a-fim) é um projeto de Stanford que monitora o desempenho fim-a-fim de enlaces de
-Internet, em 700 sítios e 160 países.} \cite{Pinger2013}, por sua vez, mostra em janeiro de 2013 uma média de
-latência de 238,062 ms com desvio padrão de 142,996, o que resulta em uma
-variação de 60\%. Os 11 meses anteriores apresentam valores semelhantes.
+Ping Fim-a-fim) é um projeto de Stanford que monitora o desempenho fim-a-fim de
+enlaces de Internet, em 700 sítios e 160 países.} \cite{Pinger2013}, por sua
+vez, mostra em janeiro de 2013 uma média de latência de 238,062 ms com desvio
+padrão de 142,996, o que resulta em uma variação de 60\%. Os 11 meses anteriores
+apresentam valores semelhantes.
 
 As taxas de perda foram escolhidas com base em medidas feitas pelo projeto
 PingER, que mede desempenho de conexões fim-a-fim na Internet. A mediana das
@@ -976,11 +981,11 @@ os valores usados neste estudo tenham sido muito grandes, duplicação de pacotes
 não influenciou a resposta (ver abaixo).
 
 Duas referências sobre reordenação de pacotes foram encontradas. A primeira, o
-projeto PingER, mostra taxas muito baixas -- em janeiro de 2013, média de 0,006\% e
-mediana de 0\%. Estudo realizado em 2003 entre sítios na China mostra taxas de
-reordenação de pacotes de 3,187\% \cite{Wang2004}. Os valores usados no experimento foram
-maiores, mas mesmo assim reordenação de pacotes não influenciou a resposta (ver
-abaixo).
+projeto PingER, mostra taxas muito baixas -- em janeiro de 2013, média de
+0,006\% e mediana de 0\%. Estudo realizado em 2003 entre sítios na China mostra
+taxas de reordenação de pacotes de 3,187\% \cite{Wang2004}. Os valores usados no
+experimento foram maiores, mas mesmo assim reordenação de pacotes não
+influenciou a resposta (ver abaixo).
 
 Ambos os algoritmos de congestionamento testados são usados em redes com largura
 de banda e latências grandes. Ambos já estavam disponíveis no Linux usado nos
@@ -1090,17 +1095,6 @@ importantes, dado o objetivo deste trabalho. Os experimentos também consideraram
 a latência como fator para verificar a importância relativa entre os fatores de
 carga de trabalho e a rede.
 
-A consistência na linha do tempo pode tornar um sistema sob cargas com um maior
-número de escritas inviável pois as escritas se tornam indisponíveis em caso de
-falha. Assim, este estudo considera situações em que ela é competitiva quando
-comparada com a consistência em momento indeterminado, por isso as relações
-leitura/escrita usadas resultavam em mais leituras que escritas. Além disso, ao
-atualizar um objeto na consistência em momento indeterminado, é necessário o
-envio do relógio-vetor, por isso uma leitura\footnote{É possível fazer
-atualizações sem relógio-vetor, mas isso cria versões concorrentes do mesmo
-objeto.} é realizada pelo \emph{benchmark} antes de toda atualização. Isso restringe a
-quantidade de escritas a um máximo de 50\% da carga de trabalho.
-
 A partir disso, os níveis selecionados para carga de trabalho foram:
 
 \begin{itemize}
@@ -1115,11 +1109,27 @@ distribuição Pareto)
 
 \end{itemize}
 
-A distribuição normal não foi usada para popularidade por simplicidade. Pelo
-teorema do limite central, a medida em que o tamanho de uma amostra tende a
-infinito, a distribuição normal e a uniforme se aproximam. Dado que o \emph{benchmark}
-já implementava a distribuição uniforme mas não a normal, não havia a
-necessidade de implementar a segunda.
+A relação leitura/escrita 2:1 representa uma carga balanceada entre os dois
+tipos de operações e a 10:1 representa uma carga intensiva de leituras. A
+consistência na linha do tempo pode tornar um sistema sob cargas com um maior
+número de escritas inviável pois as escritas se tornam indisponíveis em caso de
+falha. Assim, este estudo considera situações em que ela é competitiva quando
+comparada com a consistência em momento indeterminado, por isso as relações
+leitura/escrita usadas resultavam em mais leituras que escritas. Além disso, ao
+atualizar um objeto na consistência em momento indeterminado, é necessário o
+envio do relógio-vetor, por isso uma leitura\footnote{É possível fazer
+atualizações sem relógio-vetor, mas isso cria versões concorrentes do mesmo
+objeto.} é realizada pelo \emph{benchmark} antes de toda atualização. Isso
+restringe a quantidade de escritas a um máximo de 50\% da carga de trabalho.
+
+A popularidade dos objetos uniforme representa uma taxa de chegada de
+requisições média igual entre os objetos e concentrada representa uma taxa de
+chegada que segue uma distribuição Pareto.
+
+Os níveis de localidade foram escolhidos de forma a ter situações sem influência
+de localidade (50\%) e com localidade alta (90\%). O valor de localidade alta é
+baseado no relatado em estudo feito pelo Yahoo! em seus sistemas de produção
+\cite{Cooper2008}.
 
 Como os modos possuem comportamentos diferentes para requisições locais e
 remotas, os experimentos foram executados para cada modo. O resultado para
@@ -1200,11 +1210,6 @@ Dessa forma, só foram escolhidos níveis para localidade:
 
 \end{itemize}
 
-Os níveis de localidade foram escolhidos de forma a ter situações sem influência
-de localidade (50\%) e com localidade alta (90\%). O valor de localidade alta é
-baseado no relatado em estudo feito pelo Yahoo! em seus sistemas de produção
-\cite{Cooper2008}.
-
 Os valores fixados dos fatores desconsiderados foram:
 
 \begin{itemize}
@@ -1218,3 +1223,44 @@ Os valores fixados dos fatores desconsiderados foram:
 O valor da relação leitura/escrita é um balanço razoável entre leituras e
 escritas. O valor de popularidade é o mais simples para a interpretação dos
 resultados.
+
+%% ------------------------------------------------------------------------- %%
+\section{Estudo Final} \label{sec:estudo_final}
+
+%% ------------------------------------------------------------------------- %%
+\subsection{Fatores do estudo final} \label{sec:fatores_do_estudo_final}
+
+Os fatores selecionados para compor o estudo e seus níveis podem ser vistos na
+Tabela~\ref{tab:fatores_e_niveis_do_estudo_final}, resultando em um total de 64
+experimentos.
+
+\begin{table}[!h] \begin{center} \begin{tabular}{|l|c|c|} \hline
+
+\multicolumn{1}{|c|}{Fator} & \multicolumn{1}{|c|}{Níveis} &
+\multicolumn{1}{|c|}{Total de níveis}\\ \hline
+
+Modo & ind1, ind2, lt\_qqer e lt\_rec & 4\\ \hline
+
+Latência da WAN (ms) & 0, 100, 200 e 300 & 4\\ \hline
+
+Variação da latência da WAN (\%) & 0 e 60 & 2\\ \hline
+
+Localidade & 0,5 e 0,9 & 2\\ \hline
+
+\end{tabular}
+
+\caption{Fatores e níveis do estudo final.}
+\label{tab:fatores_e_niveis_do_estudo_final}
+
+\end{center} \end{table}
+
+%% ------------------------------------------------------------------------- %%
+\subsection{Configuração do sistema} \label{sec:configuracao_do_sistema}
+
+%% ------------------------------------------------------------------------- %%
+\subsection{Configuração do emulador de rede}
+\label{sec:configuracao_do_emulador_de_rede}
+
+%% ------------------------------------------------------------------------- %%
+\subsection{Configuração do \emph{benchmark}}
+\label{sec:configuracao_do_benchmark}
