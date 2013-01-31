@@ -43,7 +43,6 @@ desempenho em disco é sempre menor.
 \paragraph{Quantidade de nós do sistema}A menos que um sistema distribuído
 apresente escalabilidade linear, quanto mais nós ele tiver, menor será o
 desempenho por nó.
-% citar contenção e coerência - gcap
 
 \paragraph{Quantidade de centros de dados}A menos que as redes que ligam os
 centros de dados tomados dois a dois tenham as mesmas características, o tempo
@@ -133,17 +132,15 @@ soma dos seus tempos de envio, de processamento e de recebimento. A latência
 afeta os tempos de envio e recebimento.
 
 \paragraph{Variação da latência da LAN}A latência em uma rede não é constante,
-dado que dentre suas causas está a dinâmica da rede. Por exemplo, rajadas de
+dado que dentre suas causas está a dinâmica da rede
+\cite{Gurtov2002,Kraska2012}. Por exemplo, rajadas de
 tráfego aumentam a fila de pacotes a ser processados em um roteador, o que se
 manifesta como aumento de latência nas conexões passando por ele. Quando o
 roteador volta a sua operação normal, a latência diminui. A latência não vaira
-aleatoriamente, ela tem períodos de aumento e de diminuição gradual.  No
+aleatoriamente, ela tem períodos de aumento e de diminuição gradual. No
 exemplo, a latência diminui em função da diminuição da fila no roteador, ela não
 cai imediatamente para o seu valor médio. Esse fato levou ao uso de correlação
 na variação da latência nos experimentos.
-%TODO: citar paper mdcc sobre variação de latência e
-%http://amplab.cs.berkeley.edu/2011/10/20/latencies-gone-wild/ Effect of Delays
-%on TCP Performance
 
 \paragraph{Largura de banda da WAN}Mesma justificativa que para largura de banda
 da LAN.
@@ -179,8 +176,7 @@ e/ou aumento do tempo de resposta das requisições.
 \paragraph{Taxa de reordenação de pacotes na WAN}Pacotes fora de ordem acionam o
 mecanismo de recuperação rápida, com consequente diminuição da janela de
 transmissão. Além disso, pacotes fora de ordem ocupam espaço no \emph{buffer} do
-receptor, o que pode afetar seu desempenho [StudyReordering].
-% A Study of Internet Packet Reordering
+receptor, o que pode afetar seu desempenho \cite{Wang2004}.
 
 \paragraph{Algoritmo de prevenção de congestionamento}O algoritmo de prevenção
 de congestionamento é responsável pelo dimensionamento da janela de transmissão.
@@ -453,9 +449,7 @@ disponível nas placas de rede dos nós do aglomerado e não foram encontrados
 indícios de que o comutador seria um gargalo. Tomando o AWS como base, estudos
 informais indicam que é essa a largura de banda observada dentro de um mesmo
 centro de dados por instâncias com perfil de E/S ``Alto'' (por exemplo, uma
-instância M1 Grande). [Redis Repl, Net perf].
-% http://blog.rightscale.com/2007/10/28/network-performance-within-amazon-ec2-and-to-amazon-s3/
-% http://3scale.github.com/2012/07/25/fun-with-redis-replication/
+instância M1 Grande) \cite{Thorsten2007,Pujol2012}.
 
 \paragraph{Latência da LAN:}Latência do aglomerado utilizado no estudo. Um teste
 com ping com 60 amostras espaçadas em 5 s no aglomerado mediu 167 $\mu$s de
@@ -468,9 +462,9 @@ de 90 $\mu$s.
 
 \paragraph{Largura de banda da WAN:} 100 Mb/s. Um estudo informal entre os
 serviços EC2 e S3 da Amazon com 9 segmentos de rede entre eles (indício de que
-estão em centros de dados diferentes) mediu 400 Mb/s [Net Perf]. Outro estudo
+estão em centros de dados diferentes) mediu 400 Mb/s \cite{Thorsten2007}. Outro estudo
 cita que é comum medir 100 Mb/s como largura de banda entre zonas de
-disponibilidade. [Redis Repl].
+disponibilidade \cite{Pujol2012}.
 
 \paragraph{Taxa de chegada de requisições}15 operações/s para cada thread de
 cada instância do \emph{benchmark}. Esse valor foi usado pois esse parâmetro se
@@ -861,10 +855,11 @@ menor essa quantidade, mais rápida é a execução dos experimentos. Por outro
 lado, a opção foi por um número intermediário de forma a evitar um excesso de
 conflitos. Já no caso do tamanho dos objetos armazenados, o valor foi escolhido
 baseado em estudo dos sistemas de caching distribuído no Facebook, que relata
-que 90\% dos objetos nesses sistemas são menores do que 500 bytes.
+que 90\% dos objetos nesses sistemas são menores do que 500 bytes
+\cite{Atikoglu2012}.
 
 %TODO: comentar conflitos, resultados são estranhos confl : 5 44 44 1 2 5 1   |
-%CV =  0.6548619 TODO: citar Workload Analysis of a Large-Scale Key-Value Store
+%CV =  0.6548619
 
 %% ------------------------------------------------------------------------- %%
 \subsection{Fatores de rede} \label{sec:fatores_de_rede}
@@ -878,13 +873,13 @@ recepção.
 Pelo BDP de um enlace, quanto maior a latência da rede, maior é a quantidade de
 pacotes em trânsito. Um gargalo comum em WANs é o tamanho dos \emph{buffers} de
 transmissão e recepção das pontas serem menores que o BDP. Recomendações sugerem
-a configuração de \emph{buffers} com tamanho em bytes igual ao dobro do BDP. Em
+a configuração de \emph{buffers} com tamanho em bytes igual ao dobro do BDP
+\cite{Jones2006,ESNet2012}. Em
 princípio essa otimização seria aplicada aos estudos, mas experimentos com iperf
 mostraram ganhos de desempenho para \emph{buffers} de até quatro vezes o BDP, portanto
 um estudo fatorial foi feito para verificar esse fato. O estudo usou latência e
 reordenação de pacotes para criar cenários que pressionassem os \emph{buffers} de forma
 diferente.
-%TODO: ref
 
 Os níveis selecionados foram:
 
@@ -955,7 +950,6 @@ níveis inicialmente selecionados para fatores de rede foram:
 
 \end{itemize}
 %TODO: Considera-se que perdas acima de x\% tornam a comunicação impraticável.
-%A Study of Internet Packet Reordering
 %http://www.slac.stanford.edu/comp/net/wan-mon/thru-vs-loss.html
 
 Os níveis da latências foram baseados em estudo que relata as latências entre os
@@ -966,10 +960,11 @@ dados dos EUA e a maior foi 277 ms entre Irlanda e Singapura.
 
 O mesmo estudo usado para latência apresenta um gráfico com grandes variações de
 latência, chegando a máximos de até 3 ordens de grandeza em alguns períodos
-curtos. O projeto PingER, por sua vez, mostra em janeiro de 2013 uma média de
+curtos. O projeto PingER\footnote{\emph{Ping End-to-end Reporting} (Relatório de
+Ping Fim-a-fim) é um projeto de Stanford que monitora o desempenho fim-a-fim de enlaces de
+Internet, em 700 sítios e 160 países.} \cite{Pinger2013}, por sua vez, mostra em janeiro de 2013 uma média de
 latência de 238,062 ms com desvio padrão de 142,996, o que resulta em uma
 variação de 60\%. Os 11 meses anteriores apresentam valores semelhantes.
-%http://www-iepm.slac.stanford.edu/pinger/
 
 As taxas de perda foram escolhidas com base em medidas feitas pelo projeto
 PingER, que mede desempenho de conexões fim-a-fim na Internet. A mediana das
@@ -978,21 +973,16 @@ perdas medidas em janeiro de 2013 foi 0,119\% e a mediana do último ano foi
 mas este trabalho considerou que a WAN entre os dois centros de dados é de boa
 qualidade, portanto não apresentaria taxas de perda muito altas.
 
-% http://www-wanmon.slac.stanford.edu/cgi-wrap/pingtable.pl?file=duplicate_packets&by=by-node&size=100&tick=monthly&from=EDU.SLAC.STANFORD.N3&to=WORLD&ex=none&only=all&dataset=hep&percentage=any
-
 O mesmo estudo mostra taxas de duplicação de pacotes muitos baixas (0\%). Embora
 os valores usados neste estudo tenham sido muito grandes, duplicação de pacotes
 não influenciou a resposta (ver abaixo).
 
-Duas referências sobre reordenação de pacotes foram encontradas. A primeira, já
-citada, mostra taxas muito baixas -- em janeiro de 2013, média de 0,006\% e
+Duas referências sobre reordenação de pacotes foram encontradas. A primeira, o
+projeto PingER, mostra taxas muito baixas -- em janeiro de 2013, média de 0,006\% e
 mediana de 0\%. Estudo realizado em 2003 entre sítios na China mostra taxas de
-reordenação de pacotes de 3,187\%. Os valores usados no experimento foram
+reordenação de pacotes de 3,187\% \cite{Wang2004}. Os valores usados no experimento foram
 maiores, mas mesmo assim reordenação de pacotes não influenciou a resposta (ver
 abaixo).
-%http://www-wanmon.slac.stanford.edu/cgi-wrap/pingtable.pl?file=out_of_order_packets&by=by-node&size=100&tick=monthly&from=EDU.SLAC.STANFORD.N3&to=WORLD&ex=none&only=all&dataset=hep&percentage=any
-
-%http://research.microsoft.com/en-us/people/lguohan/reorder-icoin04.pdf
 
 Ambos os algoritmos de congestionamento testados são usados em redes com largura
 de banda e latências grandes. Ambos já estavam disponíveis no Linux usado nos

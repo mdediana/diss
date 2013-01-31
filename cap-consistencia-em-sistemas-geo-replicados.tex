@@ -42,8 +42,7 @@ relacionada a retransmissões do TCP, mas também acontece devido a balanceamento
 de carga ou problemas de hardware ou software em dispositivos intermediários.
 
 Os principais mecanismos adotados no TCP para prover comunicação confiável são
-descritos a seguir [Stevens, CongContr]:
-% [CongContr] http://tools.ietf.org/html/rfc5681
+descritos a seguir \cite{Stevens1993,RFC5861}:
 
 \paragraph{Reconhecimento positivo com retransmissão}O TCP garante a entrega de
 dados pelo uso de números de sequência e reconhecimento dos pacotes e de
@@ -109,8 +108,7 @@ de número 41 no exemplo), a janela assume o valor $cwnd = ssthresh$ -- metade do
 seu tamanho no momento em que o terceiro ACK em duplicata foi recebido.
 
 \paragraph{Pacotes duplicados}Pacotes duplicados são simplesmente descartados no
-receptor [RFC 793].
-% RFC 793 - Transmission Control Protocol, Section 1.5
+receptor.
 
 \paragraph{Pacotes corrompidos}O TCP tem um campo com uma soma de verificação
 que é usada no receptor para checar se o pacote foi corrompido em trânsito. Em
@@ -427,7 +425,7 @@ consistência causal.} \label{tab:consistencia_causal_valida} \end{center}
 & T3       &	T4			\\ \hline R1 & W(x,a) &          &          & &				\\
 \hline R2 &        & a = R(x) & W(x,b)   &          &				\\ \hline R3 & & & &
 b = R(x) & a = R(x)	\\ \end{tabular} \caption{Sequência de operações inválida
-para consistência causal} \label{tab:consistencia_causal_invalida.} \end{center}
+para consistência causal} \label{tab:consistencia_causal_invalida} \end{center}
 \end{table}
 
 A consistência em momento indeterminado\footnote{O termo \emph{eventual

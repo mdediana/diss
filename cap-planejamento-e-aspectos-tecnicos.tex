@@ -126,7 +126,7 @@ atuar.
 \subsection{Técnica de avaliação} \label{sec:tecnica_de_avaliacao}
 
 A escolha da técnica de avaliação depende em parte dos parâmetros e fatores
-\cite{Jain199}. Apesar de o levantamento de parâmetros e a seleção de fatores
+\cite{Jain1991}. Apesar de o levantamento de parâmetros e a seleção de fatores
 terem sido completados depois desse passo, nesse momento já existia uma lista
 preliminar. Essa lista era composta por parâmetros diretamente ligados a meta
 deste trabalho, como os relacionados a carga de trabalho e rede. A escolha da
@@ -239,8 +239,16 @@ em momento indeterminado já disponível no Riak. Durante a implementação houve a
 preocupação de manter o código das duas o mais próximo possível de forma a
 eliminar diferenças dos tempos de execução dos dois modelos.
 
+Por último, outras alterações menores no riak\_kv foram o tratamento de parâmetros extras na interface
+HTTP, necessários para a consistência na linha do tempo, e a implementação de
+estatísticas de migrações.
+
+As modificações feitas no riak\_kv se encontram em
+\url{https://github.com/mdediana/riak\_kv.git}.
+
 %% ------------------------------------------------------------------------- %%
-\subsubsection{Outras modificações implementadas no Riak}
+\subsubsection{Implementação de algoritmo de particionamento para centros de
+dados}
 
 Além do riak\_kv, outro módulo alterado foi o riak\_core, responsável pelo
 roteamento de requisições em um aglomerado de Riak. Quando o Riak recebe uma
@@ -258,10 +266,8 @@ apenas para o cenário do estudo, de apenas dois centros de dados (ver seção
 \ref{sec:parametros_fixados}) e baseada nos nomes dos nós para saber em qual
 centro de dados cada um deles se encontra.
 
-Outras alterações menores foram o tratamento de parâmetros extras na interface
-HTTP, necessários para a consistência na linha do tempo, e a implementação de
-estatísticas de migrações.
-
+As modificações feitas no riak\_core se encontram em
+\url{https://github.com/mdediana/riak\_core.git}.
 
 %% ------------------------------------------------------------------------- %%
 \subsection{\emph{Benchmark}} \label{sec:benchmark}
@@ -272,14 +278,23 @@ leitura/escrita, popularidade dos objetos acessados, entre outras. O \emph{bench
 originalmente não é distribuído, portanto foi modificado pois mais de uma
 instância dele precisava ser executada simultaneamente nos experimentos. Além de
 evitar gargalos no \emph{benchmark}, isso era importante para a implementação de
-localidade. Além disso, foi necessária a implementação de um script para a
-consolidação dos dados obtidos pelas diversas instâncias do Basho Bench.
+localidade. Além disso, foi necessária a implementação de um pequeno programa em Erlang
+(basho\_bench\_dist) para a
+consolidação dos dados obtidos pelas diversas instâncias do Basho Bench. Parte
+dessa consolidação envolveu a fusão de histogramas usados pelo Basho Bench que
+por sua vez usavam o projeto basho\_stats, que também precisou ser modificado.
 
-Outro \emph{benchmark} considerado foi o YCSB \cite{Cooper2010}.  Apesar de possuir
+Outro \emph{benchmark} considerado foi o
+YCSB\footnote{\url{git://github.com/brianfrankcooper/YCSB.git}} \cite{Cooper2010}.  Apesar de possuir
 mais flexibilidade que o Basho Bench nas suas configurações, ele não estava
 preparado para acessar o Riak, acesso esse que precisaria ser implementado. Além
 disso, ele também não oferecia muitas das funcionalidades necessárias para os
 experimentos, que precisariam ser implementadas.
+
+As alteração feitas no Basho Bench estão em
+\url{https://github.com/mdediana/basho\_bench.git}, o basho\_bench\_dist se
+encontra em \url{https://github.com/mdediana/basho\_bench\_dist.git} e as
+modificações do basho\_stats em \url{https://github.com/mdediana/basho\_stats.git}.
 
 %% ------------------------------------------------------------------------- %%
 \subsection{Ambiente} \label{sec:ambiente}
@@ -328,6 +343,10 @@ sendo que a distinção entre nós executando instâncias do Riak ou do Basho Bench
 foi feita através dos scripts que gerenciam os experimentos (subseção
 \ref{sec:execucao_e_analise_dos_experimentos}).
 
+Pesquisadores com acesso ao
+Grid5000 podem acessar essa imagem, que se encontra no sítio Sophia em
+\emph{/home/madediana/images/squeeze-x64-riak.tgz}.
+
 %% ------------------------------------------------------------------------- %%
 \subsection{Rede} \label{sec:rede}
 
@@ -346,13 +365,14 @@ netem\footnote{\url{http://www.linuxfoundation.org/collaborate/workgroups/networ
 foi usado. Ele provê funcionalidade para inserção de latência de rede, variação
 da latência, perda de pacotes, pacotes duplicados, corrompidos e/ou fora de
 ordem.  Existem outras ferramentas como o
-dummynet\footnote{\url{http://info.iet.unipi.it/~luigi/dummynet/}} e o
+dummynet\footnote{\url{http://info.iet.unipi.it/~luigi/dummynet/}}
+\cite{Carbone2010} e o
 NISTNet\footnote{\url{http://snad.ncsl.nist.gov/itg/nistnet/}}, mas elas foram
 desconsideradas dado que o netem já vem integrado ao tc e satisfazia os
 requisitos funcionais dos experimentos.
 
 Existem recomendações sobre otimizações de sistemas Linux para quando esses se
-comunicam através de WANs. Durante os experimentos, sempre que os parâmetros da
+comunicam através de WANs \cite{Jones2006,ESNet2012}. Durante os experimentos, sempre que os parâmetros da
 WAN foram alterados, um script para ajuste da pilha TCP foi usado (para mais
 detalhes, ver Seção~\ref{sec:fatores_de_rede}).
 
@@ -384,8 +404,8 @@ sub-redes ao tc de modo que as características de WAN eram aplicadas às
 requisições que saíam para o outro centro de dados, enquanto as requisições para
 o mesmo centro de dados saíam inalteradas.
 
-%TODO: dummynet: Marta Carbone and Luigi Rizzo, Dummynet Revisited, ACM SIGCOMM
-%Computer Communication Review, 40(2) pg.12-20, March 2010
+Esse processo é executado pelo script net (ver Subseção
+\ref{sec:execucao_e_analise_dos_experimentos}.
 
 %% ------------------------------------------------------------------------- %%
 \subsection{Execução e análise dos experimentos}
@@ -399,6 +419,9 @@ scripts se localizavam no frontend do Grid5000 e foram escritos em bash.  Esses
 scripts definem o fluxo de trabalho do estudo, descrito a seguir.  O segundo
 conjunto (cmb-local) foi usado na análise dos dados, se localizava no computador
 do autor e era composto por scripts em bash, Ruby e R.
+
+Os scripts em cmb se encontram em \url{https://github.com/mdediana/cmb.git} e os
+em cmb-local se encontram em \url{https://github.com/mdediana/cmb-local.git}.
 
 %% ------------------------------------------------------------------------- %%
 \subsubsection{Fluxo de trabalho dos experimentos}
@@ -525,7 +548,6 @@ salvos para serem usados na análise dos resultados depois.
 %% ------------------------------------------------------------------------- %%
 \section{Tipos de Experimentos} \label{sec:tipos_de_experimentos}
 
-%TODO: talvez citar o outro livro de performance
 São alguns os tipos de experimentos usados em um estudo
 experimental. A escolha entre eles se dá principalmente pelo balanço entre
 recursos utilizados (tempo, dinheiro, energia, etc.) e quantidade de informação
