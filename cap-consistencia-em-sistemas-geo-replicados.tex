@@ -80,8 +80,7 @@ modo de prevenção de congestionamento.
 diferentes algoritmos de prevenção de congestionamento. O algoritmo padrão de
 prevenção de congestionamento aumenta a janela de congestionamento em $1 / cwnd$
 a cada ACK recebido. Assim, durante essa fase, o aumento da janela de
-transmissão é linear, e não mais exponencial como no início lento. TODO: cubic e
-htcp.
+transmissão é linear, e não mais exponencial como no início lento.
 
 \paragraph{Retransmissão rápida}O receptor envia um ACK para todo pacote
 recebido, mesmo que fora de ordem. Por exemplo, se os pacotes de 10 bytes com
@@ -113,7 +112,7 @@ receptor.
 \paragraph{Pacotes corrompidos}O TCP tem um campo com uma soma de verificação
 que é usada no receptor para checar se o pacote foi corrompido em trânsito. Em
 caso positivo, ele é descartado. Do ponto de vista do transmissor, o pacote foi
-perdido, então os mecanismos usuais de controle de congestionamento são
+perdido, então os mecanismos usuais de controle de fluxo são
 acionados. 
 
 %% ------------------------------------------------------------------------- %%
