@@ -1,33 +1,12 @@
 %% ------------------------------------------------------------------------- %%
 \chapter{Análise dos Resultados} \label{cap:analise_dos_resultados}
 
+ \emph{benchmark}. 
+
 O estudo final foi um estudo fatorial completo (seção
 \ref{sec:tipos_de_experimentos}). A sua execução foi rápida e
 usou poucos recursos devido aos estudos fatoriais fracionados feitos para
-triagem dos fatores -- a execução de uma repetição do estudo final demorava 6,5 horas. O estudo final usou os fatores e níveis descritos na Tabela
-\ref{tab:fatores_e_niveis_do_estudo_final}, em um total de 64 experimentos.
-
-\begin{table}[!h] \begin{center} \begin{tabular}{|l|c|c|} \hline
-
-\multicolumn{1}{|c|}{Fator} & \multicolumn{1}{|c|}{Níveis} &
-\multicolumn{1}{|c|}{Total de níveis}\\ \hline
-
-Modo & \emph{ind1}, \emph{ind2}, \emph{lt\_qqer} e \emph{lt\_rec} & 4\\ \hline
-
-Latência da WAN (ms) & 0, 100, 200 e 300 & 4\\ \hline
-
-Variação da latência da WAN (\%) & 0 e 60 & 2\\ \hline
-
-Localidade & 0,5 e 0,9 & 2\\ \hline
-
-\end{tabular}
-
-\caption{Fatores e níveis do estudo final.}
-\label{tab:fatores_e_niveis_do_estudo_final}
-
-\end{center} \end{table}
-
-O pequeno número de fatores e níveis foi importante para uma análise consistente
+triagem dos fatores -- a execução de uma repetição do estudo final demorava 6,5 horas. O pequeno número de fatores e níveis foi importante para uma análise consistente
 dos resultados. Esse fato é enfatizado pela principal referência metodológica usada
 neste trabalho \cite{Jain1991} e também foi sugerido para o autor em
 conversa com o pesquisador visitante no IME Jean-Marc Vincent, que possui grande
@@ -65,36 +44,73 @@ tempo. Assim, os conflitos no caso da consitência em momento indeterminado são
 mais graves.
 
 %% ------------------------------------------------------------------------- %%
-\subsection{Tamanho das amostras e replicações} \label{sec:}
+\subsection{Tamanho da amostra e replicações} \label{sec:}
 
-%O tratamento estatístico dado para os experimentos consistiu basicamente na
-%definição do tempo de execução de cada experimento de forma a ter amostras
-%suficientes para garantir o nível de confiabilidade procurado.
-%
-%A quantidade de amostras necessárias é dada por:
-%
-%$n = (\frac{100 * z * s}{r * \bar{x}})^2$,
-%
-%onde z é o valor z relativo do nível de confiança desejado, s é o desvio padrão amostral, r é a
-%precisão desejada e $\bar{x}$ é a média.
-%
-%Para fazer a estimativa, foi usado o experimento com maior desvio padrão, que é
-%aquele em que a quantidade de requisições locais e remotas é balanceada
-%e a variação da rede é a maior. Esse experimento é o que tem modo \emph{lt\_rec} e
-%localidade 50\%, latência de rede 300 ms e variação da latência de 60\%. O
-%cálculo foi feito considerando o nível de confiança de 95\% ($z = 1.960$) e
-%precisão de 1\%. A principal referência metodológica usada para o estudo
-%considera níveis de confiança de 90\% ou 95\% altos \cite{Jain1991}. Os valores da média e desvio padrão foram calculados a partir
-%dos percentis e eram em $\bar{x} = 0,2533949$ s e $s = 0,2878649$ s.
-%
-%A partir desses valores a quantidade de amostras necessárias é 49579. Esse experimento sendo executado ao longo de 3 min resultou em um total de 50828
-%amostras, e é o experimento com menor número de amostras do estudo. Como a
-%configuração padrão do \emph{benchmark} era baseada em tempo e não em quantidade de
-%requisições, os experimentos usaram 3 min como tempo. Vale notar que o nível de confiança
-%de 95\% é o mínimo atingido, os outros experimentos adquiriram  mais amostras e portanto oferecem uma confiança maior que os 95\%.
-%
-%min=1000000; for f in res.1/*/summary.csv; do n=$(tail -1 $f | cut -d, -f3);
-%echo $n; [[ $min -gt $n ]] && min=$n; done; echo $min
+O tamanho da amostra de um experimento é dado por:
+
+$n = (\frac{100 * z * s}{r * \bar{x}})^2$,
+
+onde z é o valor z relativo do nível de confiança desejado, s é o erro padrão, r é a
+precisão desejada e $\bar{x}$ é a média.
+
+O erro padrão é o desvio
+padrão da média da amostra e é dado por:
+
+$s = \frac{\sigma}{\sqrt{n}}$,
+
+onde
+$\sigma$ é o desvio padrão da média da população e $n$ é o tamanho da amostra.
+
+O nível de confiança determina o intervalo de
+confiança, que é um intervalo de valores centrado na média e com uma probabilidade
+de que a média da população esteja incluída nele. Por exemplo, dada
+uma média $\bar{x} = 100$ ms, um erro padrão\footnote{O erro padrão é o desvio
+padrão da média da amostra e é dado por $s = \frac{\sigma}{\sqrt{n}}$, onde
+$\sigma$ é o desvio padrão da média da população e $n$ é o tamanho da amostra.}
+$s = 5$ ms e nível de confiança
+de 95\% ($z = 1,960$), o intervalo de confiança é $(100 - 1,960 * 5, 100 +
+1,960 * 5) = (90,2, 109,8)$, o que significa que existe 95\% de chance de a
+média da população estar nesse intervalo, ou que de cada 100 repetições do
+experimento, 95 terão a média dentro desse intervalo.
+
+A exatidão indica qual a distância de
+uma medição da média da população. No caso, a exatidão é aplicada ao intervalo
+de confiança, portanto o cálculo do intervalo acima com uma exatidão de 1\%
+passa a ser $(100 * (1 - 0,01) - 1,960 * 5, 100 * (1 + 0,01) + 1,960 * 5) =
+(89,2, 110,8)$. 
+
+O tamanho da amostra depende de conhecer a média e o erro padrão, portanto
+experimentos precisam ser feitos para uma estimativa desses valores. No caso
+deste estudo, cada experimento tinha potencialmente média e erro padrão
+diferentes dos outros -- por exemplo, um experimento de com todas as requisições
+locais apresentaria um desvio padrão menor do que um com requisições locais e
+remotas. Por isso, a opção foi executar todos os experimentos e depois verificar se
+o tamanho da amostra estava adequado para cada um deles.
+ 
+A configuração do \emph{benchmark} é baseada em duração, e não em quantidade de
+requisições. Testes exploratórios foram
+feitos para identificar o tempo que os experimentos deveriam usar. Executando
+cada experimento por 3 min, o valor mínimo de quantidade de requisições de um
+experimento foi 76137, para
+lt\_rec, localidade de 50\% e latência de rede de 300 ms.
+
+Dados esses resultados, foram verificados os tamanhos da amostra dos
+experimentos. Com um nível de confiança de 99\% e exatidão de 2\%, todos os
+experimentos tinham o tamanho da amostra suficiente. Com precisão de 1\%, apenas os
+experimentos para \emph{lt\_rec}, localidade 50\% e latência de rede 300 ms apresentou
+tamanho de amostra insuficiente -- para variação de latência de 0\% ele
+precisaria de 127789 amostras mas tinha 115175, e para variação de latência 60\%
+ele precisaria de 83030 mas tinha 76137.
+
+Vale notar que o tamanho da amostra
+na maioria dos experimentos foi bem maior do que o necessário. Por exemplo, para
+ind1, localidade de 50\% e latência de 300 ms, foram observadas 358301 amostras
+quando apenas 933 seriam suficientes. Isso significa que os experimentos
+poderiam ser executados em bem menos tempo caso o \emph{benchmark} fosse limitado
+por quantidade de requisições em vez de tempo\footnote{A limitação da quantidade
+de requisições foi implementada no \emph{benchmark} pois era necessária para a etapa
+de aquecimento, mas não foi usada nos experimentos}.
+
 
 %% ------------------------------------------------------------------------- %%
 \section{Análise dos Tempos de Resposta}
@@ -140,9 +156,9 @@ No caso de escritas e localidade 50\%, \emph{lt\_rec} apresenta um desempenho um
 melhor que ev2 e \emph{lt\_qqer}. A explicação provável para isso é o fato de o sistema
 estar menos carregado para esse modo do que os outros, o que acontece pois as leituras de \emph{lt\_rec} são mais lentas. Esse fato pode ser
 comprovado pela vazão dos modos \emph{lt\_rec}, ev2 e \emph{lt\_qqer}, respectivamente, 594,
-1072, 941 operações/s. Já no caso de localidade 0,9, \emph{lt\_rec} e \emph{lt\_qqer} se
+1072, 941 operações/s. Já no caso de localidade 90\%, \emph{lt\_rec} e \emph{lt\_qqer} se
 beneficiam da localidade, enquanto ev2 não e continua com o mesmo perfil
-apresentado para localidade 0,5.
+apresentado para localidade 50\%.
 
 % grep 0.5,uni,2:1,200,60 res.1/summary.csv | cut -d, -f1,11
 
@@ -164,78 +180,6 @@ A análise dos conflitos
 
 %% ------------------------------------------------------------------------- %%
 \section{Análise das Migrações} \label{sec:analise_das_migracoes}
-
-%% ------------------------------------------------------------------------- %%
-%\section{TEXTO DA QUALIFICAÇÃO - DESCARTAR?} \subsection{Resultados parciais}
-%\label{sec:resultados_parciais}
-%
-%Até o momento foram executados alguns testes para um melhor entendimento do
-%problema sendo tratado e para o estudo e a avaliação das tecnologias usadas nos
-%experimentos.
-%
-%Primeiramente foram executados alguns experimentos no Revoada, aglomerado de 8
-%nós administrado pelo IME - USP. Esses experimentos usaram o Cassandra
-%\cite{Lakshman2010} como sistema de armazenamento e YCSB \cite{Cooper2010} como
-%aplicação para execução dos testes, e foram feitos como testes preliminares
-%sobre o efeito da latência de rede no desempenho de diferentes níveis de
-%consistência. Os experimentos usaram 3 nós de Cassandra e uma instância do
-%YCSB.  Foram usados os níveis de consistência ONE ($W = 1$ ou $R = 1$), QUORUM
-%($W = \lceil(N+1)/2\rceil$ ou $R = \lceil(N+1)/2\rceil)$ e ALL ($W = N$ ou $R =
-%N$) e latências variando de 0 a 300 ms. O YCSB não estava preparado para lidar
-%com diferentes configurações de consistência do Cassandra e foi alterado para
-%tal.  Para uma dada latência de rede, foi observado um aumento no tempo de
-%resposta e diminuição da vazão a medida em que configurações mais rígidas de
-%consistência foram usadas. Para uma dada configuração de consistência, foi
-%observado um aumento no tempo de resposta e diminuição da vazão a medida em que
-%a latência de rede foi aumentada. A preparação e execução desses experimentos
-%colaborou para um melhor entendimento de ferramentas e técnicas a serem usadas
-%neste trabalho.
-%
-%Um segundo conjunto de experimentos foi realizado no Grid5000 com três
-%configurações de consistência implementadas no Riak \cite{Riak}: consistência
-%em momento indeterminado, consistência na linha do tempo com leituras
-%consistentes e consistência na linha do tempo com leituras de qualquer versão.
-%Os experimentos usaram um aglomerado de 6 nós para o Riak, e um nó para o Basho
-%Bench \cite{Basho}. Os experimentos foram feitos usando latências de 0 a 150
-%ms.  Foram usadas 3 configurações relativas à distribuição dos nós por centros
-%de dados: todos os nós no mesmo centro de dados, dois nós em um centro de dados
-%remoto e quatro nós em um centro de dados remoto (o centro de dados local é o
-%centro de dados onde a aplicação de execução de testes roda). A carga de
-%trabalho usada foi uniforme para distribuição das chaves e para alvos dos
-%acessos. Esses experimentos funcionaram como testes da implementação de
-%consistência na linha do tempo. Os resultados observados não foram os
-%esperados, pois indicaram um melhor desempenho da consistência em momento
-%indeterminado, seguido da consistência na linha do tempo com leituras
-%consistentes e por último consistência na linha do tempo com leituras de versão
-%qualquer. O resultado esperado seria que leituras de versão qualquer
-%apresentassem desempenho melhor do que leituras consistentes. Isso pode ter
-%acontecido por problemas na implementação ou por algum fator não previsto no
-%funcionamento desses modelos de consistência. Esse fato precisa ser
-%investigado. Além disso, como esperado, os experimentos mostraram a existência
-%de conflitos na consistência em momento indeterminado, enquanto nenhum conflito
-%aconteceu na consistência na linha do tempo. O impacto desses conflitos no
-%desempenho não foi medido. A partir desses experimentos foi possível entender o
-%comportamento do Riak no ambiente do Grid5000, além de servir como prova de
-%conceito da implementação da consistência na linha do tempo no Riak.
-%
-%%% ------------------------------------------------------------------------- %%
-%\subsection{Apresentação dos resultados}
-%\label{sec:apresentacao_dos_resultados}
-%
-%\textbf{TEXTO DA QUALIFICAÇÃO}
-%
-%A comparação de desempenho dos dois modelos de consistência será apresentada em
-%duas tabelas, uma para os valores obtidos de tempo de resposta e outra para
-%vazão. Cada linha corresponde a uma carga de trabalho, dada pela tripla
-%(distribuição de operações, distribuição dos destinos dos acessos, localidade).
-%Cada latência da rede define uma coluna. Cada célula da tabela apresenta 3
-%valores: o desempenho da consistência em momento indeterminado, consistência na
-%linha do tempo com leitura mais recente e consistência na linha do tempo com
-%leitura qualquer.
-%
-%Outros valores e gráficos que ajudem na interpretação dos resultados serão
-%apresentados, como a quantidade de conflitos no caso da consistência em momento
-%indeterminado.
 
 %% ------------------------------------------------------------------------- %%
 \section{Ameaças à Validade} \label{sec:ameacas_a_validade}
