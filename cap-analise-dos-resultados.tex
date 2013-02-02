@@ -12,7 +12,7 @@ triagem dos fatores -- a execução de uma repetição do estudo final demorava 6,5 
 \multicolumn{1}{|c|}{Fator} & \multicolumn{1}{|c|}{Níveis} &
 \multicolumn{1}{|c|}{Total de níveis}\\ \hline
 
-Modo & ind1, ind2, lt\_qqer e lt\_rec & 4\\ \hline
+Modo & \emph{ind1}, \emph{ind2}, \emph{lt\_qqer} e \emph{lt\_rec} & 4\\ \hline
 
 Latência da WAN (ms) & 0, 100, 200 e 300 & 4\\ \hline
 
@@ -41,7 +41,7 @@ TODO: seções
 %% ------------------------------------------------------------------------- %%
 \subsection{Hipóteses} \label{sec:hipoteses}
 
-A principal hipótese deste trabalho era que um sistema geo-replicado usando consistência na
+A principal hipótese deste trabalho era que um sistema georeplicado usando consistência na
 linha do tempo apresentaria um desempenho competitivo com a consistência em
 momento indeterminado para algumas cargas de trabalho, como uma que apresentasse
 localidade alta, por exemplo. Essa hipótese se baseava em uma
@@ -80,7 +80,7 @@ mais graves.
 %
 %Para fazer a estimativa, foi usado o experimento com maior desvio padrão, que é
 %aquele em que a quantidade de requisições locais e remotas é balanceada
-%e a variação da rede é a maior. Esse experimento é o que tem modo lt\_rec e
+%e a variação da rede é a maior. Esse experimento é o que tem modo \emph{lt\_rec} e
 %localidade 50\%, latência de rede 300 ms e variação da latência de 60\%. O
 %cálculo foi feito considerando o nível de confiança de 95\% ($z = 1.960$) e
 %precisão de 1\%. A principal referência metodológica usada para o estudo
@@ -126,21 +126,21 @@ opção foi fazer a análise do valor intermediário. O gráfico para latência de
 rede de 200 ms pode ser visto na Figura
 \ref{fig:fda_dos_tempos_de_resposta_para_latencia_de_rede_de_200_ms}.
 
-No caso de leituras e localidade 50\%, apenas lt\_rec apresenta requisições
+No caso de leituras e localidade 50\%, apenas \emph{lt\_rec} apresenta requisições
 remotas. Uma porção pequena dessas leituras tem tempo de resposta menor que a
 latência da rede, o que se explica pela variação da latência de até 60\%. A
-localidade 90\% beneficia lt\_rec, que continua
+localidade 90\% beneficia \emph{lt\_rec}, que continua
 apresentando tempos de resposta mais altos que os outros modos. O degrau que
-aparecia nos gráficos para latência de 0 ms permanece, mas no caso de lt\_rec ele
+aparecia nos gráficos para latência de 0 ms permanece, mas no caso de \emph{lt\_rec} ele
 surge próximo do percentil equivalente a localidade (50 ou 90). Isso sugere que esse e um
 efeito que sempre afeta requisições locais, independente da proporção que
 representem do total de requisições.
 
-No caso de escritas e localidade 50\%, lt\_rec apresenta um desempenho um pouco
-melhor que ev2 e lt\_qqer. A explicação provável para isso é o fato de o sistema
-estar menos carregado para esse modo do que os outros, o que acontece pois as leituras de lt\_rec são mais lentas. Esse fato pode ser
-comprovado pela vazão dos modos lt\_rec, ev2 e lt\_qqer, respectivamente, 594,
-1072, 941 operações/s. Já no caso de localidade 0,9, lt\_rec e lt\_qqer se
+No caso de escritas e localidade 50\%, \emph{lt\_rec} apresenta um desempenho um pouco
+melhor que ev2 e \emph{lt\_qqer}. A explicação provável para isso é o fato de o sistema
+estar menos carregado para esse modo do que os outros, o que acontece pois as leituras de \emph{lt\_rec} são mais lentas. Esse fato pode ser
+comprovado pela vazão dos modos \emph{lt\_rec}, ev2 e \emph{lt\_qqer}, respectivamente, 594,
+1072, 941 operações/s. Já no caso de localidade 0,9, \emph{lt\_rec} e \emph{lt\_qqer} se
 beneficiam da localidade, enquanto ev2 não e continua com o mesmo perfil
 apresentado para localidade 0,5.
 

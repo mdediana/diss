@@ -1,123 +1,54 @@
 %% ------------------------------------------------------------------------- %%
-\chapter{Consistência em Sistemas Geo-replicados}
-\label{cap:consistencia_em_sistemas_geo_replicados}
+\chapter{Consistência em Sistemas Georeplicados}
+\label{cap:consistencia_em_sistemas_georeplicados}
 
 Este capítulo apresenta os conceitos relacionados à replicação de dados em
-sistemas geo-replicados, as motivações para seu uso e os compromissos
+sistemas georeplicados, as motivações para seu uso e os compromissos
 resultantes. Embora alguns conceitos e princípios descritos não sejam exclusivos
-de sistemas geo-replicados, eles são necessários para um entendimento mais
+de sistemas georeplicados, eles são necessários para um entendimento mais
 profundo do projeto e desenvolvimento desse tipo de sistema.
 
-Muitas das dificuldades de geo-replicação são evidenciadas ao se analisar os
-mecanismos que o TCP oferece para comunicação ponto-a-ponto confiável,
-explicados na Seção~\ref{sec:tcp_e_comunicacao_confiavel}. TODO Seções
+A Seção~\ref{sec:sistemas_de_armazenamento} faz algumas considerações sobre a
+nomenclatura usada para os sistemas tratados neste trabalho. A
+Seção~\ref{sec:estrategias_para_escalabilidade_de_aplicacoes_web} apresenta
+conceitos de escalabilidade de aplicações web. Uma estratégia comum para
+escalabilidade é o uso de replicação, a
+Seção~\ref{sec:replicacao_de_dados_e_seus_compromissos} mostra diferentes tipos
+de replicação e as vantagens e desvantagens de cada um. Um sistema pode
+apresentar diferentes garantias de consistência dependendo da forma como replica
+seus dados, a Seção~\ref{sec:modelos_de_consistencia_para_replicacao} descreve
+diversos tipos de modelos de consistência, incluindo os dois que são alvo deste
+trabalho. A
+Seção~\ref{sec:consistencia_desempenho_e_disponibilidade_em_sistemas_georeplicados}
+mostra como diferentes modelos de consistência resultam em diferentes princípios
+arquiteturais para sistemas de larga escala. Por fim, a
+Seção~\ref{sec:trabalhos_relacionados} apresenta os trabalhos relacionados a
+este.
 
 %% ------------------------------------------------------------------------- %%
-\section{TCP e Comunicação Confiável} \label{sec:tcp_e_comunicacao_confiavel}
+\section{Sistemas de armazenamento} \label{sec:sistemas_de_armazenamento}
 
-Uma das principais diferenças entre redes de longa distância (WANs) e redes
-locais (LANs), além da área pela qual se estendem, diz respeito a confiabilidade
-do meio. LANs costumam usar topologias simples com poucos dispositivos e
-segmentos entre os nós, enquanto com WANs acontece o contrário.  Além disso,
-LANs costumam ser mais homogêneas e terem um único administrador. No caso de
-WANs, um pacote de dados normalmente atravessa diversas redes compostas por
-dispositivos e administradores diferentes. Do ponto de vista deste trabalho, um
-centro de dados corresponde a uma LAN, enquanto a geo-replicação ocorre na WAN.
+A área de bancos de dados tradicionalmente trata de bancos de dados que utilizam
+o modelo relacional de dados, criado no início dos anos 70 \cite{Codd1970}. Essa
+tradição é enraizada a ponto de a área normalmente utilizar os conceitos de
+bancos de dados e bancos de dados relacionais como sinônimos (o mesmo valendo
+para SGBDs e SGBDs relacionais, e SGBDDs e SGBDDs relacionais). Mas outros
+modelos de dados também são usados para resolver problemas específicos de
+armazenamento, como os modelos de dados de grafos \cite{Angles2008} e o
+semiestruturado \cite{Abiteboul1997}. Esses modelos se popularizaram no contexto
+de grandes aplicações web a partir da segunda metade dos anos 2000. Ao usar os
+termos banco de dados, SGBDs e SGBDDs, este trabalho não faz distinção sobre
+qual o modelo de dados utilizado. As referências aos bancos de dados, SGBDs e
+SGBDDs relacionais são feitas explicitamente.
 
-TCP/IP é a pilha de protocolos comumente utilizada em sistemas geo-replicados. O
-protocolo IP provê os mecanismos de endereçamento e roteamento. O TCP provê
-comunicação ponto-a-ponto confiável. Para tal, usa diversos mecanismos
-relacionados e dependentes entre si para lidar com controle de fluxo e perdas,
-corrupção, reordenação e duplicação de pacotes.
-
-O controle de fluxo é feito por mecanismos usados nas pontas de uma conexão com
-o objetivo de usar a rede de forma eficiente e evitar o envio de mais dados do
-que o receptor pode tratar.  Perdas acontecem quando um dispositivo na rede
-descarta pacotes, o que pode ser causado por corrupção de pacotes ou
-congestionamento da rede, como \emph{buffers} esgotados em um roteador, por
-exemplo.  Reordenação ocorre quando pacotes de uma mesma conexão TCP enviados
-nos instantes T1 e T2 seguem caminhos diferentes na rede, e o pacote enviado em
-T2 chega ao receptor antes do enviado em T1. Duplicação normalmente está
-relacionada a retransmissões do TCP, mas também acontece devido a balanceamento
-de carga ou problemas de hardware ou software em dispositivos intermediários.
-
-Os principais mecanismos adotados no TCP para prover comunicação confiável são
-descritos a seguir \cite{Stevens1993,RFC5861}:
-
-\paragraph{Reconhecimento positivo com retransmissão}O TCP garante a entrega de
-dados pelo uso de números de sequência e reconhecimento dos pacotes e de
-mensagens de reconhecimento enviadas pelo receptor. Cada pacote enviado pelo
-transmissor carrega um número de sequência que representa a posição do primeiro
-byte de dados desse pacote no fluxo de dados. Ao receber um pacote, o receptor
-envia para o transmissor um pacote ACK com número de reconhecimento informando
-qual é o próximo byte que espera receber. Por exemplo, se um transmissor envia
-um pacote de 10 bytes de dados de carga e número de sequência 1, o receptor
-responderá com um ACK com número de reconhecimento 11. Um temporizador de
-transmissão é ativado para cada pacote enviado. Se o temporizador expirar antes
-do recebimento do ACK, o pacote é reenviado.
-
-\paragraph{Controle de fluxo}A janela de recebimento é a quantidade de bytes que
-o receptor está disposto a receber, baseada no espaço livre de seu \emph{buffer}
-de recepção. O receptor envia o valor da janela em todas as suas respostas para
-o transmissor. Esse mecanismo evita que o transmissor envie mais dados do que o
-receptor pode tratar.
-
-\paragraph{Início lento}Ao contrário da janela de recebimento, a janela de
-congestionamento é mantida pelo transmissor, e é uma estimativa do
-congestionamento da rede. O transmissor calcula o tamanho da janela ($cwnd$ --
-\emph{Congestion window}) a partir dos ACKs recebidos. O mecanismo de início
-lento atua no início de uma conexão, quando o transmissor ainda não recebeu
-ACKs. No primeiro pacote, $cwnd$ é igual a 1 ou 2 vezes o tamanho máximo de
-segmento TCP ($MSS$ -- \emph{Maximum Segment Size}). Para cada ACK recebido,
-$cwnd$ é incrementada em 1 $MSS$. Assim, a janela dobra de tamanho a cada tempo
-de ida e volta até que atinja o tamanho da janela de recebimento ou uma perda
-aconteça. Quando uma perda acontece, um segundo valor passa a ser levado em
-consideração, o limiar do início lento ($ssthresh$ -- \emph{Slow start
-threshold} onde $ssthresh = cwnd / 2$) e o processo começa de novo, com $cwnd$
-igual a 1 ou 2 $MSS$, até atingir $ssthresh$.  A partir desse ponto, o TCP entra
-em modo de prevenção de congestionamento.
-
-\paragraph{Prevenção de congestionamento}As diferentes variações do TCP usam
-diferentes algoritmos de prevenção de congestionamento. Um dos primeiros
-algoritmos de prevenção de congestionamento implementados no TCP aumenta a
-janela de congestionamento em $1 / cwnd$ a cada ACK recebido
-\cite{Jacobson1988}. Assim, durante essa fase, o aumento da janela de
-transmissão é linear, e não mais exponencial como no início lento. Existem
-muitas outras opções de algoritmos de prevenção de congestionamento, entre elas
-duas são de interesse particular para este trabalho por focarem em redes com
-latência e largura de banda grandes.
-
-\paragraph{Retransmissão rápida}O receptor envia um ACK para todo pacote
-recebido, mesmo que fora de ordem. Por exemplo, se os pacotes de 10 bytes com
-números de sequência 1, 21 e 31 chegam ao receptor, ele responde com três ACKs
-com número de reconhecimento 11. O transmissor trata os primeiros ACKs em
-duplicata como reordenação de pacotes e apenas os ignora. Mas ao receber o
-terceiro, ele considera que um pacote foi perdido (o de número 21 no exemplo).
-EM vez de esperar o temporizador, o mecanismo de retransmissão rápida
-retransmite o pacote imediatamente.
-
-\paragraph{Recuperação rápida}O mecanismo de retransmissão rápida ter sido
-acionado indica que uma perda aconteceu, portanto algum mecanismo de prevenção
-de congestionamento deve atuar. Mas o recebimento de ACKs de pacotes posteriores
-ao perdido indica que o congestionamento foi uma situação pontual, já que o
-fluxo de dados entre transmissor e receptor não foi totalmente cortado. Por
-isso, reduzir drasticamente a janela de transmissão pelo uso do início lento
-implicaria em perda de vazão desnecessária. Assim, a recuperação rápida atua
-juntamente com a retransmissão rápida. Quando o terceiro ACK em duplicata é
-recebido, ssthresh assume o valor de $cwnd / 2$, o pacote é retransmitido e a
-janela de congestionamento assume o valor $cwnd = ssthresh + 3 * MSS$. Se outros
-ACKs chegam em duplicata, a janela é incrementada em 1 MSS para cada um. Quando
-um ACK diferente chega, reconhecendo todos os pacotes recebidos fora de ordem (o
-de número 41 no exemplo), a janela assume o valor $cwnd = ssthresh$ -- metade do
-seu tamanho no momento em que o terceiro ACK em duplicata foi recebido.
-
-\paragraph{Pacotes duplicados}Pacotes duplicados são simplesmente descartados no
-receptor.
-
-\paragraph{Pacotes corrompidos}O TCP tem um campo com uma soma de verificação
-que é usada no receptor para checar se o pacote foi corrompido em trânsito. Em
-caso positivo, ele é descartado. Do ponto de vista do transmissor, o pacote foi
-perdido, então os mecanismos usuais de controle de fluxo são acionados. 
+Dados distribuídos podem ser gerenciados por outros tipos de sistemas que não
+SGBDDs, como tabelas de espalhamento distribuídas (DHTs -- \emph{Distributed
+hash table}) e sistemas de arquivos distribuídos. Esses sistemas lidam com
+questões semelhantes, como replicação, por exemplo, o que faz com que muitas
+técnicas surgidas em um contexto sejam aplicadas em outro. Considerando que
+muitas vezes a distinção entre esses diferentes tipos de sistema não é clara,
+sempre que possível o termo sistema de armazenamento é utilizado ao longo deste
+trabalho para se referir a eles de forma genérica.
 
 %% ------------------------------------------------------------------------- %%
 \section{Estratégias para Escalabilidade de Aplicações Web}
@@ -192,8 +123,8 @@ Replicação de dados é o processo de criar cópias de uma coleção de dados
 \cite{Saito2005}. A primeira é a diminuição da latência por meio da replicação
 de dados para localizações mais próximas de onde esses dados são usados. Isso é
 válido tanto para pequenas distâncias físicas, quando se replica dados entre nós
-em um mesmo bastidor (\emph{rack}) \cite{Shvachko2010}, quanto para longas
-distâncias, quando se replica dados entre centros de dados em diferentes
+em um mesmo bastidor (\emph{rack}) \cite{Shvachko2010}, quanto para
+longas distâncias, quando se replica dados entre centros de dados em diferentes
 localizações geográficas \cite{DeCandia2007,Cooper2008}. A segunda razão para
 replicar dados é aumentar a vazão do sistema por meio do balanceamento de carga
 entre diferentes servidores, possibilitando que o mesmo dado seja servido por
@@ -235,7 +166,7 @@ leitura, recusando apenas as de escrita. Existem soluções, como o uso de
 quóruns, que proporcionam um aumento da disponibilidade de um sistema replicado
 \cite{Gifford1979,Thomas1979,Enez-peris2003}. Uma discussão mais aprofundada dos
 problemas de disponibilidade da replicação pessimista pode ser vista na Seção
-\ref{sec:consistencia_desempenho_e_disponibilidade_em_sistemas_geo_replicados}.
+\ref{sec:consistencia_desempenho_e_disponibilidade_em_sistemas_georeplicados}.
 
 Outra desvantagem de replicação pessimista é o seu desempenho, especialmente em
 WANs. Esse tipo de rede pode causar um aumento no tempo de resposta de
@@ -255,13 +186,13 @@ ser a solução mais viável para sistemas de larga escala.
 %% ------------------------------------------------------------------------- %%
 \subsection{Replicação otimista} \label{sec:replicacao_otimista}
 
-Ao contrário da replicação pessimista, a replicação otimista é assíncrona (ou
-preguiçosa) \cite{Saito2005,Gray1996,Davidson1985}. Um sistema usando replicação
-otimista apresenta maiores escalabilidade, desempenho e disponibilidade que um
-outro usando replicação pessimista \cite{Saito2005,Gallersdorfer1995}. O
-contraponto da replicação otimista é que um sistema que a use pode apresentar
-dados desatualizados e conflitantes em caso de falhas de nós ou particionamento
-da rede.
+Ao contrário da replicação pessimista, a replicação otimista é assíncrona
+\cite{Saito2005,Gray1996,Davidson1985}. Um sistema usando replicação otimista
+apresenta maiores escalabilidade, desempenho e disponibilidade que um outro
+usando replicação pessimista \cite{Saito2005,Gallersdorfer1995}. O contraponto
+da replicação otimista é que um sistema que a use pode apresentar dados
+desatualizados e conflitantes em caso de falhas de nós ou particionamento da
+rede.
 
 Quando esse tipo de replicação é utilizado são necessários mecanismos de
 resolução de conflitos. Esses mecanismos podem ser simples como a regra de
@@ -471,20 +402,20 @@ mecanismos de resolução de conflitos \cite{Saito2005}, pois todas as escritas
 obedecem uma ordem serial.
 
 O modelo de consistência de um sistema replicado impacta o seu desempenho,
-disponibilidade e manutenibilidade. Sistemas web geo-replicados normalmente usam
+disponibilidade e manutenibilidade. Sistemas web georeplicados normalmente usam
 os modelos de consistência mais relaxados para atingir maiores desempenho e
 disponibilidade. Existem padrões arquiteturais que ajudam os desenvolvedores a
 entender as trocas entre consistência, desempenho e disponibilidade. A seção
 seguinte discute esses padrões.
 
 %% ------------------------------------------------------------------------- %%
-\section{Consistência, Desempenho e Disponibilidade em Sistemas Geo-replicados}
-\label{sec:consistencia_desempenho_e_disponibilidade_em_sistemas_geo_replicados}
+\section{Consistência, Desempenho e Disponibilidade em Sistemas Georeplicados}
+\label{sec:consistencia_desempenho_e_disponibilidade_em_sistemas_georeplicados}
 
-A maioria dos sistemas geo-replicados têm fortes requisitos de escalabilidade,
+A maioria dos sistemas georeplicados têm fortes requisitos de escalabilidade,
 desempenho e disponibilidade. Nesse contexto, alguns padrões arquiteturais
 usados em sistemas menores deixam de ser válidos. Esta seção trata dos problemas
-enfrentados pelos desenvolvedores de sistemas de larga escala geo-replicados e
+enfrentados pelos desenvolvedores de sistemas de larga escala georeplicados e
 dos princípios arquiteturais usados para solucioná-los. Conhecer esses problemas
 e padrões é importante para entender a motivação e os compromissos envolvidos em
 diferentes modelos de consistência.
@@ -548,12 +479,12 @@ problemas comuns em redes de longa distância como perda de pacotes, por exemplo.
 A possibilidade de particionamento da rede não é uma característica do sistema,
 mas sim da rede na qual ele opera -- particionamentos em redes locais são raros,
 mas são comuns em WANs \cite{DeCandia2007,Hale2010,Amir1996}. Assim, em sistemas
-geo-replicados, boa parte da rede está fora do controle dos administradores do
+georeplicados, boa parte da rede está fora do controle dos administradores do
 sistema. Essa é a essência do teorema CAP: em um sistema no qual existe a
 possibilidade de particionamento da rede, resta aos desenvolvedores escolher
 entre disponibilidade e consistência.
 
-Dessa forma, desenvolvedores de sistemas web geo-replicados costumam escolher
+Dessa forma, desenvolvedores de sistemas web georeplicados costumam escolher
 disponibilidade e tolerância a particionamento. O caso de indisponibilidade de
 uma réplica é menos complexo, o sistema continua funcionando normalmente, mesmo
 que com alguma degradação no desempenho. O maior problema é a síndrome do
@@ -610,17 +541,17 @@ Outro exemplo de balanço entre consistência e disponibilidade é a consistência
 na linha do tempo \cite{Cooper2008,Alsberg1976}. Esse modelo usa o conceito de
 cópia primária, mas em vez de aplicá-lo ao banco de dados como um todo, cada
 objeto replicado no sistema possui sua cópia primária (réplica mestre). Todas as
-escritas são feitas na réplica mestre, que usa replicação preguiçosa de mestre
-para propagar o valor das atualizações \cite{Gray1996}. Como existe uma única
-réplica em que uma escrita pode ocorrer, caso uma requisição precise
-necessariamente ler o valor mais recente do objeto, a réplica mestre é lida. Mas
-caso a aplicação possa ler valores desatualizados de um objeto, ela pode acessar
-qualquer outra réplica. Assim, a falha da réplica mestre torna o objeto
-indisponível para escritas e para leituras que exijam o valor mais recente do
-objeto. No caso de um particionamento da rede, o objeto permanece disponível
-para escrita e leitura para os clientes que ficaram na partição com acesso à
-réplica mestre. Para clientes nas outras partições, o objeto fica disponível
-apenas para leituras que explicitamente tolerem valores desatualizados.
+escritas são feitas na réplica mestre, que usa replicação assíncrona para
+propagar o valor das atualizações \cite{Gray1996}. Como existe uma única réplica
+em que uma escrita pode ocorrer, caso uma requisição precise necessariamente ler
+o valor mais recente do objeto, a réplica mestre é lida. Mas caso a aplicação
+possa ler valores desatualizados de um objeto, ela pode acessar qualquer outra
+réplica. Assim, a falha da réplica mestre torna o objeto indisponível para
+escritas e para leituras que exijam o valor mais recente do objeto. No caso de
+um particionamento da rede, o objeto permanece disponível para escrita e leitura
+para os clientes que ficaram na partição com acesso à réplica mestre. Para
+clientes nas outras partições, o objeto fica disponível apenas para leituras que
+explicitamente tolerem valores desatualizados.
 
 O teorema CAP não cobre todas as trocas envolvidas no projeto de sistemas
 distribuídos de larga escala. O teorema PACELC fala sobre uma outra razão para
@@ -642,7 +573,7 @@ desempenho da consistência na linha do tempo é a migração do mestre de um objeto
 para o centro de dados no qual ele é escrito mais frequentemente.
 
 %% ------------------------------------------------------------------------- %%
-\subsection{Trabalhos relacionados} \label{sec:trabalhos_relacionados}
+\section{Trabalhos relacionados} \label{sec:trabalhos_relacionados}
 
 Uma abordagem comum na literatura de sistemas distribuídos é a proposta de um
 novo conceito e a implementação de um sistema que use esse conceito seguida de

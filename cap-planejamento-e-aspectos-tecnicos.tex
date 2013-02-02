@@ -20,7 +20,7 @@ tipos de experimentos usados neste trabalho são explicados na seção
 %% ------------------------------------------------------------------------- %%
 \section{Definição do Estudo} \label{sec:definicao_do_estudo}
 
-Eeste trabalho usa como principal referência metodológica o livro \emph{The Art
+Este trabalho usa como principal referência metodológica o livro \emph{The Art
 of Computer Systems Performance Analysis} (A Arte da Análise de Desempenho de
 Sistemas de Computação) \cite{Jain1991}, de Raj Jain. Esse livro trata da
 análise de desempenho de sistemas de software e/ou hardware, e apresenta
@@ -32,56 +32,53 @@ a definição da técnica de avaliação.  Isso foi feito pois essa foi a fase maior
 complexidade do estudo, inclusive estando descritos em um capítulo à parte
 (Capítulo~\ref{cap:parametros_e_fatores}) por esse motivo.
 
-A Subseção~\ref{sec:nomenclatura} define termos usados ao longo deste trabalho.
-A Subseção~\ref{sec:metas_do_estudo} descreve as metas e o contexto do estudo. A
-Subseção~\ref{sec:metricas} define quais os critérios usados na avaliação de
-desempenho. A seguir, a Subseção~\ref{sec:tecnica_de_avaliacao} apresenta a
-técnica escolhida para o estudo.
- 
 %% ------------------------------------------------------------------------- %%
 \subsection{Nomenclatura} \label{sec:nomenclatura}
 
 A literatura sobre experimentos apresenta alguns termos importantes para a
-comunicação de objetivos, procedimentos e resultados. Termos usados
-frequentemente neste e nos próximos capítulos são:
+comunicação de objetivos, procedimentos e resultados \cite{Jain1991}. Termos
+usados frequentemente neste e nos próximos capítulos são:
 
-\begin{itemize} \item Variáveis de resposta: Resultados de um experimento
-(variáveis dependentes). No caso deste estudo, as variáveis de resposta são as
-métricas de desempenho.
+\paragraph{Estudo:} Um conjunto de experimentos relacionados. O plural
+``experimentos'' também é usado no lugar de ``estudo'' ao longo deste trabalho.
 
-\item Parâmetros: Características do sistema (hardware e software) e da carga de
-trabalho (requisições para o sistema) que afetam o desempenho do sistema.
-Exemplos de parâmetros são CPU, latência da rede e relação leitura/escrita.
+\paragraph{Variáveis de resposta:} Resultados de um experimento (variáveis
+dependentes). No caso deste estudo, as variáveis de resposta são as métricas de
+desempenho.
 
-\item Fatores: Parâmetros que são variados nos experimentos (variáveis
+\paragraph{Parâmetros:} Características do sistema (hardware e software) e da
+carga de trabalho (requisições para o sistema) que afetam o desempenho do
+sistema.  Exemplos de parâmetros são CPU, latência da rede e relação
+leitura/escrita.
+
+\paragraph{Fatores:} Parâmetros que são variados nos experimentos (variáveis
 independentes) e cujo efeito no desempenho é analisado. Parâmetros que não são
 fatores possuem um único valor em todos os experimentos (variáveis fixas e
 constantes).
 
-\item Níveis: Valores assumidos pelos fatores nos experimentos.
+\paragraph{Níveis:} Valores assumidos pelos fatores nos experimentos.
 
-\item Interação entre fatores: Dois ou mais fatores interagem se a influência
-que um deles tem no desempenho depende do nível dos outros. Por exemplo, um
-software é testado nas combinações das CPUs A e B e 4 GB e 8 GB de memória. Se
-ao mudar a CPU de A para B o desempenho sempre aumenta em 10\%, por exemplo,
-independente do tamanho da memória, se diz que CPU e memória não interagem. Mas
-se ao mudar a CPU de A para B o desempenho aumenta em 10\% quando o sistema tem
-4 GB, mas e 30\% quando tem 8GB, se diz que CPU e memória interagem.
+\paragraph{Interação entre fatores:} Dois ou mais fatores interagem se a
+influência que um deles tem no desempenho depende do nível dos outros. Por
+exemplo, um software é testado nas combinações das CPUs A e B e 4 GB e 8 GB de
+memória. Se ao mudar a CPU de A para B o desempenho sempre aumenta em 10\%, por
+exemplo, independente do tamanho da memória, se diz que CPU e memória não
+interagem. Mas se ao mudar a CPU de A para B o desempenho aumenta em 10\% quando
+o sistema tem 4 GB, mas e 30\% quando tem 8 GB, se diz que CPU e memória
+interagem.
 
-\item Ordem de uma interação entre fatores: A quantidade de fatores envolvidos
-na interação -- por exemplo, uma interação de terceira ordem é uma interação
-entre três fatores.
+\paragraph{Ordem de uma interação entre fatores:} A quantidade de fatores
+envolvidos na interação -- por exemplo, uma interação de terceira ordem é uma
+interação entre três fatores.
 
-\item Projeto dos experimentos: Especificação do número de experimentos e das
-combinações de fatores e níveis usados.
-
-\end{itemize}
+\paragraph{Projeto dos experimentos:} Especificação do número de experimentos e
+das combinações de fatores e níveis usados.
 
 %% ------------------------------------------------------------------------- %%
 \subsection{Metas do estudo} \label{sec:metas_do_estudo}
 
 A meta deste estudo foi comparar o desempenho de um sistema de armazenamento
-geo-replicado usando consistência em momento indeterminado e consistência na
+georeplicado usando consistência em momento indeterminado e consistência na
 linha do tempo. A hipótese era que um sistema usando consistência na linha do
 tempo apresenta desempenho igual ou superior a um usando consistência em momento
 indeterminado para cargas de trabalho específicas, apesar de ser um modelo
@@ -149,14 +146,6 @@ preparação envolveu predominantemente atividades de programação e administração
 de sistemas, como implementação da consistência na linha do tempo e preparação
 de scripts para a execução dos experimentos.
 
-O sistema de armazenamento usado como objeto de estudo nos experimentos é
-descrito na Subseção~\ref{sec:sistema_de_armazenamento}. A carga sobre o sistema
-é definida pelo \emph{benchmark}, descrito na Subseção~\ref{sec:benchmark}. O
-ambiente dos experimentos é definido pela plataforma escolhida para executá-los,
-descrita na Subseção~\ref{sec:ambiente}. A forma como a WAN é emulada é descrita
-na Subseção~\ref{sec:rede}. A estrutura para execução e análise dos experimentos
-é descrita na Subseção~\ref{sec:execucao_e_analise_dos_experimentos}.
-
 %% ------------------------------------------------------------------------- %%
 \subsection{Sistema de armazenamento} \label{sec:sistema_de_armazenamento}
 
@@ -171,9 +160,9 @@ particulares do sistema que não o modelo de consistência, como a tecnologia
 utilizada, detalhes de configuração, entre outros. No caso de uso de mais de um
 sistema, esses fatores, pouco importantes para este estudo, precisariam ser
 levados em conta. O segundo problema é que apesar de existirem sistemas de
-armazenamento de software livre / código aberto que implementam consistência em
-momento indeterminado, não foram encontrados sistemas que implementassem
-consistência na linha do tempo.
+armazenamento de software livre que implementam consistência em momento
+indeterminado, não foram encontrados sistemas que implementassem consistência na
+linha do tempo.
 
 Assim, decidiu-se usar um único sistema para os experimentos. Uma opção para tal
 era implementar um sistema de armazenamento distribuído específico para os
@@ -182,15 +171,15 @@ complexo, já que precisa prover funcionalidades como controle de entrada e saída
 dos nós no aglomerado, algoritmos de particionamento, etc.
 
 Para evitar a implementação completa de um sistema de armazenamento e tornar
-este trabalho mais realista, algumas opções de software livre / código aberto
-foram analisadas. A seleção das opções foi feita considerando modelos de
-consistência, estabilidade da solução e simplicidade de desenvolvimento. Como
-não foram encontrados sistemas de armazenamento de software livre / código
-aberto que implementem consistência na linha do tempo, as soluções avaliadas
-foram aquelas que implementam consistência em momento indeterminado. Os sistemas
-encontrados foram Dynomite \cite{Dynomite}, Cassandra \cite{Lakshman2010},
-Voldemort \cite{Voldemort} e Riak \cite{Riak}. Todos eles usam basicamente a
-mesma arquitetura do Dynamo, provendo gerenciamento de entrada e saída de nós no
+este trabalho mais realista, algumas opções de software livre foram analisadas.
+A seleção das opções foi feita considerando modelos de consistência,
+estabilidade da solução e simplicidade de desenvolvimento. Como não foram
+encontrados sistemas de armazenamento de software livre que implementem
+consistência na linha do tempo, as soluções avaliadas foram aquelas que
+implementam consistência em momento indeterminado. Os sistemas encontrados foram
+Dynomite \cite{Dynomite}, Cassandra \cite{Lakshman2010}, Voldemort
+\cite{Voldemort} e Riak \cite{Riak}. Todos eles usam basicamente a mesma
+arquitetura do Dynamo, provendo gerenciamento de entrada e saída de nós no
 aglomerado, relógios vetor para identificação e resolução de conflitos entre
 diferentes réplicas dos objetos \cite{Lamport1978} e espalhamento consistente
 para o particionamento dos objetos \cite{Karger1997a}.
@@ -240,7 +229,49 @@ Por último, outras alterações menores no riak\_kv foram o tratamento de
 parâmetros extras na interface HTTP, necessários para a consistência na linha do
 tempo, e a implementação de estatísticas de migrações.
 
-As modificações feitas no riak\_kv se encontram em
+A versão do riak\_kv usada como base foi a 1.1. Durante a fase inicial de
+desenvolvimento as modificações feitas não estavam em um sistema de controle de
+versão. A partir do momento em que o git passou a ser usado, foram 2011 linhas
+inseridas e 222 removidas em 18 \emph{commits} nos seguintes 11 arquivos:
+
+% git log --author="mdediana" --pretty=tformat: --numstat | awk '{ add += $1;
+% del += $2 } END { print add, del }
+
+%git shortlog --author="mdediana" --numbered --summary
+
+\begin{itemize}
+
+\item \emph{riak\_client.erl}
+
+\item \emph{riak\_kv\_get\_fsm.erl}
+
+\item \emph{riak\_kv\_get\_fsm\_sup.erl}
+
+\item \emph{riak\_kv\_put\_fsm\_sup.erl}
+
+\item \emph{riak\_kv\_put\_fsm.erl}
+
+\item \emph{riak\_kv\_stat.erl}
+
+\item \emph{riak\_kv\_timeline\_get\_core.erl}
+
+\item \emph{riak\_kv\_timeline\_get\_fsm.erl}
+
+\item \emph{riak\_kv\_timeline\_put\_fsm.erl}
+
+\item \emph{riak\_kv\_wm\_raw.hrl}
+
+\item \emph{riak\_kv\_wm\_worker.erl}
+
+\end{itemize}
+
+Desses arquivos, os únicos que não estavam originalmente no riak\_kv são os três
+com a implementação da consistência na linha do tempo:
+\emph{riak\_kv\_timeline\_get\_core.erl} (237 linhas),
+\emph{riak\_kv\_timeline\_get\_fsm.erl} (528 linhas) e
+\emph{riak\_kv\_timeline\_put\_fsm.erl} (900 linhas). A maior parte dessas
+linhas foi retirada da implementação original da consistência em momento
+indeterminado. As modificações feitas no riak\_kv se encontram em
 \url{https://github.com/mdediana/riak\_kv.git}.
 
 %% ------------------------------------------------------------------------- %%
@@ -263,8 +294,65 @@ apenas para o cenário do estudo, de apenas dois centros de dados (ver seção
 \ref{sec:parametros_fixados}) e baseada nos nomes dos nós para saber em qual
 centro de dados cada um deles se encontra.
 
+A partir do momento em que o git passou a ser usado para controle de versão,
+foram 106 linhas inseridas e 17 removidas em 4 \emph{commits} nos seguintes 3
+arquivos:
+
+\begin{itemize}
+
+\item \emph{riak\_core.app} (diretório \emph{ebin})
+
+\item \emph{riak\_core\_apl.erl}
+
+\item \emph{riak\_core\_claim\_2\_dcs.erl}
+
+\end{itemize}
+
 As modificações feitas no riak\_core se encontram em
 \url{https://github.com/mdediana/riak\_core.git}.
+
+%% ------------------------------------------------------------------------- %%
+\subsubsection{Testes da implementação}
+
+Os testes foram executados manualmente. Os principais cenários testados (CD se
+refere a centro de dados):
+
+\begin{itemize}
+
+\item Requisição de inserção a partir do CD1 ocorrendo no CD1
+
+\item Requisição de inserção a partir do CD1 sendo redirecionada para o CD2
+
+\item Verificação de que inserções resultavam em ao menos uma réplica em cada
+centro de dados
+
+\item Requisição de leitura/atualização a partir do CD1 sempre ocorrendo no CD1
+para consistência em momento indeterminado (local)
+
+\item Requisição de leitura de ``qualquer versão'' a partir do CD1 sempre
+ocorrendo no CD1 para consistência na linha do tempo (local)
+
+\item Requisição de leitura da ``versão mais recente''/atualização a partir do
+CD1 sendo redirecionada para a réplica mestre no CD1 para consistência na linha
+do tempo (local)
+
+\item Requisição de leitura da ``versão mais recente''/atualização a partir do
+CD1 sendo redirecionada para a réplica mestre no CD2 para consistência na linha
+do tempo (remota)
+
+\item \emph{LM} requisições de atualização a partir do CD1 de um objeto no CD2
+resultando em migração da réplica mestre para o CD2, onde \emph{LM} é o limiar
+de migração
+
+\item Requisição de atualização sendo redirecionada para uma réplica mestre ao
+mesmo tempo em que a réplica mestre migra (a requisição é redirecionada para a
+nova réplica mestre)
+
+\end{itemize}
+
+Por fim, outro indício de que implementação estava correta é que os resultados
+apresentados no Capítulo~\ref{cap:analise_dos_resultados} estão de acordo com o
+comportamento esperado de cada modelo de consistência.
 
 %% ------------------------------------------------------------------------- %%
 \subsection{\emph{Benchmark}} \label{sec:benchmark}
@@ -288,6 +376,40 @@ suas configurações, ele não estava preparado para acessar o Riak, acesso esse
 que precisaria ser implementado. Além disso, ele também não oferecia muitas das
 funcionalidades necessárias para os experimentos, que precisariam ser
 implementadas.
+
+% desconsidera 23 linhas de examples/locality.config
+A partir do momento em que o git passou a ser usado para controle de versão,
+foram 90 linhas inseridas e 17 removidas em 16 \emph{commits} nos seguintes 3
+arquivos do Basho Bench:
+
+\begin{itemize}
+
+\item \emph{basho\_bench.app.src}
+
+\item \emph{basho\_bench\_driver\_http\_raw.erl}
+
+\item \emph{basho\_bench\_keygen.erl}
+
+\item \emph{basho\_bench\_stats.erl}
+
+\item \emph{basho\_bench\_worker.erl}
+
+\end{itemize}
+
+No basho\_stats, foram 77 linhas inseridas e 35 removidas em 2 \emph{commits}
+nos seguintes 2 arquivos:
+
+\begin{itemize}
+
+\item \emph{basho\_stats\_histogram.erl}
+
+\item \emph{basho\_stats\_sample.erl}
+
+\end{itemize}
+
+Por último, o basho\_bench\_dist é composto por um único arquivo
+(\emph{basho\_bench\_dist.erl}) de 149 linhas, muitas das quais foram copiadas
+do Basho Bench.
 
 As alteração feitas no Basho Bench estão em
 \url{https://github.com/mdediana/basho\_bench.git}, o basho\_bench\_dist se
@@ -333,8 +455,9 @@ de imagens nos nós reservados pelo usuário.
 A imagem usada nos experimentos é um Debian GNU/Linux 6.0 (Squeeze) com kernel
 2.6.32-5-amd64 baseado em uma imagem pré-configurada disponibilizada pelo
 Grid5000 (squeeze-x64-base). Além do conteúdo da imagem base, a imagem usada nos
-experimentos possui o Riak e o Basho Bench modificados e algumas ferramentas de
-monitoração e análise de desempenho como
+experimentos possui o Erlang R14B04 instalado a partir do fonte, o Riak e o
+Basho Bench modificados e algumas ferramentas de monitoração e análise de
+desempenho como
 sysstat\footnote{\url{http://sebastien.godard.pagesperso-orange.fr/}},
 bwm-ng\footnote{\url{http://www.gropp.org/?id=projects&sub=bwm-ng}} e
 iperf\footnote{\url{http://iperf.sourceforge.net/}}. Uma única imagem foi usada,
@@ -400,10 +523,8 @@ rede do Grid5000.
 A partir dessa configuração foi possível adicionar um filtro baseado em
 sub-redes ao tc de modo que as características de WAN eram aplicadas às
 requisições que saíam para o outro centro de dados, enquanto as requisições para
-o mesmo centro de dados saíam inalteradas.
-
-Esse processo é executado pelo script net (ver Subseção
-\ref{sec:execucao_e_analise_dos_experimentos}.
+o mesmo centro de dados saíam inalteradas. Esse processo é executado pelo script
+net (ver Subseção \ref{sec:execucao_e_analise_dos_experimentos}.
 
 %% ------------------------------------------------------------------------- %%
 \subsection{Execução e análise dos experimentos}
@@ -547,9 +668,8 @@ configuração são salvos para serem usados na análise dos resultados depois.
 \section{Tipos de Experimentos} \label{sec:tipos_de_experimentos}
 
 São alguns os tipos de experimentos usados em um estudo experimental. A escolha
-entre eles se dá principalmente pelo balanço entre recursos utilizados (tempo,
-dinheiro, energia, etc.) e quantidade de informação adquirida -- quanto mais
-recursos são gastos, maior é a quantidade de informação adquirida.
+entre eles se dá principalmente pelo balanço entre recursos utilizados na sua
+execução (tempo, dinheiro, energia, etc.) e quantidade de informação adquirida.
 
 Experimentos fatoriais consistem da combinação de dois ou mais fatores em cada
 experimento que compõe o estudo. Existem dois tipos principais de projetos de

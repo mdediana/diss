@@ -9,12 +9,124 @@ inicial de fatores foi formada pelos parâmetros restantes. Como essa seleção era
 grande, experimentos foram usados para identificar os fatores mais influentes
 para o estudo. Os fatores menos influentes foram tratados como parâmetros e
 tiveram seus valores fixados. Os fatores mais influentes foram usados nos
-experimentos finais. 
+experimentos finais.
 
-A lista de parâmetros inicialmente levantada é apresentada na
-Seção~\ref{sec:lista_de_parametros}. Os parâmetros fixados e seus valores estão
-na Seção~\ref{sec:parametros_fixados}. Por fim, a seleção dos fatores e os
-experimentos que levaram a ela estão na Seção~\ref{sec:selecao_dos_fatores}.
+A fim de caracterizar a WAN, as principais características de uma rede são
+evidenciadas pelos mecanismos presentes no protocolo TCP, explicado na
+Seção~\ref{sec:mecanismos_do_tcp_e_parametros_de_rede}. A lista de parâmetros
+inicialmente levantada é apresentada na Seção~\ref{sec:lista_de_parametros}. Os
+parâmetros fixados e seus valores estão na Seção~\ref{sec:parametros_fixados}. A
+seleção dos fatores e os experimentos que levaram a ela estão na
+Seção~\ref{sec:selecao_dos_fatores}. Por fim, um sumário dos fatores
+selecionados e as configurações do estudo final são apresentados na
+Seção~\ref{sec:configuracao_do_estudo_final}.
+
+%% ------------------------------------------------------------------------- %%
+\section{Mecanismos do TCP e Parâmetros de Rede}
+\label{sec:mecanismos_do_tcp_e_parametros_de_rede} Uma das principais diferenças
+entre redes de longa distância (WANs) e redes locais (LANs), além da área pela
+qual se estendem, diz respeito a confiabilidade do meio. LANs costumam usar
+topologias simples com poucos dispositivos e segmentos entre os nós, enquanto o
+contrário acontece em WANs. Além disso, LANs costumam ser mais homogêneas e
+terem um único administrador. No caso de WANs, um pacote de dados normalmente
+atravessa diversas redes compostas por dispositivos e administradores
+diferentes. Do ponto de vista deste trabalho, um centro de dados corresponde a
+uma LAN, enquanto a georeplicação ocorre na WAN.
+
+TCP/IP é a pilha de protocolos comumente utilizada em sistemas georeplicados. O
+protocolo IP provê os mecanismos de endereçamento e roteamento. O TCP provê
+comunicação ponto-a-ponto confiável. Para tal, usa diversos mecanismos
+relacionados e dependentes entre si para lidar com controle de fluxo e perdas,
+corrupção, reordenação e duplicação de pacotes.
+
+O controle de fluxo é feito por mecanismos usados nas pontas de uma conexão com
+o objetivo de usar a rede de forma eficiente e evitar o envio de mais dados do
+que o receptor pode tratar. Perdas acontecem quando um dispositivo na rede
+descarta pacotes, o que pode ser causado por corrupção de pacotes ou
+congestionamento da rede, como \emph{buffers} esgotados em um roteador, por
+exemplo. Reordenação ocorre quando pacotes de uma mesma conexão TCP enviados nos
+instantes T1 e T2 seguem caminhos diferentes na rede, e o pacote enviado em T2
+chega ao receptor antes do enviado em T1. Duplicação normalmente está
+relacionada a retransmissões do TCP, mas também acontece devido a balanceamento
+de carga ou problemas de hardware ou software em dispositivos intermediários.
+
+Os principais mecanismos adotados no TCP para prover comunicação confiável são
+descritos a seguir \cite{Stevens1993,RFC5861}:
+
+\paragraph{Reconhecimento positivo com retransmissão}O TCP garante a entrega de
+dados pelo uso de números de sequência e reconhecimento dos pacotes e de
+mensagens de reconhecimento enviadas pelo receptor. Cada pacote enviado pelo
+transmissor carrega um número de sequência que representa a posição do primeiro
+byte de dados desse pacote no fluxo de dados. Ao receber um pacote, o receptor
+envia para o transmissor um pacote ACK com número de reconhecimento informando
+qual é o próximo byte que espera receber. Por exemplo, se um transmissor envia
+um pacote de 10 bytes de dados de carga e número de sequência 1, o receptor
+responderá com um ACK com número de reconhecimento 11. Um temporizador de
+transmissão é ativado para cada pacote enviado. Se o temporizador expirar antes
+do recebimento do ACK, o pacote é reenviado.
+
+\paragraph{Controle de fluxo}A janela de recebimento é a quantidade de bytes que
+o receptor está disposto a receber, baseada no espaço livre de seu \emph{buffer}
+de recepção. O receptor envia o valor da janela em todas as suas respostas para
+o transmissor. Esse mecanismo evita que o transmissor envie mais dados do que o
+receptor pode tratar.
+
+\paragraph{Início lento}Ao contrário da janela de recebimento, a janela de
+congestionamento é mantida pelo transmissor, e é uma estimativa do
+congestionamento da rede. O transmissor calcula o tamanho da janela ($cwnd$ --
+\emph{Congestion window}) a partir dos ACKs recebidos. O mecanismo de início
+lento atua no início de uma conexão, quando o transmissor ainda não recebeu
+ACKs. No primeiro pacote, $cwnd$ é igual a 1 ou 2 vezes o tamanho máximo de
+segmento TCP ($MSS$ -- \emph{Maximum Segment Size}). Para cada ACK recebido,
+$cwnd$ é incrementada em 1 $MSS$. Assim, a janela dobra de tamanho a cada tempo
+de ida e volta até que atinja o tamanho da janela de recebimento ou uma perda
+aconteça. Quando uma perda acontece, um segundo valor passa a ser levado em
+consideração, o limiar do início lento ($ssthresh$ -- \emph{Slow start
+threshold} onde $ssthresh = cwnd / 2$) e o processo começa de novo, com $cwnd$
+igual a 1 ou 2 $MSS$, até atingir $ssthresh$.  A partir desse ponto, o TCP entra
+em modo de prevenção de congestionamento.
+
+\paragraph{Prevenção de congestionamento}As diferentes variações do TCP usam
+diferentes algoritmos de prevenção de congestionamento. Um dos primeiros
+algoritmos de prevenção de congestionamento implementados no TCP aumenta a
+janela de congestionamento em $1 / cwnd$ a cada ACK recebido
+\cite{Jacobson1988}. Assim, durante essa fase, o aumento da janela de
+transmissão é linear, e não mais exponencial como no início lento. Variações de
+TCP oferecem outras opções de algoritmos de prevenção de congestionamento,
+inclusive algumas delas sendo focadas em redes com latência e largura de banda
+grandes (ver Subseção~\ref{sec:fatores_de_rede}).
+
+\paragraph{Retransmissão rápida}O receptor envia um ACK para todo pacote
+recebido, mesmo que fora de ordem. Por exemplo, se os pacotes de 10 bytes com
+números de sequência 1, 21 e 31 chegam ao receptor, ele responde com três ACKs
+com número de reconhecimento 11. O transmissor trata os primeiros ACKs em
+duplicata como reordenação de pacotes e apenas os ignora. Mas ao receber o
+terceiro, ele considera que um pacote foi perdido (o de número 21 no exemplo).
+EM vez de esperar o temporizador, o mecanismo de retransmissão rápida
+retransmite o pacote imediatamente.
+
+\paragraph{Recuperação rápida}O mecanismo de retransmissão rápida ter sido
+acionado indica que uma perda aconteceu, portanto algum mecanismo de prevenção
+de congestionamento deve atuar. Mas o recebimento de ACKs de pacotes posteriores
+ao perdido indica que o congestionamento foi uma situação pontual, já que o
+fluxo de dados entre transmissor e receptor não foi totalmente cortado. Por
+isso, reduzir drasticamente a janela de transmissão pelo uso do início lento
+implicaria em perda de vazão desnecessária. Assim, a recuperação rápida atua
+juntamente com a retransmissão rápida. Quando o terceiro ACK em duplicata é
+recebido, ssthresh assume o valor de $cwnd / 2$, o pacote é retransmitido e a
+janela de congestionamento assume o valor $cwnd = ssthresh + 3 * MSS$. Se outros
+ACKs chegam em duplicata, a janela é incrementada em 1 MSS para cada um. Quando
+um ACK diferente chega, reconhecendo todos os pacotes recebidos fora de ordem (o
+de número 41 no exemplo), a janela assume o valor $cwnd = ssthresh$ -- metade do
+seu tamanho no momento em que o terceiro ACK em duplicata foi recebido.
+
+\paragraph{Pacotes duplicados}Pacotes duplicados são simplesmente descartados no
+receptor.
+
+\paragraph{Pacotes corrompidos}O TCP tem um campo com uma soma de verificação
+que é usada no receptor para checar se o pacote foi corrompido em trânsito. Em
+caso positivo, ele é descartado. Do ponto de vista do transmissor, o pacote foi
+perdido, então os mecanismos usuais de controle de fluxo são acionados.
 
 %% ------------------------------------------------------------------------- %%
 \section{Lista de Parâmetros} \label{sec:lista_de_parametros}
@@ -24,6 +136,17 @@ e de carga de trabalho. As justificativas para a escolha de um parâmetro nem
 sempre consideraram todas as situações possíveis em que ele afeta o desempenho
 do sistema, em alguns casos uma única razão foi considerada suficiente para
 tratá-lo como parâmetro.
+
+Alguns parâmetros das listas a seguir foram fixados, as justificativas e seus
+valores estão descritos na Seção~\ref{sec:parametros_fixados}. Os restantes
+foram considerados fatores e o tratamento dado a eles está na Seção
+\ref{sec:selecao_dos_fatores}.
+
+Uma última observação é que todos valores de latência relatados referem-se a
+latência de ida e volta.
+
+%% ------------------------------------------------------------------------- %%
+\subsection{Parâmetros de sistema} \label{sec:parametros_de_sistema}
 
 Os parâmetros de sistema levantados foram:
 
@@ -45,23 +168,14 @@ desempenho em disco é sempre menor.
 apresente escalabilidade linear, quanto mais nós ele tiver, menor será o
 desempenho por nó.
 
-\paragraph{Quantidade de centros de dados}A menos que as redes que ligam os
-centros de dados tomados dois a dois tenham as mesmas características, o tempo
-de resposta de uma dada requisição depende de sua origem e destino. Por exemplo,
-uma requisição saindo de um centro de dados no Brasil com destino a um centro de
-dados na Argentina não tem o mesmo tempo de resposta que outra saindo do Brasil
-mas com destino ao Japão.
-
-\paragraph{Capacidade dos centro de dados}A menos que todos os centros de dados
+\paragraph{Capacidade dos centros de dados}A menos que todos os centros de dados
 possuam as mesmas capacidades agregadas de processamento, armazenamento e
 largura de banda, a vazão de cada centro de dados é diferente, o que se reflete
 no desempenho das requisições.
 
-\paragraph{Quantidade de instâncias do \emph{benchmark}}Uma quantidade muito
-pequena de instâncias pode se tornar o gargalo do experimento, uma quantidade
-muito grande pode resultar em sobrecarga do sistema. Em ambos os casos o
-desempenho medido do sistema não corresponde a suas condições normais de
-operação.
+\paragraph{Quantidade de instâncias do \emph{benchmark}}Considerando que cada
+instância do \emph{benchmark} gere a mesma taxa de requisições, uma quantidade
+mínima é necessária para a evitar gargalos no \emph{benchmark}.
 
 \paragraph{Quantidade de threads por instância do \emph{benchmark}}Mesma
 justificativa que para quantidade de instâncias do \emph{benchmark}.
@@ -79,10 +193,9 @@ armazenamento utilizado. No caso de armazenamento em memória, o tamanho dos
 objetos influencia a fragmentação da memória, o que também afeta o desempenho.
 Além disso, o tamanho dos objetos afeta o comportamento da comunicação TCP, dado
 que objetos muito grandes precisam ser divididos em mais de um pacote e objetos
-muito pequenos resultam em uma carga paga\footnote{Um pacote de dados é composto
-por dados e metadados (cabeçalho, por exemplo). Os dados são a carga paga.}
-proporcionalmente menor. Isso tende a se refletir como diminuição da vazão e/ou
-aumento do tempo de resposta das requisições.
+muito pequenos resultam em uma carga paga (\emph{payload}) proporcionalmente
+menor. Isso tende a se refletir como diminuição da vazão e/ou aumento do tempo
+de resposta das requisições.
 
 \paragraph{Algoritmo de particionamento}O algoritmo de particionamento define a
 distribuição dos objetos pelos nós. No caso de uma distribuição desbalanceada,
@@ -112,6 +225,9 @@ metadados, por exemplo, resulta em desempenho das requisições mais alto.
 
 \paragraph{Nível de log}O nível de log afeta a quantidade de escritas em disco,
 o que por sua vez afeta o desempenho do sistema.
+
+%% ------------------------------------------------------------------------- %%
+\subsection{Parâmetros de rede} \label{sec:parametros_de_rede}
 
 Os parâmetros de rede levantados foram:
 
@@ -180,16 +296,20 @@ mecanismo de recuperação rápida, com consequente diminuição da janela de
 transmissão. Além disso, pacotes fora de ordem ocupam espaço no \emph{buffer} do
 receptor, o que pode afetar seu desempenho \cite{Wang2004}.
 
-\paragraph{Algoritmo de prevenção de congestionamento}O algoritmo de prevenção
-de congestionamento é responsável pelo dimensionamento da janela de transmissão.
-Quanto maior a janela de transmissão, maior a quantidade dados em trânsito e
-maior a vazão do sistema.
+\paragraph{Variação de TCP}Variações de TCP oferecem diferentes algoritmos de
+prevenção de congestionamento, responsável pelo dimensionamento da janela de
+congestionamento.  Quanto maior a janela de congestionamento, maior a quantidade
+dados em trânsito e maior a vazão do sistema.
+
+\paragraph{Quantidade e características dos enlaces de WAN}A menos que os
+enlaces que interligam os centros de dados tenham as mesmas características, o
+tempo de resposta de uma dada requisição depende de sua origem e destino.
 
 Taxas de perda, de duplicação e reordenação de pacotes não foram consideradas
 para LAN pois ocorrem com menor frequência e geram pouco impacto nesse tipo de
 rede. Em WANs, esses fenômenos estão relacionados a uma maior quantidade de nós
-intermediários (incluindo roteadores e proxies) e redes heterogêneas que os
-pacotes atravessam.
+intermediários (incluindo roteadores e \emph{proxies}) e redes heterogêneas que
+os pacotes atravessam.
 
 O Produto Banda-Latência (\emph{Bandwidth Delay Product} -- BDP) representa a
 quantidade máxima de dados em trânsito em uma conexão TCP e é comumente usado
@@ -200,7 +320,16 @@ requisições (Seção~\ref{sec:metricas}), que é mais facilmente comparável
 diretamente com a latência da rede. Além disso, foi considerado para estudo um
 cenário de implantação em que uma nuvem semelhante ao EC2 da Amazon fosse usada,
 então a largura de banda foi fixada nos estudos com base em valores relatados
-(ver Seção~\ref{sec:parametros_fixados}). 
+(ver Seção~\ref{sec:parametros_fixados}).
+
+Por último, a variação de TCP usada é definida naa configuração nos nós, e
+portanto poderia ser considerada um parâmetro de sistema. Mas como uma única
+variação foi usada em todos os nós e a análise do parâmetro fazia mais sentido
+no contexto da rede, a opção foi por classificá-lo como parâmetro de rede.
+
+%% ------------------------------------------------------------------------- %%
+\subsection{Parâmetros de carga de trabalho}
+\label{sec:parametros_de_carga_de_trabalho}
 
 Os parâmetros de carga de trabalho levantados foram:
 
@@ -242,11 +371,6 @@ leituras de ``versão mais recente'' pois têm maior probabilidade de ser
 atendidas localmente. No caso onde existe garantia de haver ao menos uma réplica
 por centro de dados, as leituras de ``qualquer versão'' só não são atendidas
 localmente em caso de falha.
-
-Alguns parâmetros dessa lista foram fixados, as justificativas e seus valores
-estão descritos na Seção~\ref{sec:parametros_fixados}. Os restantes foram
-considerados fatores e o tratamento dado a eles está na Seção
-\ref{sec:selecao_dos_fatores}.
 
 %% ------------------------------------------------------------------------- %%
 \section{Parâmetros Fixados} \label{sec:parametros_fixados}
@@ -324,7 +448,7 @@ desempenho, como pode ser visto na Tabela
 
 \begin{tabular}{|c|c|c|c|c|c|} \hline
 
-Aglomerado & Sequencial (MB/s) & Aleatório (seeks/s) & Aleatório (em ms) \\
+Aglomerado & Sequencial (MB/s) & Aleatório (buscas/s) & Aleatório (em ms) \\
 \hline
 
 parapluie & 103,9 & 77 & 13,0 \\ \hline
@@ -404,14 +528,9 @@ um comutador Foundry FastIron Super X.
 Os parâmetros inicialmente levantados que não foram considerados fatores foram
 fixados. O valores definidos foram:
 
-\paragraph{Quantidade de centros de dados:}2. Esse valor simplificou a análise
-pois resultou em apenas um segmento de WAN nos experimentos. Além disso, ele
-tornou a modificação do algoritmo de particionamento do Riak mais simples (ver
-Seção~\ref{sec:sistema_de_armazenamento}).
-
-\paragraph{Capacidade do centro de dados:}Os centros de dados têm a mesma
-capacidade, pois ambos possuem a mesma quantidade de nós e os nós têm a mesma
-configuração de hardware, resultando em um sistema simétrico e homogêneo.
+\paragraph{Capacidade dos centros de dados:}Os centros de dados têm a mesma
+capacidade, com a mesma quantidade de nós e os nós têm a mesma configuração de
+hardware, resultando em um sistema simétrico e homogêneo.
 
 \paragraph{Algoritmo de particionamento das chaves:}O algoritmo padrão do Riak
 foi usado (espalhamento consistente), configurado com 512 partições. Esse valor
@@ -469,11 +588,16 @@ estão em centros de dados diferentes) mediu 400 Mb/s \cite{Thorsten2007}. Outro
 estudo cita que é comum medir 100 Mb/s como largura de banda entre zonas de
 disponibilidade \cite{Pujol2012}.
 
+\paragraph{Quantidade e características dos enlaces de WAN:} 1. Um único enlace
+significa que o estudo usou dois centros de dados. Esse valor simplificou a
+análise e a modificação do algoritmo de particionamento do Riak (ver
+Seção~\ref{sec:sistema_de_armazenamento}).
+
 \paragraph{Taxa de chegada de requisições}15 operações/s para cada thread de
 cada instância do \emph{benchmark}. Esse valor foi usado pois esse parâmetro se
 relaciona diretamente com a quantidade de threads por instância do
-\emph{benchmark}.  Assim, considerando que threads por instância foi
-inicialmente considerado um fator, a taxa de chegada foi fixada.
+\emph{benchmark}. Assim, considerando que threads por instância foi inicialmente
+considerado um fator, a taxa de chegada foi fixada.
 
 Vale notar que a LAN nos experimentos era definida pela infraestrutura do
 Grid5000 usada, mas a WAN foi emulada (ver Seção~\ref{sec:rede}). Dessa forma,
@@ -482,6 +606,8 @@ os da WAN foram usados como configuração do emulador.
 
 %% ------------------------------------------------------------------------- %%
 \section{Seleção dos Fatores} \label{sec:selecao_dos_fatores}
+
+% Tabelas: \cellcolor[gray]{c} % c=0.9: 20-50, c=0.7: 51-80, c=0.5: 81-100
 
 Os parâmetros que não foram fixados consequentemente eram candidatos a fatores
 nos experimentos finais. Como a lista precisava ser reduzida pois ainda era
@@ -525,7 +651,7 @@ Os fatores de rede eram:
 
 \item Taxa de reordenação de pacotes na WAN
 
-\item Algoritmo de prevenção congestionamento
+\item Variação de TCP
 
 \end{itemize}
 
@@ -605,12 +731,7 @@ fatores localidade e popularidade na consistência na linha do tempo impuseram a
 necessidade de uma fase de aquecimento após a carga do sistema, o processo é
 explicado na Subseção~\ref{sec:aquecimento}. Projetos de experimentos fatoriais
 fracionados 2\textsuperscript{k} foram realizados para cada um dos fatores
-restantes e estão descritos nas subseções subsequentes: fatores de tamanho do
-sistema e \emph{benchmark} na Subseção
-\ref{sec:fatores_de_tamanho_do_sistema_e_benchmark}, fatores de banco de dados
-na Subseção~\ref{sec:fatores_de_banco_de_dados}, fatores de rede na
-Subseção~\ref{sec:fatores_de_rede} e fatores de carga de trabalho na
-Subseção~\ref{sec:fatores_de_carga_de_trabalho}.
+restantes e estão descritos nas subseções subsequentes.
 
 %% ------------------------------------------------------------------------- %%
 \subsection{Modo} \label{sec:modo}
@@ -619,13 +740,14 @@ Os modos adotados foram:
 
 \begin{itemize}
 
-\item ind1: Consistência em momento indeterminado com $W$ = 1 e $R$ = 1
+\item \emph{ind1}: Consistência em momento indeterminado com $W$ = 1 e $R$ = 1
 
-\item ind2: Consistência em momento indeterminado com $W$ = 2 e $R$ = 1
+\item \emph{ind2}: Consistência em momento indeterminado com $W$ = 2 e $R$ = 1
 
-\item lt\_qqer: Consistência na linha do tempo com leituras de qualquer versão
+\item \emph{lt\_qqer}: Consistência na linha do tempo com leituras de qualquer
+versão
 
-\item lt\_rec: Consistência na linha do tempo com leituras da versão mais
+\item \emph{lt\_rec}: Consistência na linha do tempo com leituras da versão mais
 recente
 
 \end{itemize}
@@ -635,11 +757,12 @@ algoritmo de particionamento garante que existe ao menos uma réplica em cada
 centro de dados (ver Subseção~\ref{sec:sistema_de_armazenamento}). Assim,
 existem sempre duas situações possíveis com relação à localização das réplicas
 do ponto de vista do coordenador: uma local e duas remotas ou duas locais e uma
-remota. Dado isso, o modo ind1 resulta em todas as leituras e escritas locais. O
-modo ind2 resulta em todas as leituras locais e metade das escritas locais e a
-outra metade remotas. O modo lt\_qqer resulta em todas as leituras locais e a
-quantidade de escritas dependente da localidade dos acessos. Finalmente, o modo
-lt\_rec resulta tanto em leituras quanto escritas dependentes da localidade.
+remota. Dado isso, o modo \emph{ind1} resulta em todas as leituras e escritas
+locais. O modo \emph{ind2} resulta em todas as leituras locais e metade das
+escritas locais e a outra metade remotas. O modo \emph{lt\_qqer} resulta em
+todas as leituras locais e a quantidade de escritas dependente da localidade dos
+acessos. Finalmente, o modo \emph{lt\_rec} resulta tanto em leituras quanto
+escritas dependentes da localidade.
 
 Os modos foram escolhidos de forma a representar situações encontradas em
 sistemas de produção e ao mesmo tempo limitar a quantidade de níveis. Assim,
@@ -652,8 +775,8 @@ relações leitura/escrita usadas nos experimentos (ver Subseção
 \ref{sec:fatores_de_carga_de_trabalho}).
 
 Esses modos implicam em trocas além de desempenho e consistência. A principal é
-durabilidade, que para ind2 é mais alta do que para os outros casos, em que a
-confirmação de escrita de uma única réplica é suficiente.
+durabilidade, que para \emph{ind2} é mais alta do que para os outros casos, em
+que a confirmação de escrita de uma única réplica é suficiente.
 
 %% ------------------------------------------------------------------------- %%
 \subsection{Aquecimento} \label{sec:aquecimento}
@@ -740,8 +863,8 @@ assim a mesma quantidade de partições por nó. Fazer o mesmo para quantidade de
 instâncias do \emph{benchmark} e quantidade de threads por instância foi uma
 forma de balancear a carga média tanto por nó quanto por partição.
 
-O estudo usou modo lt\_rec, localidade de 50\% e latência de rede de 100 ms.
-Esses valores foram escolhidos pois por meio deles obtém-se uma quantidade
+O estudo usou modo \emph{lt\_rec}, localidade de 50\% e latência de rede de 100
+ms.  Esses valores foram escolhidos pois por meio deles obtém-se uma quantidade
 balanceada de leituras e escritas locais e remotas. O resultado do estudo está
 na Tabela \ref{tab:estudo_para_quantidade_de_nos_do_sistema}.
 
@@ -749,18 +872,19 @@ na Tabela \ref{tab:estudo_para_quantidade_de_nos_do_sistema}.
 
 Operação & Percentil & N & A & T & NA & NT & AT & NAT\\ \hline
 
-leitura & 10 & 30 & 18 & 22 & 10 & 8 & 7 & 4 \\ \hline
+leitura & 10 & \cellcolor[gray]{0.9} 30 & 18 & \cellcolor[gray]{0.9} 22 & 10 & 8
+& 7 & 4 \\ \hline
 
-leitura & 90 & 65 & 13 & 15 & 3 & 4 & 0 & 0 \\ \hline
+leitura & 90 & \cellcolor[gray]{0.7} 65 & 13 & 15 & 3 & 4 & 0 & 0 \\ \hline
 
-escrita & 10 & 96 & 2 & 1 & 0 & 0 & 0 & 0 \\ \hline
+escrita & 10 & \cellcolor[gray]{0.5} 96 & 2 & 1 & 0 & 0 & 0 & 0 \\ \hline
 
-escrita & 90 & 65 & 15 & 13 & 3 & 3 & 0 & 0 \\ \hline
+escrita & 90 & \cellcolor[gray]{0.7} 65 & 15 & 13 & 3 & 3 & 0 & 0 \\ \hline
 
 \end{tabular} \caption[Estudo para quantidade de nós do sistema.]{Estudo para
 quantidade de nós do sistema. N representa a quantidade de nós do sistema, A
 representa a quantidade de instâncias do \emph{benchmark} e T representa a
-quantidade de threads usadas em cada instânca do \emph{benchmark}.}
+quantidade de threads usadas em cada instância do \emph{benchmark}.}
 \label{tab:estudo_para_quantidade_de_nos_do_sistema} \end{center} \end{table}
 
 Na maioria dos casos, o tamanho do sistema tem a maior influência nos resultados
@@ -801,7 +925,7 @@ experimentos que precisassem de 40 nós seriam mais difíceis de ser executados.
 %% ------------------------------------------------------------------------- %%
 \subsection{Fatores de banco de dados} \label{sec:fatores_de_banco_de_dados}
 
-Este estudo foi feito para dimensionar o tamanho do banco de dados, que afeta o
+Um estudo foi feito para dimensionar o tamanho do banco de dados, que afeta o
 uso de memória e de banda. Os experimentos consideraram a latência como fator
 para verificar a importância relativa entre esses fatores e a rede.
 
@@ -815,22 +939,22 @@ Os níveis selecionados foram:
 
 \end{itemize}
 
-O estudo usou modo lt\_rec e localidade de 50\%. Esses valores foram escolhidos
-pois através deles obtém-se uma quantidade balanceada de leituras e escritas
-locais e remotas. O resultado do estudo está na Tabela
+O estudo usou modo \emph{lt\_rec} e localidade de 50\%. Esses valores foram
+escolhidos pois através deles obtém-se uma quantidade balanceada de leituras e
+escritas locais e remotas. O resultado do estudo está na Tabela
 \ref{tab:estudo_para_quantidade_e_tamanho_dos_objetos_armazenados}.
 
 \begin{table}[!h] \begin{center} \begin{tabular}{|c|c|c|c|c|c|c|c|c|} \hline
 
 Operação & Percentil & Q & T & L & QT & QL & TL & QTL\\ \hline
 
-leitura & 10 & 0 & 100 & 0 & 0 & 0 & 0 & 0 \\ \hline
+leitura & 10 & 0 & \cellcolor[gray]{0.5} 100 & 0 & 0 & 0 & 0 & 0 \\ \hline
 
-leitura & 90 & 0 & 0 & 100 & 0 & 0 & 0 & 0 \\ \hline
+leitura & 90 & 0 & 0 & \cellcolor[gray]{0.5} 100 & 0 & 0 & 0 & 0 \\ \hline
 
-escrita & 10 & 0 & 100 & 0 & 0 & 0 & 0 & 0 \\ \hline
+escrita & 10 & 0 & \cellcolor[gray]{0.5} 100 & 0 & 0 & 0 & 0 & 0 \\ \hline
 
-escrita & 90 & 0 & 0 & 100 & 0 & 0 & 0 & 0 \\ \hline
+escrita & 90 & 0 & 0 & \cellcolor[gray]{0.5} 100 & 0 & 0 & 0 & 0 \\ \hline
 
 \end{tabular} \caption[Estudo para quantidade e tamanho dos objetos
 armazenados.]{Estudo para quantidade e tamanho dos objetos armazenados. Q
@@ -869,11 +993,10 @@ que 90\% dos objetos nesses sistemas são menores do que 500 bytes
 %% ------------------------------------------------------------------------- %%
 \subsection{Fatores de rede} \label{sec:fatores_de_rede}
 
-Dado o objetivo do trabalho, este era um dos estudos mais importantes, dado que
-a partir dele seria possível selecionar os fatores de rede mais influentes.  Mas
-antes do estudo propriamente dito, um estudo preliminar foi feito para verificar
-as recomendações de otimização para WAN do tamanho dos \emph{buffers} de
-transmissão e recepção.
+Dado o objetivo do trabalho, o estudo para fatores de rede era um dos mais
+importantes da etapa de seleção de fatores. Mas antes dele, um estudo preliminar
+foi feito para verificar as recomendações de otimização para WAN do tamanho dos
+\emph{buffers} de transmissão e recepção.
 
 Pelo BDP de um enlace, quanto maior a latência da rede, maior é a quantidade de
 pacotes em trânsito. Um gargalo comum em WANs é o tamanho dos \emph{buffers} de
@@ -897,10 +1020,10 @@ Os níveis selecionados foram:
 
 \end{itemize}
 
-O estudo usou modo lt\_rec e localidade de 50\%. Esses valores foram escolhidos
-pois através deles obtém-se uma quantidade balanceada de leituras e escritas
-locais e remotas. Para a rede, a variação de latência foi de 50\%.  A alta
-variabilidade ajuda a criar um cenário que pressiona os \emph{buffers} de
+O estudo usou modo \emph{lt\_rec} e localidade de 50\%. Esses valores foram
+escolhidos pois através deles obtém-se uma quantidade balanceada de leituras e
+escritas locais e remotas. Para a rede, a variação de latência foi de 50\%.  A
+alta variabilidade ajuda a criar um cenário que pressiona os \emph{buffers} de
 transmissão e recepção. O resultado do estudo está na Tabela
 \ref{tab:estudo_para_tamanho_dos_buffers_de_transmissao_e_recepcao}.
 
@@ -908,13 +1031,13 @@ transmissão e recepção. O resultado do estudo está na Tabela
 
 Operação & Percentil & L & O & B & LO & LB & OB & LOB\\ \hline
 
-leitura & 10 & 92 & 0 & 3 & 0 & 0 & 2 & 3\\ \hline
+leitura & 10 & \cellcolor[gray]{0.5} 92 & 0 & 3 & 0 & 0 & 2 & 3\\ \hline
 
-leitura & 90 & 98 & 0 & 1 & 0 & 0 & 0 & 0\\ \hline
+leitura & 90 & \cellcolor[gray]{0.5} 98 & 0 & 1 & 0 & 0 & 0 & 0\\ \hline
 
-escrita & 10 & 87 & 11 & 0 & 1 & 1 & 0 & 0\\ \hline
+escrita & 10 & \cellcolor[gray]{0.5} 87 & 11 & 0 & 1 & 1 & 0 & 0\\ \hline
 
-escrita & 90 & 99 & 0 & 0 & 0 & 0 & 0 & 0\\ \hline
+escrita & 90 & \cellcolor[gray]{0.5} 99 & 0 & 0 & 0 & 0 & 0 & 0\\ \hline
 
 \end{tabular} \caption[Estudo para tamanho dos \emph{buffers} de transmissão e
 recepção.]{Estudo para tamanho dos \emph{buffers} de transmissão e recepção. L
@@ -950,7 +1073,7 @@ motivo. Os níveis inicialmente selecionados para fatores de rede foram:
 
 \item Taxa de reordenação de pacotes na WAN (\%): 0,05 e 5
 
-\item Algoritmo de congestionamento: TCP CUBIC e H-TCP
+\item Variação de TCP: CUBIC e H-TCP
 
 \end{itemize}
 
@@ -987,11 +1110,19 @@ taxas de reordenação de pacotes de 3,187\% \cite{Wang2004}. Os valores usados no
 experimento foram maiores, mas mesmo assim reordenação de pacotes não
 influenciou a resposta (ver abaixo).
 
-Ambos os algoritmos de congestionamento testados são usados em redes com largura
-de banda e latências grandes. Ambos já estavam disponíveis no Linux usado nos
-experimentos, sendo que TCP CUBIC é o padrão do kernel do Linux a partir da
-versão 2.6.19. Eles foram escolhidos pois ambos são citados nas referências
-sobre otimizações da pilha TCP para WANs.
+Tanto H-TCP \cite{Leith2004} quanto CUBIC \cite{Ha2008} foram projetados com
+foco em redes com largura de banda e latências grandes (BDP alto). Ambos já
+estavam disponíveis no Linux usado nos experimentos, sendo que TCP CUBIC é o
+padrão do kernel do Linux a partir da versão 2.6.19. Eles foram escolhidos pois
+são citados nas referências sobre otimizações da pilha TCP para WANs
+\cite{Jones2006,ESNet2012}.
+
+Além das configurações de cada fator, o emulador de rede tinha outras duas
+configurações fixas. O parâmetro largura de banda da WAN foi configurado com 100
+Mb/s (ver Subseção~\ref{sec:parametros_restantes}). A variação da latência foi
+configurada para obedecer uma distribuição normal, criando assim uma relação
+entre o valor de latência da cada pacote e o anterior e evitando grandes
+variações aleatórias de latência.
 
 O resultado do estudo está na Tabela \ref{tab:estudo_para_fatores_de_rede}. Com
 exceção dos fatores e da interação entre latência e variação de latência, todas
@@ -1003,9 +1134,11 @@ também foram suprimidas.
 
 Operação & Percentil & L & V & P & D & O & C & LV\\ \hline
 
-leitura & 90 & 72 & 21 & 1 & 0 & 0 & 0 & 6\\ \hline
+leitura & 90 & \cellcolor[gray]{0.7} 72 & \cellcolor[gray]{0.9} 21 & 1 & 0 & 0 &
+0 & 6\\ \hline
 
-escrita & 90 & 69 & 23 & 1 & 0 & 0 & 0 & 6\\ \hline
+escrita & 90 & \cellcolor[gray]{0.7} 69 & \cellcolor[gray]{0.9} 23 & 1 & 0 & 0 &
+0 & 6\\ \hline
 
 \end{tabular}
 
@@ -1056,7 +1189,7 @@ fatores nos experimentos foram:
 Níveis nulos de latência e variação da latência equivalem a ter todo o sistema
 operando em uma rede local. Os resultados obtidos para esses casos foram usados
 como auxílio na interpretação dos resultados, mas não foram considerados na
-análise final dado que sistemas geo-replicados, por definição, não operam nessas
+análise final dado que sistemas georeplicados, por definição, não operam nessas
 condições.
 
 Os valores fixados dos fatores desconsiderados foram:
@@ -1069,12 +1202,12 @@ Os valores fixados dos fatores desconsiderados foram:
 
 \item Taxa de reordenação de pacotes na WAN (\%): 0
 
-\item Algoritmo de congestionamento: cubic
+\item Algoritmo de congestionamento: CUBIC
 
 \end{itemize}
 
 Taxas de perda, duplicação e reordenação  de pacotes foram ignoradas no estudo
-final. O algoritmo de congestionamento foi fixado como ``cubic'', pois esse é o
+final. O algoritmo de congestionamento foi fixado como CUBIC, pois esse é o
 padrão no sistema Linux utilizado nos experimentos.
 
 Apesar da taxa de reordenação de pacotes ser fixada, a ocorrência de alguns
@@ -1090,10 +1223,10 @@ latência usando distribuição normal.
 \subsection{Fatores de carga de trabalho}
 \label{sec:fatores_de_carga_de_trabalho}
 
-Juntamente com o estudo para fatores de rede, este era um dos estudos mais
-importantes, dado o objetivo deste trabalho. Os experimentos também consideraram
-a latência como fator para verificar a importância relativa entre os fatores de
-carga de trabalho e a rede.
+Juntamente com o estudo para fatores de rede, o estudo para fatores de carga de
+trabalho era um dos mais importantes, dado o objetivo deste trabalho. Os
+experimentos também consideraram a latência como fator para verificar a
+importância relativa entre os fatores de carga de trabalho e a rede.
 
 A partir disso, os níveis selecionados para carga de trabalho foram:
 
@@ -1136,8 +1269,8 @@ remotas, os experimentos foram executados para cada modo. O resultado para
 requisições locais apresentaram CVs em torno de 0,02 para todos os modos. Isso
 indica que requisições locais não sofrem influência de nenhum dos fatores. Já
 requisições remotas apresentaram CVs de aproximadamente 50\% e influência da
-latência de 100\% para ind2, tl\_qqer e tl\_rec (ind1 não tem requisições
-remotas).
+latência de 100\% para \emph{ind2}, \emph{lt\_qqer} e \emph{lt\_rec}
+(\emph{ind1} não tem requisições remotas).
 
 A análise da relação leitura/escrita e localidade não usou percentis, mas sim a
 média do tempo de resposta de todas as requisições (leituras e escritas). Isso
@@ -1156,13 +1289,17 @@ localidade nunca teria influência. O resultado do estudo está na Tabela
 Modo & R & X & P & L & RX & RP & RL & XP & XL & PL & RXP & RXL & RPL & XPL &
 RXPL\\ \hline
 
-ind1 & 19 & 12 & 2 & 31 & 0 & 3 & 2 & 4 & 6 & 6 & 4 & 0 & 0 & 8 & 1\\ \hline
+\emph{ind1} & 19 & 12 & 2 & 31 & 0 & 3 & 2 & 4 & 6 & 6 & 4 & 0 & 0 & 8 & 1\\
+\hline
 
-ind2 & 50 & 0 & 0 & 39 & 0 & 0 & 11 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0\\ \hline
+\emph{ind2} & 50 & 0 & 0 & 39 & 0 & 0 & 11 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0\\
+\hline
 
-lt\_qqer & 25 & 30 & 0 & 19 & 9 & 0 & 6 & 0 & 8 & 0 & 0 & 3 & 0 & 0 & 0\\ \hline
+\emph{lt\_qqer} & 25 & 30 & 0 & 19 & 9 & 0 & 6 & 0 & 8 & 0 & 0 & 3 & 0 & 0 & 0\\
+\hline
 
-lt\_rec & 0 & 53 & 0 & 34 & 0 & 0 & 0 & 0 & 13 & 0 & 0 & 0 & 0 & 0 & 0\\ \hline
+\emph{lt\_rec} & 0 & 53 & 0 & 34 & 0 & 0 & 0 & 0 & 13 & 0 & 0 & 0 & 0 & 0 & 0\\
+\hline
 
 \end{tabular} \caption[Estudo para fatores de carga de trabalho.]{Estudo para
 fatores de carga de trabalho. R representa a relação leitura/escrita, X
@@ -1171,7 +1308,7 @@ de rede.} \label{tab:estudo_para_fatores_de_carga_de_trabalho}.  \end{center}
 \end{table}
 
 Como esperado, localidade e latência influenciam as respostas em geral. Uma
-observação é o fato de inclusive ind1 ser afetada por latência. Isso
+observação é o fato de inclusive \emph{ind1} ser afetada por latência. Isso
 provavelmente é resultado dos mecanismos de replicação e correção de leituras
 serem afetados pela latência.
 
@@ -1184,16 +1321,16 @@ mais alta para verificar se a influência de popularidade aumenta.
 
 Apesar de alguns modos aparentemente sofrerem impacto considerável da relação
 leitura/escrita, esse impacto é consequência da relação entre requisições locais
-e remotas. Para ind1, tanto leituras quanto escritas são locais e a relação
-leitura/escrita e suas interações com outros fatores impacta pouco esse modo.
-Para lt\_rec, leituras e escritas são locais ou remotas dependendo da localidade
-e a relação leitura/escrita não impacta esse modo. Para ind2, todas as leituras
-são locais e metade das escritas é remota, portanto quando a relação
-leitura/escrita muda, a relação entre requisições locais e remotas muda
-proporcionalmente -- como esperado, esse modo é impactado pela relação
-leitura/escrita. A mesma observação vale para lt\_qqer, que tem todas as
-leituras locais e escritas dependendo da localidade, e também sofre impacto da
-relação leitura/escrita.
+e remotas. Para \emph{ind1}, tanto leituras quanto escritas são locais e a
+relação leitura/escrita e suas interações com outros fatores impacta pouco esse
+modo.  Para \emph{lt\_rec}, leituras e escritas são locais ou remotas dependendo
+da localidade e a relação leitura/escrita não impacta esse modo. Para
+\emph{ind2}, todas as leituras são locais e metade das escritas é remota,
+portanto quando a relação leitura/escrita muda, a relação entre requisições
+locais e remotas muda proporcionalmente -- como esperado, esse modo é impactado
+pela relação leitura/escrita. A mesma observação vale para \emph{lt\_qqer}, que
+tem todas as leituras locais e escritas dependendo da localidade, e também sofre
+impacto da relação leitura/escrita.
 
 Caso o mecanismo de armazenamento fosse disco ao invés de memória, a relação
 leitura/escrita provavelmente sofreria impacto de fato. Isso porque escritas
@@ -1225,21 +1362,30 @@ escritas. O valor de popularidade é o mais simples para a interpretação dos
 resultados.
 
 %% ------------------------------------------------------------------------- %%
-\section{Estudo Final} \label{sec:estudo_final}
+\section{Configuração do Estudo Final} \label{sec:configuracao_do_estudo_final}
+
+Os valores dos parâmetros fixados constavam em arquivos de configuração
+específicos ou em um arquivo chamado \emph{env.sh}, incluído por todos os
+scripts de configuração e execução (ver
+Subseção~\ref{sec:execucao_e_analise_dos_experimentos}). Nas subseções a seguir,
+quando um script é citado como responsável pela configuração de um parâmetro,
+ele usava o valor definido em \emph{env.sh}.
+
+Os resultados de fatores selecionados nos estudos fracionados formavam o estudo
+final. Um sumário dos fatores selecionados é apresentado a seguir.
 
 %% ------------------------------------------------------------------------- %%
-\subsection{Fatores do estudo final} \label{sec:fatores_do_estudo_final}
+\subsection{Fatores selecionados}
 
-Os fatores selecionados para compor o estudo e seus níveis podem ser vistos na
-Tabela~\ref{tab:fatores_e_niveis_do_estudo_final}, resultando em um total de 64
-experimentos.
+Os fatores selecionados para compor o estudo final e seus níveis podem ser
+vistos na Tabela~\ref{tab:fatores_e_niveis_do_estudo_final}.
 
 \begin{table}[!h] \begin{center} \begin{tabular}{|l|c|c|} \hline
 
 \multicolumn{1}{|c|}{Fator} & \multicolumn{1}{|c|}{Níveis} &
 \multicolumn{1}{|c|}{Total de níveis}\\ \hline
 
-Modo & ind1, ind2, lt\_qqer e lt\_rec & 4\\ \hline
+Modo & \emph{ind1}, \emph{ind2}, \emph{lt\_qqer} e \emph{lt\_rec} & 4\\ \hline
 
 Latência da WAN (ms) & 0, 100, 200 e 300 & 4\\ \hline
 
@@ -1254,13 +1400,4 @@ Localidade & 0,5 e 0,9 & 2\\ \hline
 
 \end{center} \end{table}
 
-%% ------------------------------------------------------------------------- %%
-\subsection{Configuração do sistema} \label{sec:configuracao_do_sistema}
-
-%% ------------------------------------------------------------------------- %%
-\subsection{Configuração do emulador de rede}
-\label{sec:configuracao_do_emulador_de_rede}
-
-%% ------------------------------------------------------------------------- %%
-\subsection{Configuração do \emph{benchmark}}
-\label{sec:configuracao_do_benchmark}
+Esse número de fatores e níveis resultou em um total de 64 experimentos.

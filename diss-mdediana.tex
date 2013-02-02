@@ -31,6 +31,7 @@
 \usepackage{caption}
 \usepackage[pagebackref,colorlinks=true,urlcolor=red,citecolor=green,linkcolor=blue]{hyperref}
 \usepackage[letterpaper,top=2.54cm, bottom=2.54cm, left=2.54cm, right=2.54cm]{geometry}
+\usepackage[table]{xcolor}  % cores de células em tabelas
 
 % Tikz conf retirada de http://www.texample.net/tikz/examples/simple-flow-chart/
 \usepackage{tikz}
@@ -82,7 +83,7 @@
 \thispagestyle{empty}
 \begin{center}
     \vspace*{2.3cm}
-    \textbf{\Large{Desempenho de sistemas geo-replicados\\
+    \textbf{\Large{Desempenho de sistemas georeplicados\\
     com consistência em momento indeterminado\\
     e na linha do tempo}}\\
 	
@@ -120,7 +121,7 @@
 \thispagestyle{empty}
 	\begin{center}
     	\vspace*{2.3 cm}
-      \textbf{\Large{Desempenho de sistemas geo-replicados\\
+      \textbf{\Large{Desempenho de sistemas georeplicados\\
       com consistência em momento indeterminado\\
       e na linha do tempo}}\\
 	    \vspace*{2 cm}
@@ -163,7 +164,7 @@ Agradecimentos ...
 % Resumo
 \chapter*{Resumo}
 
-\textbf{Desempenho de sistemas geo-replicados com consistência em momento
+\textbf{Desempenho de sistemas georeplicados com consistência em momento
 indeterminado e na linha do tempo}\\
 
 Sistemas web de larga escala são distribuídos em milhares de servidores em
@@ -172,7 +173,7 @@ sobre redes de longa distância (WANs). Várias técnicas são usadas para atingir
 os altos níveis de escalabilidade requeridos por esses sistemas. Replicação de
 dados está dentre as principais delas, e tem por objetivo diminuir a latência,
 aumentar a vazão e/ou aumentar a disponibilidade do sistema. O principal
-problema do uso de replicação em sistemas geo-replicados é a dificuldade de
+problema do uso de replicação em sistemas georeplicados é a dificuldade de
 garantir consistência entre as réplicas sem prejudicar consideravelmente o
 desempenho e a disponibilidade do sistema. O desempenho do sistema é afetado
 pelas latências da ordem de centenas de milissegundos da WAN, enquanto a
@@ -182,7 +183,7 @@ armazenamento, mais simples é o desenvolvimento do sistema que o usa, mas
 menores são seu desempenho e disponibilidade.
 
 Entre os modelos de consistência mais relaxados e mais difundidos em sistemas
-web geo-replicados está a consistência em momento indeterminado (\emph{eventual
+web georeplicados está a consistência em momento indeterminado (\emph{eventual
 consistency}). Esse modelo de consistência garante que as réplicas convergem
 após as escritas terem cessado. Um modelo mais rígido e menos difundido é a
 consistência na linha do tempo. Esse modelo de consistência usa uma réplica
@@ -195,12 +196,12 @@ apresenta disponibilidade menor que a consistência em momento indeterminado, mas
 não existem dados comparando o desempenho de ambas.
 
 O objetivo principal deste trabalho é a comparação do desempenho de sistemas de
-armazenamento geo-replicados usando esses dois modelos de consistência. Para
+armazenamento georeplicados usando esses dois modelos de consistência. Para
 cada modelo de consistência, são realizados experimentos que medem o tempo de
 resposta e a vazão do sistema sob diferentes cargas de trabalho e diferentes
 latências entre centros de dados. Esse comparativo pode auxiliar desenvolvedores
 e administradores de sistemas no processo de planejamento de capacidade e nas
-estimativas do custo de desenvolvimento de um sistema geo-replicado.
+estimativas do custo de desenvolvimento de um sistema georeplicado.
 
 \noindent \textbf{Palavras-chave:} Sistemas distribuídos, modelos de
 consistência, sistemas web de larga escala, desempenho.
@@ -290,7 +291,7 @@ scale web systems, performance.
 %\doublespacing              % espaçamento duplo
 
 \input cap-introducao        % associado ao arquivo: 'cap-introducao.tex'
-\input cap-consistencia-em-sistemas-geo-replicados
+\input cap-consistencia-em-sistemas-georeplicados
 \input cap-planejamento-e-aspectos-tecnicos
 \input cap-parametros-e-fatores
 \input cap-analise-dos-resultados
