@@ -15,7 +15,7 @@ na Seção~\ref{sec:definicao_do_estudo}. As descrições do sistema de
 armazenamento e do \emph{benchmark} usados, bem como do ambiente em que operaram
 nos experimentos, se encontram na Seção~\ref{sec:aspectos_tecnicos}. Por fim, os
 tipos de experimentos usados neste trabalho são explicados na seção
-\ref{sec:tipos_de_experimentos}.
+\ref{sec:experimentos_fatoriais}.
 
 %% ------------------------------------------------------------------------- %%
 \section{Definição do Estudo} \label{sec:definicao_do_estudo}
@@ -665,15 +665,16 @@ configuração são salvos para serem usados na análise dos resultados depois.
 \paragraph{Término do Riak (stop)}Essa etapa é responsável por encerrar o Riak.
 
 %% ------------------------------------------------------------------------- %%
-\section{Tipos de Experimentos} \label{sec:tipos_de_experimentos}
+\section{Experimentos Fatoriais} \label{sec:experimentos_fatoriais}
 
 São alguns os tipos de experimentos usados em um estudo experimental. A escolha
 entre eles se dá principalmente pelo balanço entre recursos utilizados na sua
 execução (tempo, dinheiro, energia, etc.) e quantidade de informação adquirida.
 
 Experimentos fatoriais consistem da combinação de dois ou mais fatores em cada
-experimento que compõe o estudo. Existem dois tipos principais de projetos de
-experimentos fatoriais: completo e fracionado \cite{Jain1991}.
+experimento que compõe o estudo. Um projeto que considere todos os fatores em
+todos os níveis é chamado completo, caso contrário é chamado fracionado
+\cite{Jain1991}.
 
 Um projeto de experimentos fatoriais completo é constituído por experimentos com
 todas as combinações possíveis de fatores e seus níveis. Assim, a quantidade
@@ -692,18 +693,16 @@ fatores não afetam igualmente as variáveis de resposta, pelo contrário, é comum
 alguns poucos fatores explicarem a maior parte dos efeitos na resposta
 \cite{Jain1991}.
 
-Para esses casos, um projeto de experimentos fatoriais fracionado é utilizado
-para fazer uma triagem dos fatores, identificando quais deles são os mais
-influentes.  Nesse tipo de experimento, utiliza-se apenas uma parte de todos os
-experimentos definidos no projeto de experimentos fatoriais completo. Um tipo
-particular de projeto de experimentos fatoriais fracionado é o
-2\textsuperscript{k}.
-%% ------------------------------------------------------------------------- %%
-\subsection{Projeto de experimentos fatoriais fracionado 2\textsuperscript{k}}
-\label{sec:projeto_de_experimentos_fatoriais_fracionado_2k}
+Para esses casos, um tipo particular de projeto de experimentos fatoriais
+completo é utilizado para fazer uma triagem dos fatores, identificando quais
+deles são os mais influentes. Esse tipo está descrito na subseção a seguir.
 
-Em um projeto de experimentos fatoriais fracionado 2\textsuperscript{k}, todos
-os fatores inicialmente selecionados são usados, mas apenas com dois níveis cada
+%% ------------------------------------------------------------------------- %%
+\subsection{Projeto de experimentos fatoriais 2\textsuperscript{k}}
+\label{sec:projeto_de_experimentos_fatoriais_2k}
+
+Em um projeto de experimentos fatoriais 2\textsuperscript{k}, todos os fatores
+inicialmente selecionados são usados, mas apenas com dois níveis cada
 (normalmente o mínimo e o máximo), resultando em um total de
 2\textsuperscript{k} experimentos. O desempenho em função dos fatores é expresso
 por um modelo de regressão não-linear da forma:

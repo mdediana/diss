@@ -19,7 +19,7 @@ parâmetros fixados e seus valores estão na Seção~\ref{sec:parametros_fixados}. A
 seleção dos fatores e os experimentos que levaram a ela estão na
 Seção~\ref{sec:selecao_dos_fatores}. Por fim, um sumário dos fatores
 selecionados e as configurações do estudo final são apresentados na
-Seção~\ref{sec:configuracao_do_estudo_final}.
+Seção~\ref{sec:fatores_selecionados}.
 
 %% ------------------------------------------------------------------------- %%
 \section{Mecanismos do TCP e Parâmetros de Rede}
@@ -611,13 +611,13 @@ os da WAN foram usados como configuração do emulador.
 
 Os parâmetros que não foram fixados consequentemente eram candidatos a fatores
 nos experimentos finais. Como a lista precisava ser reduzida pois ainda era
-grande, experimentos fatoriais fracionados foram realizados. Dada a meta do
-estudo, fatores de rede e de carga de trabalho foram priorizados, portanto havia
-intenção de desconsiderar os fatores de sistema desde o início. Mesmo assim,
-estudos fatoriais foram feitos para eles por dois motivos.  Primeiro, para
-verificar quais fatores eram mais influentes e portanto representavam ameaças à
-validade se desconsiderados. Depois, para ter mais informações sobre os valores
-a serem usados para eles.
+grande, experimentos fatoriais 2\textsuperscript{k} foram realizados. Dada a
+meta do estudo, fatores de rede e de carga de trabalho foram priorizados,
+portanto havia intenção de desconsiderar os fatores de sistema desde o início.
+Mesmo assim, estudos fatoriais foram feitos para eles por dois motivos.
+Primeiro, para verificar quais fatores eram mais influentes e portanto
+representavam ameaças à validade se desconsiderados. Depois, para ter mais
+informações sobre os valores a serem usados para eles.
 
 Os fatores de sistema eram:
 
@@ -697,21 +697,21 @@ era um fator bem mais influente.
 
 Existem outras situações em que desconsiderar um fator que aparece como
 influente não implica necessariamente em ameaça à validade. O método de análise
-de variação de um estudo fracionado 2\textsuperscript{k} mostra a importância
-relativa de cada fator, o que não significa que esses fatores sejam de fato
-influentes. Por exemplo, ao testar o desempenho de um software com duas CPUs e
-dois tamanhos de memória diferentes (4 experimentos), um estudo fatorial vai
-indicar a influência de um ou dos dois fatores mesmo que a maior diferença entre
-as respostas seja de 0,001\%. Nesse caso, a variação é pouco significativa, mas
-o estudo fatorial vai indicar qual a influência relativa de cada fator nesses
-0,001\% de variação. Para tratar esses casos, também foram calculados os
-coeficientes de variação\footnote{O coeficiente de variação é a divisão do
-desvio padrão pela média e é uma maneira de representar a variabilidade dos
-dados desconsiderando sua ordem de grandeza} (CVs) das respostas para estimar
-qual a influência daquele conjunto de fatores e interações como um todo. Assim,
-quando o CV era baixo (1\%, por exemplo), nenhum dos fatores usados no estudo
-era influente, já que nenhuma combinação de fatores e níveis resultou em
-variação significativa da resposta.
+de variação de um estudo 2\textsuperscript{k} mostra a importância relativa de
+cada fator, o que não significa que esses fatores sejam de fato influentes. Por
+exemplo, ao testar o desempenho de um software com duas CPUs e dois tamanhos de
+memória diferentes (4 experimentos), um estudo fatorial vai indicar a influência
+de um ou dos dois fatores mesmo que a maior diferença entre as respostas seja de
+0,001\%. Nesse caso, a variação é pouco significativa, mas o estudo fatorial vai
+indicar qual a influência relativa de cada fator nesses 0,001\% de variação.
+Para tratar esses casos, também foram calculados os coeficientes de
+variação\footnote{O coeficiente de variação é a divisão do desvio padrão pela
+média e é uma maneira de representar a variabilidade dos dados desconsiderando
+sua ordem de grandeza} (CVs) das respostas para estimar qual a influência
+daquele conjunto de fatores e interações como um todo. Assim, quando o CV era
+baixo (1\%, por exemplo), nenhum dos fatores usados no estudo era influente, já
+que nenhuma combinação de fatores e níveis resultou em variação significativa da
+resposta.
 
 Os tempos de resposta das requisições remotas dominam a média dos tempos de
 resposta pois são ordens de grandeza maiores que os das requisições locais. Por
@@ -730,8 +730,8 @@ como um único fator chamado modo, descrito na Subseção~\ref{sec:modo}. Os
 fatores localidade e popularidade na consistência na linha do tempo impuseram a
 necessidade de uma fase de aquecimento após a carga do sistema, o processo é
 explicado na Subseção~\ref{sec:aquecimento}. Projetos de experimentos fatoriais
-fracionados 2\textsuperscript{k} foram realizados para cada um dos fatores
-restantes e estão descritos nas subseções subsequentes.
+2\textsuperscript{k} foram realizados para cada um dos fatores restantes e estão
+descritos nas subseções subsequentes.
 
 %% ------------------------------------------------------------------------- %%
 \subsection{Modo} \label{sec:modo}
@@ -1362,23 +1362,11 @@ escritas. O valor de popularidade é o mais simples para a interpretação dos
 resultados.
 
 %% ------------------------------------------------------------------------- %%
-\section{Configuração do Estudo Final} \label{sec:configuracao_do_estudo_final}
+\section{Fatores selecionados} \label{sec:fatores_selecionados}
 
-Os valores dos parâmetros fixados constavam em arquivos de configuração
-específicos ou em um arquivo chamado \emph{env.sh}, incluído por todos os
-scripts de configuração e execução (ver
-Subseção~\ref{sec:execucao_e_analise_dos_experimentos}). Nas subseções a seguir,
-quando um script é citado como responsável pela configuração de um parâmetro,
-ele usava o valor definido em \emph{env.sh}.
-
-Os resultados de fatores selecionados nos estudos fracionados formavam o estudo
-final. Um sumário dos fatores selecionados é apresentado a seguir.
-
-%% ------------------------------------------------------------------------- %%
-\subsection{Fatores selecionados}
-
-Os fatores selecionados para compor o estudo final e seus níveis podem ser
-vistos na Tabela~\ref{tab:fatores_e_niveis_do_estudo_final}.
+Os fatores selecionados nos estudos 2\textsuperscript{k} compuseram o estudo
+final e são apresentados junto com seus níveis na
+Tabela~\ref{tab:fatores_e_niveis_do_estudo_final}.
 
 \begin{table}[!h] \begin{center} \begin{tabular}{|l|c|c|} \hline
 
