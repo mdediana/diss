@@ -1,38 +1,169 @@
 %% ------------------------------------------------------------------------- %%
 \chapter{Conclusões} \label{cap:conclusoes}
 
-% Os resultados dos exp 2k são mais interessantes que o resultado final
+Este trabalho comparou o desempenho de um mesmo sistema de armazenamento usando
+consistência em momento indeterminado e consistência na linha do tempo operando
+em uma WAN. A consistência na linha do tempo se mostrou competitiva com a
+consistência em momento indeterminado quando a localidade de escritas é alta e
+quando as leituras são de ``qualquer versão'' (ver
+Seção~\ref{sec:analise_dos_tempos_de_resposta}).
 
-% Esse trabalho oferece uma infraestrutura para outros extudo do gênero
-% (considerando disco, por ex), em especial se o Riak for utilizado, dado que
-% muito da automatização (start/stop, métricas, logs, \emph{benchmark}, etc.) é
-% específica dele.
+As principais vantagens da linha do tempo sobre a consistência em momento
+indeterminado são a garantia de que as réplicas não são atualizadas com valores
+divergentes e a existência de uma réplica mestre que corresponde à versão mais
+recente. Com isso, desenvolvedores não precisam implementar resolução de
+conflitos ou ações de compensação na aplicação (ver
+Seção~\ref{sec:replicacao_de_dados_e_seus_compromissos}). Um cenário
+particularmente interessante para o uso da consistência na linha do tempo é o
+caso em que a aplicação tolera inconsistências na maioria das leituras, mas em
+algumas poucas situações precisa da versão consistente.
+
+A principal desvantagem da consistência na linha do tempo com relação à
+consistência em momento indeterminado é o fato de a indisponibilidade da réplica
+mestre por falha do nó ou particionamento da rede impedir escritas e leituras
+consistentes. Uma outra desvantagem é que mesmo sendo competitiva, ela apresenta
+variabilidade relativamente alta nos tempos de resposta. Por exemplo, a
+localidade 90\% implica que 10\% das escritas e 10\% das leituras consistentes
+são remotas, com tempos de resposta da ordem da latência da rede. Para
+aplicações em que os requisitos de tempos de resposta são dados pelo percentil
+99,9, como é o caso da Amazon \cite{DeCandia2007}, a consistência na linha do
+tempo não é adequada.
+
+Além da comparação do desempenho, este trabalho apresentou resultados sobre a
+infuência que diversos fatores têm sobre o desempenho de um sistema de
+armazenamento operando sobre WAN. Por meio dos experimentos fatoriais
+2\textsuperscript{k}, descobriu-se quais fatores são mais ou menos influentes
+para o desempenho desse tipo de sistema (ver
+Seção~\ref{sec:selecao_dos_fatores}). Por exemplo, verificou-se que a quantidade
+de objetos armazenados não afeta o desempenho do sistema. Vale notar que as
+constatações feitas são válidas para o conjunto de valores de parâmetros e
+níveis testados.  Por exemplo, caso o mecanismo de armazenamento fosse disco e
+não memória, o resultado para influência da quantidade de objetos armazenados
+provavelmente seria diferente devido a interação entre disco, cache de disco e
+memória.
+
+Por último, uma consideração sobre a reprodutibilidade deste estudo. Caso um
+pesquisador queira reproduzir o estudo no Grid5000, ele tem disponíveis os
+recursos necessários para tal. Caso ele queira reproduzi-lo em outra plataforma
+(AWS, por exemplo), ele precisará criar uma nova imagem, o que é simples, dado
+que a imagem usada neste estudo tem poucos softwares instalados e está
+documentada (ver Subseção \ref{sec:ambiente}). Além disso, alguns poucos scripts
+para execução do estudo precisariam ser alterados.
 
 %% ------------------------------------------------------------------------- %%
 \section{Contribuições} \label{sec:contribuicoes}
 
+As principais contribuições deste trabalho são:
+
+\paragraph{Comparativo de desempenho entre modelos de consistência}A principal
+contribuição é a constatação de que a consistência na linha do tempo é
+competitiva em termos de desempenho com a consistência em momento indeterminado
+em um sistema operando sobre uma WAN e que apresente localidade alta. Quando
+possível, o uso da consistência na linha do tempo no lugar da consistência em
+momento indeterminado torna o desenvolvimento do sistema mais simples.
+
+\paragraph{Infraestrutura de experimentos}A segunda contribuição é a
+infraestrutura de experimentos que pode ser reaproveitada para outros estudos do
+gênero, em especial se o estudo for feito no Grid5000 e usar o Riak.
+
 %% ------------------------------------------------------------------------- %%
 \section{Lições Aprendidas} \label{sec:licoes_aprendidas}
 
-% A arte da análise de desempenho: muitas atividade da análise de desempenho não
-% são facilmente tratáveis metodologicamente, o trabalho acaba precisando de
-% muito empirismo.
+Além dos conceitos aprendidos sobre sistemas distribuídos, experimentação e
+análise de desempenho, a implementação e execução deste trabalho também resultou
+em lições e reflexões:
 
-% Reprodutibilidade
+\paragraph{A arte da análise de desempenho}A principal referência metodológica
+usada neste trabalho considera que a análise de desempenho é uma arte, sugerindo
+que existem atividades envolvidas nesse tipo de análise que não são facilmente
+tratáveis metodologicamente. Um exemplo disso a experiência do autor com a
+operação no Grid5000 influenciar a decisão sobre o tamanho do sistema, uma
+limitação que não foi mensurada com exatidão, mas sim percebida pelo trabalho
+diário na plataforma (ver
+Subseção~\ref{sec:fatores_de_tamanho_do_sistema_e_benchmark}).
 
-%Importância de ferramentas p/ pesquisa na área de sistemas: linguagens usadas,
-%linux (cache, rede, disco), ferramentas de so (top, vmstat, iostat), etc, até
-%github (footnote: este texto está no gh)
+\paragraph{O método na análise de desempenho}Apesar de a atividade de análise de
+desempenho possuir características de arte, muito dela é passível de ser
+sistematizada, importante para a confiabilidade dos resultados e produtividade
+na execução do estudo. Um exemplo disso foi uma versão anterior do estudo que
+havia sido executada com problemas não percebidos e foi descartada. Essa
+primeira versão não usava o método e as técnicas apresentadas em
+\cite{Jain1991}. Ela usava fatores que na segunda versão se mostraram pouco
+influentes (popularidade dos objetos, por exemplo) e ignorava outros que eram
+influentes (como variação da latência de rede, por exemplo).  Além disso, era
+composta por 420 experimentos que demoravam aproximadamente 24h para serem
+executados, contra os 64 experimentos e 6,5h da segunda versão do estudo, que
+redução que aconteceu pelo uso de experimentos 2\textsuperscript{k} (ver
+Seção~\ref{sec:selecao_dos_fatores}).
+
+\paragraph{Reprodutibilidade}Além de importante para a qualidade da pesquisa, o
+a reprodutibilidade do estudo facilitou executá-lo muitas vezes para comparações
+e análises. Isso foi consequência de ter o processo automatizado e, portanto,
+reprodutível. Uma execução completa do estudo consistia em usar um script para a
+reserva dos nós, outro para a implantação da imagem e um terceiro para executar
+um estudo.
+
+\paragraph{Importância de ferramentas para pesquisa na área de sistemas}Muitas
+tecnologias foram usadas neste trabalho. Além das linguagens de programação --
+Erlang, bash, Ruby e R -- entender o funcionamento do Linux foi importante por
+dois pontos de vista. O primeiro foi a forma como ele gerencia o hardware, como
+aconteceu na discussão sobre a relação entre disco, cache de disco e memória,
+por exemplo (ver Subseção~\ref{sec:aglomerado_e_mecanismo_de_armazenamento}). O
+segundo foram suas ferramentas para tarefas de administração de sistema como
+top, vmstat, iostat, bwm-ng, etc.
 
 %% ------------------------------------------------------------------------- %%
 \section{Produções ao Longo do Mestrado}
 \label{sec:producoes_ao_longo_do_mestrado}
 
-% seminários ime apr tdc estágios (?) artigo do wtdbd código do riak
-% infraestrutura de experimentos no g5k
+As principais produções ao longo do mestrado foram:
+
+\begin{itemize}
+
+\item Seminário ``NoSQL: Vantagens, desvantagens e compromissos''\footnote{Slides disponíveis em
+\url{http://www.slideshare.net/mdediana/no-sql-vantagensdesvantagensecompromissos}.}
+apresentado para o departamento de Ciência da Computação do IME.
+
+\item Apresentação ``NoSQL: Perdas e Ganhos''\footnote{Slides disponíveis em \url{http://www.slideshare.net/mdediana/no-sql-perdaseganhos}.} na The
+Developer's Conference 2010.
+
+\item Artigo curto ``NoSQL na Web 2.0: Um Estudo Comparativo de Bancos
+Não-Relacionais para Armazenamento de Dados na Web 2.0'' aceito no Workshop de
+Teses e Dissertações em Bancos de Dados 2010 (WTDBD'2010), dentro do Simpósio
+Brasileiro de Bancos de Dados (SBBD).
+
+\item Artigo ``Mitigating Network Impacts in Large Scale DFSs'', recusado no
+Euro-par 2012, relacionado ao estágio de quatro meses no INRIA em Nantes,
+França, sobre análise de desempenho de sistemas de arquivos distribuídos.
+
+\item Relatório de desempenho da DHT chamada BlobSeer, produzido em estágio em
+estágio de um mês no INRIA em Rennes, França, sobre análise de desempenho desse
+sistema.
+
+\item Código para consistência na linha do tempo no Riak (a implementação ainda
+não está pronta para uso em produção).
+
+\item Infraestrutura de experimentos, comentada na
+Seção~\ref{sec:contribuicoes}.
+
+\end{itemize}
 
 %% ------------------------------------------------------------------------- %%
 \section{Trabalhos Futuros} \label{sec:trabalhos_futuros}
 
-% discos diferentes outros modelos de consistência outras operações
-% aws
+Um dos trabalhos futuros mais interessantes seria a validação ou refutação das conclusões deste
+estudo em uma outra plataforma, de preferência uma que seja usada por aplicações
+web de produção, como o AWS, por exemplo. Os resultados poderiam
+ser diferentes por influência da virtualização, devido a latência da rede não
+variar necessariamente seguindo uma distribuição normal, dentre outros fatores.
+
+Outro tipo de trabalho poderia considerar diferentes discos, incluindo discos de
+estado sólido (\emph{Solid State Drives} -- SSDs), cujo uso em centros de dados
+vem crescendo. Seria interessante analisar e comparar a influência de cada um
+dos dois tipos de E/S -- rede e disco -- no desempenho do sistema.
+
+Enquanto este trabalho era realizado, modelos de consistência com maiores
+garantias de consistência com foco em WANs foram desenvolvidos, como os
+propostos por Google \cite{Baker2011} e Berkeley / MIT \cite{Kraska2012}.
+Seriam interessantes comparações dos desempenhos desses e de outros modelos de
+consistência.
