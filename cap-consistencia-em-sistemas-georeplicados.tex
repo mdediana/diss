@@ -388,9 +388,9 @@ indeterminado.} \label{tab:consistencia_em_momento_indeterminado_valida}
 
 Por último, a consistência na linha do tempo \cite{Cooper2008,Alsberg1976}
 define que as escritas acontecem na mesma ordem em todas as réplicas e existem
-três possibilidades de leituras. A leitura consistente lê o último valor
+três possibilidades de leituras. A leitura da ``versão mais recente'' lê o último valor
 escrito. A leitura por versão garante que o valor lido é tão ou mais novo que a
-versão especificada na operação. A leitura de qualquer versão não oferece
+versão especificada na operação. A leitura de ``qualquer versão'' não oferece
 garantias sobre quão atual é o valor lido. Do ponto de vista da escrita, a
 consistência na linha do tempo se comporta como a consistência sequencial. Do
 ponto de vista da leitura, o seu comportamento depende do tipo de leitura: com

@@ -11,7 +11,15 @@ usada neste trabalho \cite{Jain1991} e também foi sugerido para o autor em
 conversa com o pesquisador visitante no IME Jean-Marc Vincent, que possui grande
 experiência em estudos de desempenho.
 
-TODO: seções
+Este estudo tinha duas hipóteses principais que estão descritas na
+Seção~\ref{sec:hipoteses}. A seguir, a
+Seção~\ref{sec:nivel_de_confianca,_exatidao_e_tamanho_da_amostra} descreve o o
+nível de confiança do estudo relativo ao tamanho da amostra. A
+Seção~\ref{sec:analise_dos_tempos_de_resposta} mostra a análise dos tempos de
+resposta, a Seção~\ref{sec:analise_dos_conflitos} mostra a análise dos conflitos
+e a Seção~\ref{sec:analise_das_migracoes} mostra a análise das migrações. Por
+fim, a Seção~\ref{sec:ameacas_a_validade} descreve as ameaças à validade
+levantadas.
 
 %% ------------------------------------------------------------------------- %%
 \section{Hipóteses} \label{sec:hipoteses}
@@ -39,8 +47,8 @@ momento indeterminado permite atualizações simultâneas e divergentes, o que não
 consistência em momento indeterminado são mais graves.
 
 %% ------------------------------------------------------------------------- %%
-\section{Tamanho da amostra e replicações}
-\label{sec:tamanho_da_amostra_e_replicacoes}
+\section{Nível de Confiança, Exatidão e Tamanho da Amostra}
+\label{sec:nivel_de_confianca,_exatidao_e_tamanho_da_amostra}
 
 O tamanho da amostra de um experimento é dado por:
 
@@ -104,10 +112,6 @@ em vez de tempo\footnote{A limitação da quantidade de requisições foi
 implementada no \emph{benchmark} pois era necessária para a etapa de
 aquecimento, mas não foi usada nos experimentos}.
 
-Além de uma quantidade de amostras suficiente, experimentos precisam ser
-replicados para identificar qual a parte da resposta que é causada por variação
-no sistema testado. TODO: completar
-
 %% ------------------------------------------------------------------------- %%
 \section{Análise dos Tempos de Resposta}
 \label{sec:analise_dos_tempos_de_resposta}
@@ -120,7 +124,7 @@ linha vertical indica a latência de rede e a horizontal indica a localidade.
 
 Os gráficos das FDAs dos tempos de resposta quando a latência é 0 ms está na
 Figura \ref{fig:fda_dos_tempos_de_resposta_para_latencia_de_rede_de_0_ms}. Como
-esperado, todas as requisições se comportam como se fossem locais. Um fato a se
+esperado, as requisições se comportam como se fossem locais. Um fato a se
 notar é um degrau nos percentis mais altos das leituras em todos os modos. Uma
 explicação possível seria algum tipo de sobrecarga no sistema, mas nesse caso
 seria esperado ver comportamento semelhante nas escritas.
@@ -172,10 +176,53 @@ apresentando o mesmo perfil que para localidade 50\%.
 \label{fig:fda_dos_tempos_de_resposta_para_latencia_de_rede_de_200_ms}
 \end{figure}
 
-Com exceção dos degraus que aparecem nos gráficos, todos os modos apresentaram o
+Uma investigação dos degraus que apareceram nos gráficos para leituras mostra
+que em torno do percentil 90 o tempo de resposta aumenta em 10 vezes -- por
+exemplo, para \emph{ind1}, localidade 50\% e latência 0 ms, o percentil 91 é 3,8 ms e o
+percentil 92 é 38,0 ms. A partir daí, os tempos de resposta crescem linearmente,
+como pode ser visto na
+Figura~\ref{fig:aproximacao_da_fda_dos_tempos_de_resposta_para_latencia_de_rede_de_0_ms}.
+
+\begin{figure}[!t] \centering
+
+\includegraphics[width=0.5\textwidth]{ecdf_zoom.png}
+
+\caption{Aproximação da FDA dos tempos de resposta para latência de rede de 0 ms.}
+\label{fig:aproximacao_da_fda_dos_tempos_de_resposta_para_latencia_de_rede_de_0_ms}
+\end{figure}
+
+Os ganhos e perdas relativos para requisições remotas da consistência na linha
+do tempo com relação a consistência em momento indeterminado com $W = 2$ e
+latência de rede de 200 ms se encontram na
+Tabela~\ref{tab:ganhos_e_perdas_relativos_das_requisicoes_remotas}.
+
+\begin{table}[!h] \begin{center} \begin{tabular}{|c|c|c|c|} \hline
+
+Percentil & Localidade (\%) & \emph{lt\_qqer} & \emph{lt\_rec}\\ \hline
+
+75 & 50 & -15\% & 0,3\% \\ \hline
+
+75 & 90 & 99\% & 99\% \\ \hline
+
+95 & 50 & -28\% & 26\% \\ \hline
+
+95 & 90 & 27\% & 39\% \\ \hline
+
+\end{tabular} \caption[Ganhos e perdas relativos entre modos.]{Ganhos e perdas
+relativos dos tempos de resposta para os modos \emph{lt\_qqer} e lt\_lat com
+relação a \emph{ind2} para latência de 200 ms. As perdas são indicadas pelo
+sinal negativo} \label{tab:ganhos_e_perdas_relativos_das_requisicoes_remotas}
+\end{center} \end{table}
+
+Com relação ao percentil 75 e localidade 50\%, os ganhos são tão altos pois as
+requisições são locais para \emph{lt\_qqer} e \emph{lt\_rec} e são remotas para
+\emph{ind2}.
+
+Com exceção dos degraus que aparecem nos gráficos para leituras, todos os modos apresentaram o
 comportamento esperado. A hipótese de que a consistência na linha do tempo é
 competitiva em termos de desempenho com a consistência em momento indeterminado
-se confirma.
+se confirma para o caso em que a localidade é alta e principalmente caso
+leituras de ``qualquer versão'' sejam usadas.
 
 %% ------------------------------------------------------------------------- %%
 \section{Análise dos Conflitos} \label{sec:analise_dos_conflitos}
@@ -225,6 +272,7 @@ A análise de migrações foi bastante simples, apenas confirmando o comportamento
 observado no aquecimento (ver Subseção~\ref{sec:aquecimento}). As migrações para
 consistência na linha do tempo para localidade de 50\% são todas da ordem de
 7,1\% do total de requisições, enquanto para localidade de 90\% são de 0,18\%.
+
 %% ------------------------------------------------------------------------- %%
 \section{Ameaças à Validade} \label{sec:ameacas_a_validade}
 
