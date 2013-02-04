@@ -1,0 +1,9 @@
+#!/bin/bash
+
+for f in *.tex; do
+  sed -i 's/ benchmark\([ ,:;\.]\)/ \\emph{benchmark}\1/
+s/ ind1\([ ,:;\.]\)/ \\emph{ind1}\1/
+s/ ind2\([ ,:;\.]\)/ \\emph{ind2}\1/
+s/ lt\\_qqer\([ ,:;\.]\)/ \\emph{lt\\_qqer}\1/
+s/ lt\\_rec\([ ,:;\.]\)/ \\emph{lt\\_rec}\1/' $f
+done

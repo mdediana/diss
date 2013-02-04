@@ -1,10 +1,10 @@
 %% ------------------------------------------------------------------------- %%
 \chapter{Análise dos Resultados} \label{cap:analise_dos_resultados}
 
-O estudo final foi um estudo fatorial completo (seção
-\ref{sec:experimentos_fatoriais}). A sua execução foi rápida e usou poucos
-recursos devido aos estudos fatoriais 2\textsuperscript{k} feitos para triagem dos
-fatores -- a execução de uma repetição do estudo final demorava 6,5 horas. O
+O estudo final foi um estudo fatorial completo (ver
+Seção~\ref{sec:experimentos_fatoriais}). A sua execução foi rápida e usou poucos
+recursos devido aos estudos fatoriais 2\textsuperscript{k} feitos para triagem
+dos fatores -- a execução de uma repetição do estudo final demorava 6,5 horas. O
 pequeno número de fatores e níveis foi importante para uma análise consistente
 dos resultados. Esse fato é enfatizado pela principal referência metodológica
 usada neste trabalho \cite{Jain1991} e também foi sugerido para o autor em
@@ -33,10 +33,10 @@ réplica mestre. Existe um intervalo de tempo em que a atualização foi aplicada
 na réplica mestre mas ainda não foi enviada para as outras réplicas, esse
 intervalo é a janela de inconsistência. A consistência em momento indeterminado
 apresenta conflitos por motivo semelhante, com a diferença que a atualização
-pode ser aplicada em qualquer réplica. Uma segunda diferença relacionada a esse
-fato é que ela permite atualizações simultâneas e divergentes, o que não é
-permitido pela consistência na linha do tempo. Assim, os conflitos no caso da
-consitência em momento indeterminado são mais graves.
+pode ser aplicada em qualquer réplica. Desse fato resulta que a consistência em
+momento indeterminado permite atualizações simultâneas e divergentes, o que não
+é permitido pela consistência na linha do tempo. Assim, os conflitos no caso da
+consistência em momento indeterminado são mais graves.
 
 %% ------------------------------------------------------------------------- %%
 \section{Tamanho da amostra e replicações}
@@ -47,52 +47,53 @@ O tamanho da amostra de um experimento é dado por:
 $n = (\frac{100 * z * s}{r * \bar{x}})^2$,
 
 onde z é o valor z relativo do nível de confiança desejado, s é o erro padrão, r
-é a precisão desejada e $\bar{x}$ é a média.
+é a precisão desejada e $\bar{x}$ é a média da amostra.
 
-O erro padrão é o desvio padrão da média da amostra e é dado por:
+O erro padrão indica o quão perto da média da população está a média da amostra,
+enquando o desvio padrão indica a variação dos indivíduos de uma amostra da
+média da amostra. O erro padrão é dado por:
 
 $s = \frac{\sigma}{\sqrt{n}}$,
 
-onde $\sigma$ é o desvio padrão da média da população e $n$ é o tamanho da
-amostra.
+onde $\sigma$ é o desvio padrão da média e $n$ é o tamanho da amostra.
 
 O nível de confiança determina o intervalo de confiança, que é um intervalo de
 valores centrado na média e com uma probabilidade de que a média da população
 esteja incluída nele. Por exemplo, dada uma média $\bar{x} = 100$ ms, um erro
-padrão\footnote{O erro padrão é o desvio padrão da média da amostra e é dado por
-$s = \frac{\sigma}{\sqrt{n}}$, onde $\sigma$ é o desvio padrão da média da
-população e $n$ é o tamanho da amostra.} $s = 5$ ms e nível de confiança de 95\%
-($z = 1,960$), o intervalo de confiança é $(100 - 1,960 * 5, 100 + 1,960 * 5) =
-(90,2, 109,8)$, o que significa que existe 95\% de chance de a média da
-população estar nesse intervalo, ou que de cada 100 repetições do experimento,
-95 terão a média dentro desse intervalo.
+padrão $s = 5$ ms e nível de confiança de 95\% ($z = 1,960$), o intervalo de
+confiança é $(100 - 1,960 * 5, 100 + 1,960 * 5) = (90,2, 109,8)$, o que
+significa que existe 95\% de chance de a média da população estar nesse
+intervalo, ou que de cada 100 repetições do experimento, 95 terão a média dentro
+desse intervalo.
 
-A exatidão indica qual a distância de uma medição da média da população. No
-caso, a exatidão é aplicada ao intervalo de confiança, portanto o cálculo do
-intervalo acima com uma exatidão de 1\% passa a ser $(100 * (1 - 0,01) - 1,960 *
-5, 100 * (1 + 0,01) + 1,960 * 5) = (89,2, 110,8)$. 
+A exatidão indica qual a distância entre uma medição da média e média da
+população. No caso, a exatidão é aplicada ao intervalo de confiança, portanto o
+cálculo do intervalo acima com uma exatidão de 1\% passa a ser $(100 * (1 -
+0,01) - 1,960 * 5, 100 * (1 + 0,01) + 1,960 * 5) = (89,2, 110,8)$. 
 
 O tamanho da amostra depende de conhecer a média e o erro padrão, portanto
 experimentos precisam ser feitos para uma estimativa desses valores. No caso
-deste estudo, cada experimento tinha potencialmente média e erro padrão
-diferentes dos outros -- por exemplo, um experimento de com todas as requisições
-locais apresentaria um desvio padrão menor do que um com requisições locais e
-remotas. Por isso, a opção foi executar todos os experimentos e depois verificar
-se o tamanho da amostra estava adequado para cada um deles.
+deste estudo, o valor da média e do erro padrão variavam muito de um experimento
+para outro. Por exemplo, um experimento em que todas as requisições fossem
+locais apresentaria média e erro padrão menores do que um experimento em que
+houvesse um balanço entre requisições locais e remotas. Por isso, a opção foi
+executar todos os experimentos e depois verificar se o tamanho da amostra estava
+adequado para cada um deles.
  
-A configuração do \emph{benchmark} é baseada em duração, e não em quantidade de
-requisições. Testes exploratórios foram feitos para identificar o tempo que os
-experimentos deveriam usar. Executando cada experimento por 3 min, o valor
-mínimo de quantidade de requisições de um experimento foi 76137, para
-\emph{lt\_rec}, localidade de 50\% e latência de rede de 300 ms.
+A configuração do \emph{benchmark} era baseada em duração , e não em quantidade
+de requisições. Testes exploratórios foram feitos para identificar o tempo que
+os experimentos deveriam usar. Usando tempo de 3 min e repetindo os experimentos
+percebeu-se que havia pouca variação de média e erro padrão. O valor mínimo de
+quantidade de requisições de um experimento foi 76137, para \emph{lt\_rec},
+localidade de 50\% e latência de rede de 300 ms.
 
 Dados esses resultados, foram verificados os tamanhos da amostra dos
-experimentos. Com um nível de confiança de 99\% e exatidão de 2\%, todos os
+experimentos. Para nível de confiança de 99\% e exatidão de 2\%, todos os
 experimentos tinham o tamanho da amostra suficiente. Com precisão de 1\%, apenas
 os experimentos para \emph{lt\_rec}, localidade 50\% e latência de rede 300 ms
-apresentou tamanho de amostra insuficiente -- para variação de latência de 0\%
-ele precisaria de 127789 amostras mas tinha 115175, e para variação de latência
-60\% ele precisaria de 83030 mas tinha 76137.
+não tinham tamanho da amostra suficiente -- para variação de latência de 0\% o
+experimento precisaria de 127789 amostras mas tinha 115175, e para variação de
+latência 60\% ele precisaria de 83030 mas tinha 76137.
 
 Vale notar que o tamanho da amostra na maioria dos experimentos foi bem maior do
 que o necessário. Por exemplo, para \emph{ind1}, localidade de 50\% e latência
@@ -113,13 +114,12 @@ no sistema testado. TODO: completar
 
 A principal métrica usada neste estudo foi o tempo de resposta. Tomou-se o
 cuidado de evitar sobrecarregar o sistema, de forma que os tempos de resposta
-representassem o comportamento do sistema no estado estacionário. Todas as
-figuras desta seção apresentam duas linhas de grade para auxiliar na
-interpretação: a linha vertical indica a latência de rede e a horizontal indica
-a localidade.
+representassem o comportamento do sistema no estado estacionário. As figuras
+desta seção apresentam duas linhas de grade para auxiliar na interpretação: a
+linha vertical indica a latência de rede e a horizontal indica a localidade.
 
 Os gráficos das FDAs dos tempos de resposta quando a latência é 0 ms está na
-Figura \ref{fig:fda_dos_tempos_de_resposta_para_latencia_de_rede_de_0_ms} Como
+Figura \ref{fig:fda_dos_tempos_de_resposta_para_latencia_de_rede_de_0_ms}. Como
 esperado, todas as requisições se comportam como se fossem locais. Um fato a se
 notar é um degrau nos percentis mais altos das leituras em todos os modos. Uma
 explicação possível seria algum tipo de sobrecarga no sistema, mas nesse caso
@@ -134,28 +134,33 @@ seria esperado ver comportamento semelhante nas escritas.
 \end{figure}
 
 Os gráficos das FDAs para 100 ms, 200 ms e 300 ms têm a mesma forma, portanto a
-opção foi fazer a análise do valor intermediário. O gráfico para latência de
-rede de 200 ms pode ser visto na Figura
+opção foi fazer a análise para um deles apenas. O gráfico para latência de rede
+de 200 ms está na Figura
 \ref{fig:fda_dos_tempos_de_resposta_para_latencia_de_rede_de_200_ms}.
 
 No caso de leituras e localidade 50\%, apenas \emph{lt\_rec} apresenta
 requisições remotas. Uma porção pequena dessas leituras tem tempo de resposta
 menor que a latência da rede, o que se explica pela variação da latência de até
-60\%. A localidade 90\% beneficia \emph{lt\_rec}, que continua apresentando
-tempos de resposta mais altos que os outros modos. O degrau que aparecia nos
-gráficos para latência de 0 ms permanece, mas no caso de \emph{lt\_rec} ele
-surge próximo do percentil equivalente a localidade (50 ou 90). Isso sugere que
-esse e um efeito que sempre afeta requisições locais, independente da proporção
-que representem do total de requisições.
+60\%.
+
+Para leituras e localidade 90\%, \emph{lt\_rec} é beneficiado, mas continua
+apresentando tempos de resposta mais altos que os outros modos para parte das
+requisições. O degrau que aparecia nos gráficos para latência de 0 ms permanece,
+mas no caso de \emph{lt\_rec} ele surge próximo do percentil equivalente a
+localidade (50 ou 90). Isso sugere que esse é um efeito que sempre acontece com
+requisições locais, independente da proporção que representem do total de
+requisições.
 
 No caso de escritas e localidade 50\%, \emph{lt\_rec} apresenta um desempenho um
-pouco melhor que ev2 e \emph{lt\_qqer}. A explicação provável para isso é o fato
-de o sistema estar menos carregado para esse modo do que os outros, o que
-acontece pois as leituras de \emph{lt\_rec} são mais lentas. Esse fato pode ser
+pouco melhor que \emph{ind2} e \emph{lt\_qqer}. A explicação provável para isso
+é o sistema estar menos carregado para esse modo do que os outros, o que
+acontece pois as leituras de \emph{lt\_rec} são mais lentas. Esse fato é
 comprovado pela vazão dos modos \emph{lt\_rec}, ev2 e \emph{lt\_qqer},
-respectivamente, 594, 1072, 941 operações/s. Já no caso de localidade 90\%,
-\emph{lt\_rec} e \emph{lt\_qqer} se beneficiam da localidade, enquanto ev2 não e
-continua com o mesmo perfil apresentado para localidade 50\%.
+respectivamente, 594, 1072, 941 operações/s.
+
+Para escritas e localidade 90\%, \emph{lt\_rec} e \emph{lt\_qqer} apresentam
+melhor desempenho devido à localidade, enquanto \emph{ind2} continua
+apresentando o mesmo perfil que para localidade 50\%.
 
 % grep 0.5,uni,2:1,200,60 res.1/summary.csv | cut -d, -f1,11
 
@@ -168,29 +173,31 @@ continua com o mesmo perfil apresentado para localidade 50\%.
 \end{figure}
 
 Com exceção dos degraus que aparecem nos gráficos, todos os modos apresentaram o
-comportamento esperado.
+comportamento esperado. A hipótese de que a consistência na linha do tempo é
+competitiva em termos de desempenho com a consistência em momento indeterminado
+se confirma.
 
 %% ------------------------------------------------------------------------- %%
 \section{Análise dos Conflitos} \label{sec:analise_dos_conflitos}
 
 A análise dos conflitos indicou uma proporção muito alta de conflitos, da ordem
-de 30\%, para todos os casos com latência de rede diferente de 0 e variação de
-latência de 60\%. Para variação de latência de 0\%, os conflitos são da ordem de
-10\textsuperscript{-3}\%.
+de 30\%, para todos os casos com latência de rede diferente de 0 ms e variação
+de latência de 60\%. Para variação de latência de 0\%, os conflitos são da ordem
+de 0,1\%.
 
 Esses números resultam da forma como conflitos são contabilizados no Riak.
 Sempre que uma leitura é feita, ela é enviada para todas as réplicas do objeto
 requerido. Mesmo após ter retornado uma resposta para o cliente, o Riak espera
 as outras leituras para checar se existe conflito -- e no caso da consitência em
-momento indeterminado acionar o mecanismo de resolução de conflito. O mesmo
+momento indeterminado acionar o mecanismo de resolução de conflitos. O mesmo
 mecanismo foi mantido na consistência na linha do tempo para a contagem de
 conflitos, mas sem acionar a resolução de conflitos.
 
 No \emph{benchmark}, toda escrita é precedida por uma leitura (ver
-Subseção~\ref{sec:fatores_de_carga_de_trabalho}). No caso em que a latência é 0
-ms, o \emph{benchmark} envia uma leitura, o coordenador a repassa para as
-réplicas que retornam em instantes muito próximos. Na sequência, o
-\emph{benchmark} envia a escrita.  No caso em que a latência é diferente de 0 ms
+Subseção~\ref{sec:fatores_de_carga_de_trabalho}). No caso em que a latência de
+rede é 0 ms, o \emph{benchmark} envia uma leitura, o coordenador a repassa para
+as réplicas que retornam em instantes muito próximos. Na sequência, o
+\emph{benchmark} envia a escrita. No caso em que a latência é diferente de 0 ms
 e a variação é 0\%, o tempo para uma ou duas das leituras retornarem do outro
 centro de dados é grande, portanto a escrita acontece no centro de dados local
 antes. Já no caso em que a variação da latência é 60\%, existe uma chance
@@ -203,8 +210,8 @@ TODO: resultado
 
 Esse comportamento é um problema para a consistência em momento indeterminado em
 uma WAN, pois ela muitas vezes ela vai acionar o mecanismo de resolução de
-conflitos desnecessariamente, resultando em duas escritas consecutivas no objeto
-remoto.
+conflitos desnecessariamente, resultando em duas escritas consecutivas na
+réplica remota.
 
 Apesar de as proporções de conflitos serem semelhantes para os dois modelos de
 consistência, não se pode dizer que a hipótese foi confirmada. A hipótese
@@ -216,27 +223,33 @@ fato de que toda escrita é precedida de uma leitura.
 
 A análise de migrações foi bastante simples, apenas confirmando o comportamento
 observado no aquecimento (ver Subseção~\ref{sec:aquecimento}). As migrações para
-consistência na linha do tempo para localidade de 50\% são todas da ordem de 7\%
-do total de requisições, enquanto para localidade de 90\% são de 0,2\%.
-
+consistência na linha do tempo para localidade de 50\% são todas da ordem de
+7,1\% do total de requisições, enquanto para localidade de 90\% são de 0,18\%.
 %% ------------------------------------------------------------------------- %%
 \section{Ameaças à Validade} \label{sec:ameacas_a_validade}
 
+Muitos parâmetros foram fixados e fatores tidos como influentes foram
+desconsiderados (ver Capítulo~\ref{cap:parametros_e_fatores}). Com isso, estudos
+que usem outros valores para os parâmetros ou considerem outros fatores devem
+apresentar resultados diferentes. Em particular, estudos envolvendo mais nós de
+sistema podem apresentar resultados diferentes, dado que o fator quantidade de
+nós do sistema apareceu com influência relativamente alta (ver
+Subseção~\ref{sec:fatores_de_tamanho_do_sistema_e_benchmark}). Além disso, um
+estudo é limitado pelos níveis usados \cite{Jain1991}.  Por exemplo, um estudo
+2\textsuperscript{k} havia mostrado influência alta da perda de pacotes usando
+1\% como nível (ver Subseção~\ref{sec:fatores_de_rede}).  Com isso, este estudo
+provavelmente apresentaria resultados diferentes caso fosse feito com taxas de
+perda de pacotes nesse nível.
+
+Os experimentos consideram que todos os nós sempre operam sem falhas (ver
+Subseçao~\ref{sec:metas_do_estudo}). Os resultados de experimentos com o sistema
+operando em algum modo de falha (desde a falha de um nó até de um centro de
+dados inteiro) devem ser diferentes dos obtidos nesse estudo. Observação
+semelhante vale para a carga do sistema.
+
 O Riak usa uma arquitetura muito semelhante à descrita no artigo sobre o Dynamo.
 Com isso, os modelos de consistência usados nos experimentos podem apresentar
-outros resultados em sistemas que usem outras arquiteturas, embora o desempenho
-analisado neste estudo foi mais afetado for fatores de rede e carga de trabalho.
+resultados diferentes em sistemas que usem outras arquiteturas, embora o
+desempenho analisado neste estudo foi mais afetado for fatores de rede e carga
+de trabalho.
 
-Por limitação de tempo e recursos algumas variáveis que podem alterar os
-resultados desse trabalho foram desconsideradas ou fixadas. Esse é o caso de
-todas as variáveis de controle e constantes, que poderiam ser trabalhadas como
-variáveis independentes. Com isso, os resultados dos experimentos podem ser
-diferentes caso sejam usados, por exemplo, um fator de replicação ou uma
-quantidade de centros de dados diferentes. Em particular, testes de
-escalabilidade serão realizados para entender a influência do tamanho do sistema
-nos resultados.
-
-Os experimentos consideram que todos os nós sempre operam sem falhas. Os
-resultados de experimentos com o sistema operando em algum modo de falha (desde
-a falha de um nó até de um centro de dados inteiro) devem ser diferentes dos
-obtidos nesse estudo.

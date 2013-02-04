@@ -1170,12 +1170,6 @@ não é 100\% devido a arredondamento.} \label{tab:estudo_para_fatores_de_rede}
 
 %requisições remotas: CVs 58\% (leituras) e 62\% (escritas)
 
-%O mesmo estudo havia sido realizado anteriormente com níveis de perda de
-%pacotes 0,01\% e 1\%. Nesse estudo, a perda de pacotes era mais influente até
-%do que a variação da latência. Mas como redes normalmente não apresentam taxas
-%de perda de pacotes tão altas quanto 1\%, o estudo foi refeito com nível máximo
-%de 0,1\% e a perda de pacotes não afetou o resultado nesse caso.
-
 A latência, a variação de latência e a interação de primeira ordem entre elas
 respondem por 100\% dos resultados. Assim, os níveis escolhidos para esses
 fatores nos experimentos foram:
@@ -1218,6 +1212,13 @@ que faz com que o segundo pacote seja transmitido antes do primeiro. Mas a
 ocorrência de grandes diferenças de latência entre pacotes consecutivos é rara,
 dado que o emulador foi configurado para aplicar uma correlação na variação da
 latência usando distribuição normal.
+
+Um comentário final é que o mesmo estudo havia sido realizado anteriormente com
+níveis de perda de pacotes 0,01\% e 1\%. Nesse estudo, a perda de pacotes era
+mais influente até do que a variação da latência. Mas como redes normalmente não
+apresentam taxas de perda de pacotes tão altas quanto 1\%, o estudo foi refeito
+com nível máximo de 0,1\% e a perda de pacotes não afetou o resultado nesse
+caso.
 
 %% ------------------------------------------------------------------------- %%
 \subsection{Fatores de carga de trabalho}
