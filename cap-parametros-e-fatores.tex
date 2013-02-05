@@ -767,11 +767,11 @@ escritas dependentes da localidade.
 Os modos foram escolhidos de forma a representar situações encontradas em
 sistemas de produção e ao mesmo tempo limitar a quantidade de níveis. Assim,
 consistência na linha do tempo com leituras de versões específicas não foi
-considerada já que ela é um meio termo entre leituras de ``versão mais recente'' e
-leituras de ``qualquer versão''. Consistência em momento indeterminado com $W = 1$ e
-$R = 2$ não foi considerada pois sua semântica é similar a $W = 2$ e $R = 1$,
-mas teria seu desempenho prejudicado considerando que leituras predominam nas
-relações leitura/escrita usadas nos experimentos (ver Subseção
+considerada já que ela é um meio termo entre leituras de ``versão mais recente''
+e leituras de ``qualquer versão''. Consistência em momento indeterminado com $W
+= 1$ e $R = 2$ não foi considerada pois sua semântica é similar a $W = 2$ e $R =
+1$, mas teria seu desempenho prejudicado considerando que leituras predominam
+nas relações leitura/escrita usadas nos experimentos (ver Subseção
 \ref{sec:fatores_de_carga_de_trabalho}).
 
 Esses modos implicam em trocas além de desempenho e consistência. A principal é
@@ -986,9 +986,6 @@ conflitos. Já no caso do tamanho dos objetos armazenados, o valor foi escolhido
 baseado em estudo dos sistemas de caching distribuído no Facebook, que relata
 que 90\% dos objetos nesses sistemas são menores do que 500 bytes
 \cite{Atikoglu2012}.
-
-%TODO: comentar conflitos, resultados são estranhos confl : 5 44 44 1 2 5 1   |
-%CV =  0.6548619
 
 %% ------------------------------------------------------------------------- %%
 \subsection{Fatores de rede} \label{sec:fatores_de_rede}

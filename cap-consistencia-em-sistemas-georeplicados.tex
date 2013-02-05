@@ -4,61 +4,42 @@
 
 Este capítulo apresenta os conceitos relacionados à replicação de dados em
 sistemas georeplicados, as motivações para seu uso e os compromissos
-resultantes. Embora alguns conceitos e princípios descritos não sejam exclusivos
-de sistemas georeplicados, eles são necessários para um entendimento mais
-profundo do projeto e desenvolvimento desse tipo de sistema.
+resultantes. Embora alguns conceitos descritos não sejam exclusivos de sistemas
+georeplicados, eles são necessários para um entendimento mais profundo do
+projeto e desenvolvimento desse tipo de sistema.
 
-A Seção~\ref{sec:sistemas_de_armazenamento} faz algumas considerações sobre a
-nomenclatura usada para os sistemas tratados neste trabalho. A
+Este trabalho usa o termo ``sistema de armazenamento'' para se referir de forma
+geral a sistemas distribuídos que armazenam e gerenciam dados, como SGBDDs,
+tabelas de espalhamento distribuídas (\emph{Distributed hash table} -- DHT) e
+sistemas de arquivos distribuídos. Um motivo para isso é que às vezes a
+distinção entre esses tipos de sistemas não é clara. Além disso, eles lidam com
+questões semelhantes, como replicação, por exemplo, o que faz com que muitas
+técnicas surgidas em um contexto sejam aplicadas em outro.
+
 Seção~\ref{sec:estrategias_para_escalabilidade_de_aplicacoes_web} apresenta
 conceitos de escalabilidade de aplicações web. Uma estratégia comum para
 escalabilidade é o uso de replicação, a
 Seção~\ref{sec:replicacao_de_dados_e_seus_compromissos} mostra diferentes tipos
-de replicação e as vantagens e desvantagens de cada um. Um sistema pode
-apresentar diferentes garantias de consistência dependendo da forma como replica
-seus dados, a Seção~\ref{sec:modelos_de_consistencia_para_replicacao} descreve
+de replicação e as vantagens e desvantagens de cada um. Um sistema apresenta
+diferentes garantias de consistência dependendo da forma como replica seus
+dados, a Seção~\ref{sec:modelos_de_consistencia_para_replicacao} descreve
 diversos tipos de modelos de consistência, incluindo os dois que são alvo deste
 trabalho. A
 Seção~\ref{sec:consistencia_desempenho_e_disponibilidade_em_sistemas_georeplicados}
-mostra como diferentes modelos de consistência resultam em diferentes princípios
-arquiteturais para sistemas de larga escala. Por fim, a
+mostra algumas implicações dos diferentes modelos de consistência na arquitetura
+de de sistemas de larga escala. Por fim, a
 Seção~\ref{sec:trabalhos_relacionados} apresenta os trabalhos relacionados a
 este.
-
-%% ------------------------------------------------------------------------- %%
-\section{Sistemas de Armazenamento} \label{sec:sistemas_de_armazenamento}
-
-A área de bancos de dados tradicionalmente trata de bancos de dados que utilizam
-o modelo relacional de dados, criado no início dos anos 70 \cite{Codd1970}. Essa
-tradição é enraizada a ponto de a área normalmente utilizar os conceitos de
-bancos de dados e bancos de dados relacionais como sinônimos (o mesmo valendo
-para SGBDs e SGBDs relacionais, e SGBDDs e SGBDDs relacionais). Mas outros
-modelos de dados também são usados para resolver problemas específicos de
-armazenamento, como os modelos de dados de grafos \cite{Angles2008} e o
-semiestruturado \cite{Abiteboul1997}. Esses modelos se popularizaram no contexto
-de grandes aplicações web a partir da segunda metade dos anos 2000. Ao usar os
-termos banco de dados, SGBDs e SGBDDs, este trabalho não faz distinção sobre
-qual o modelo de dados utilizado. As referências aos bancos de dados, SGBDs e
-SGBDDs relacionais são feitas explicitamente.
-
-Dados distribuídos podem ser gerenciados por outros tipos de sistemas que não
-SGBDDs, como tabelas de espalhamento distribuídas (DHTs -- \emph{Distributed
-hash table}) e sistemas de arquivos distribuídos. Esses sistemas lidam com
-questões semelhantes, como replicação, por exemplo, o que faz com que muitas
-técnicas surgidas em um contexto sejam aplicadas em outro. Considerando que
-muitas vezes a distinção entre esses diferentes tipos de sistema não é clara,
-sempre que possível o termo sistema de armazenamento é utilizado ao longo deste
-trabalho para se referir a eles de forma genérica.
 
 %% ------------------------------------------------------------------------- %%
 \section{Estratégias para Escalabilidade de Aplicações Web}
 \label{sec:estrategias_para_escalabilidade_de_aplicacoes_web}
 
-Uma aplicação web potencialmente precisa ser capaz de lidar com quantidades
-crescentes de dados e tráfego. A quantidade de dados cresce com o uso do sistema
-ao longo do tempo e o aumento do tráfego costuma estar associado a um aumento do
-número de usuários. São três as estratégias de escalabilidade existentes:
-escalabilidade vertical, escalabilidade horizontal e escalabilidade diagonal.
+Uma aplicação web potencialmente precisa lidar com quantidades crescentes de
+dados e tráfego. A quantidade de dados cresce com o uso do sistema ao longo do
+tempo e o aumento do tráfego costuma estar associado a um aumento do número de
+usuários. São três as estratégias de escalabilidade existentes: escalabilidade
+vertical, escalabilidade horizontal e escalabilidade diagonal.
 
 Escalabilidade vertical é o aumento da capacidade de um sistema por meio do
 aumento dos recursos (CPU, memória, disco, etc.) de um servidor
@@ -76,39 +57,41 @@ adição de mais servidores de igual capacidade aos já existentes
 processo de escalar os componentes com e os sem estado \cite{Henderson2006}.
 Escalar as camadas do sistema que não guardam estado é relativamente simples,
 dado que todos os seus componentes são idênticos e intercambiáveis. As
-dificuldades são maiores ao escalar os componentes com estado, como SGBDs, por
+dificuldades são maiores ao escalar os componentes com estado, como SGBDDs, por
 exemplo.
 
 Particionamento de dados é a técnica de distribuir dados por diversas partições
 (nós, discos, etc.) para o aumento do desempenho de um sistema de armazenamento
 (por meio de paralelização das operações) ou para aumentar sua capacidade
 \cite{Liu2009a}. Existem basicamente três técnicas de particionamento para
-escalar horizontalmente o banco de dados \cite{Liu2009a,Pritchett2008}. A
+escalar horizontalmente um banco de dados \cite{Liu2009a,Pritchett2008}. A
 primeira técnica é o particionamento vertical, que consiste na distribuição das
 colunas das tabelas pelas partições, e é usada normalmente apenas por SGBDs
 relacionais orientados a colunas. A segunda é o particionamento funcional, que
 consiste em distribuir os dados pelas partições de acordo com as funcionalidades
-do sistema. Por exemplo, um banco de dados relacional pode ser particionado
+do sistema. Por exemplo, um banco de dados relacional é particionável
 funcionalmente colocando as tabelas relacionadas a usuários em uma partição e as
 tabelas relacionadas a produtos em uma segunda partição. Por último, o
 particionamento horizontal (ou fragmentação ou \emph{sharding}, como ficou
 particularmente conhecido entre desenvolvedores de aplicações web) é a técnica
 de particionamento que distribui as coleções de dados do mesmo tipo (usuários,
-por exemplo) pelas partições. O particionamento horizontal pode ser feito de
-acordo com diversos critérios de particionamento. Por exemplo, o particionamento
-por faixa distribui os objetos de acordo com o valor de determinado atributo dos
-objetos, como o país de origem dos usuários. Outro exemplo é o particionamento
-por espalhamento (\emph{hashing}), pelo qual os objetos são particionados de
-acordo com um índice de espalhamento calculado para cada um deles.
+por exemplo) pelas partições. O particionamento horizontal é feito de acordo com
+alguns critérios de particionamento. Por exemplo, o particionamento por faixa
+distribui os objetos de acordo com o valor de determinado atributo dos objetos,
+como o país de origem dos usuários. Outro exemplo é o particionamento por
+espalhamento (\emph{hashing}), pelo qual os objetos são particionados de acordo
+com um índice de espalhamento calculado para cada um deles.
 
 Uma terceira estratégia de escalabilidade é a escalabilidade diagonal
 \cite{Allspaw2008}, que consiste em escalar verticalmente um conjunto de nós que
 já está preparado para escalar horizontalmente. Isso acontece, por exemplo,
 quando o hardware usado se torna obsoleto. Ao escalar diagonalmente é possível
-consolidar servidores, diminuindo assim o custo operacional do sistema. Do ponto
-de vista dos desenvolvedores e administradores, pouca coisa muda com
-escalabilidade diagonal dado que a arquitetura do sistema deve ter sido criada
-para escalar horizontalmente de qualquer forma.
+consolidar servidores\footnote{Consolidação é o processo de diminuição do número
+de servidores usados por uma organização devido a um aumento na eficiência de
+sua utilização.}, diminuindo assim o custo operacional do sistema. Do ponto de
+vista dos desenvolvedores e administradores, pouca coisa muda com escalabilidade
+diagonal dado que a arquitetura do sistema deve ter sido criada para escalar
+horizontalmente de qualquer forma.
 
 Para escalar um sistema horizontalmente, além do particionamento dos dados,
 outra técnica importante é a replicação de dados. As diferentes estratégias de
@@ -122,22 +105,22 @@ Replicação de dados é o processo de criar cópias de uma coleção de dados
 \cite{Liu2009a} e é usada em sistemas distribuídos por três razões
 \cite{Saito2005}. A primeira é a diminuição da latência por meio da replicação
 de dados para localizações mais próximas de onde esses dados são usados. Isso é
-válido tanto para pequenas distâncias físicas, quando se replica dados entre nós
-em um mesmo bastidor (\emph{rack}) \cite{Shvachko2010}, quanto para
-longas distâncias, quando se replica dados entre centros de dados em diferentes
-localizações geográficas \cite{DeCandia2007,Cooper2008}. A segunda razão para
-replicar dados é aumentar a vazão do sistema por meio do balanceamento de carga
-entre diferentes servidores, possibilitando que o mesmo dado seja servido por
-mais de um servidor simultaneamente. Finalmente, a terceira razão é o aumento da
-disponibilidade do sistema, pois determinado dado pode continuar sendo acessado
-pelos clientes mesmo quando algumas das réplicas encontram-se indisponíveis.
+especialmente para longas distâncias, quando se replica dados entre centros de
+dados em diferentes localizações geográficas \cite{DeCandia2007,Cooper2008} --
+redes locais (\emph{Local area network} -- LANs) apresentam latências da ordem
+centenas de microssegundos \cite{Rumble2011}. A segunda razão para replicar
+dados é aumentar a vazão do sistema por meio do balanceamento de carga entre
+diferentes servidores, possibilitando que o mesmo dado seja servido por mais de
+um servidor simultaneamente. Finalmente, a terceira razão é o aumento da
+disponibilidade do sistema, pois determinado dado continua sendo acessado pelos
+clientes mesmo quando algumas das réplicas encontram-se indisponíveis.
 
 A replicação pode usar um esquema mestre-escravo (ou cópia primária), em que
 apenas uma das réplicas é responsável por receber atualizações e distribuí-las
 para as outras, ou mestre-mestre (ou múltiplos mestres), em que qualquer uma das
-réplicas pode receber atualizações e depois distribuí-las \cite{Liu2009a}. Além
-disso, a replicação pode ser pessimista ou otimista \cite{Liu2009a}. Essas
-estratégias são discutidas nas seções a seguir.
+réplicas recebe atualizações e depois as distribui \cite{Liu2009a}. Além disso,
+a replicação pode ser pessimista ou otimista \cite{Liu2009a}. Essas estratégias
+são discutidas nas seções a seguir.
 
 %% ------------------------------------------------------------------------- %%
 \subsection{Replicação pessimista} \label{sec:replicacao_pessimista}
@@ -150,16 +133,18 @@ consistência representada pelo ``C'' de ACID são conceitos diferentes. A
 primeira se refere à garantia de que todas as réplicas de um objeto são
 idênticas entre si a qualquer momento, enquanto a segunda se refere à
 propriedade de um banco de dados sempre ir de um estado válido para outro estado
-válido.} é a garantia oferecida por um sistema de que em um dado momento todas
-as réplicas de um determinado objeto possuem um mesmo valor do ponto de vista de
+válido (mais sobre ACID pode ser visto na
+Subseção~\ref{sec:propriedades_acid_em_sistemas_distribuidos_de_larga_escala}).}
+é a garantia oferecida por um sistema de que em um dado momento todas as
+réplicas de um determinado objeto possuem um mesmo valor do ponto de vista de
 quem o acessa \cite{Saito2005,Gray1996,Davidson1985,Parker1983}. Isso significa
 que ao alterar uma réplica, todas as outras também são alteradas antes de
 qualquer acesso independente posterior.
 
 Uma desvantagem da replicação pessimista em sistemas de larga escala é uma
 diminuição da disponibilidade do sistema. Isso porque uma operação que atualiza
-as réplicas X1 e X2 de um objeto X nos nós N1 e N2 só pode ser bem sucedida caso
-ambas as réplicas estejam disponíveis. É comum que sistemas usando replicação
+as réplicas X1 e X2 de um objeto X nos nós N1 e N2 só é bem sucedida caso ambas
+as réplicas estejam disponíveis. É comum que sistemas usando replicação
 pessimista apresentem modos de degradação que possibilitam maior disponibilidade
 na presença de falhas, como por exemplo continuar permitindo operações de
 leitura, recusando apenas as de escrita. Existem soluções, como o uso de
@@ -176,9 +161,9 @@ congestionamento, perda de pacotes e rajadas de tráfego
 nesse cenário, qualquer escrita fica sujeita a latências da ordem de dezenas ou
 centenas de milissegundos. Isso é inaceitável em aplicações web, já que muitas
 vezes cada requisição web resulta em diversos acessos ao sistema de
-armazenamento. O Yahoo!, por exemplo, considera que o acesso ao sistema de
-armazenamento deve gastar no máximo 100 ms do tempo total de processamento de
-cada requisição web \cite{Cooper2008}.
+armazenamento. Por exemplo, o Yahoo! considera que 100 ms é o máximo de tempo
+que pode ser gasto para acessos ao sistema de armazenamento durante o
+processamento de uma requisição web \cite{Cooper2008}.
 
 Por esses motivos replicação otimista, explicada na próxima subseção, costuma
 ser a solução mais viável para sistemas de larga escala.
@@ -202,13 +187,16 @@ resolução de conflitos mais sofisticados, como é o caso de relógios vetor
 \cite{Fidge1988,Parker1983}, que mantêm um histórico de quais nós foram
 responsáveis por quais atualizações em determinado objeto, tornando assim
 possível definir o(s) nó(s) que possui(em) o valor correto em caso de conflito.
-Em casos mais extremos, em que os conflitos possuem uma complexidade semântica
-tal que não é possível que sejam resolvidos pelo sistema de armazenamento, os
-conflitos são expostos para a aplicação, cujos desenvolvedores precisam escrever
-lógica específica para lidar com essas situações \cite{Davidson1985}.
+Em casos mais extremos, a complexidade semântica dos conflitos impossibilita que
+a resolução seja realizada pelo sistema de armazenamento -- por exemplo, caso um
+mesmo objeto tenha sido atualizado simultaneamente com valores divergentes em
+duas réplicas. Nesses casos, as respostas do sistema de armazenamento para
+leituras feitas pela aplicação contêm os valores divergentes. Isso implica que,
+para resolver os conflitos, os desenvolvedores precisam prever que eles podem
+acontecer e preparar a aplicação para resolvê-los \cite{Davidson1985}.
 
-Um problema que pode tornar uma aplicação ainda mais complexa na presença de
-conflitos acontece quando não é possível percebê-los imediatamente, e ações são
+Um problema que torna uma aplicação ainda mais complexa na presença de conflitos
+acontece quando não é possível perceber os conflitos imediatamente, e ações são
 tomadas na aplicação baseadas em valores inconsistentes. Esse é o caso de um
 particionamento de rede seguido de escritas divergentes em um mesmo objeto em
 cada partição. Nesse caso, clientes em cada partição podem realizar ações
@@ -216,17 +204,18 @@ inválidas baseadas nesses valores desatualizados ou conflitantes. Por exemplo,
 podem acontecer duas vendas de um mesmo produto que possui um único item em
 estoque, uma venda ocorrendo em cada partição. Ao perceber o conflito
 posteriormente, o sistema precisa usar uma ação de compensação ou correção para
-resolver o problema \cite{Hohpe2004}. No caso desse exemplo, é necessário
+resolver o problema \cite{Hohpe2004}. No caso desse exemplo, seria necessário
 estornar o valor cobrado no cartão de crédito de um dos clientes e enviar um
 email para ele avisando do problema.
 
 Uma outra alternativa para lidar com conflitos na replicação otimista é o uso de
-tipos de dados replicados livres de conflito \cite{Shapiro2011,Shapiro}, que
-garantem a convergência entre réplicas. Um exemplo de tipo de dado replicado
-livre de conflitos é um conjunto cuja única operação disponível é adição. No
-caso de um particionamento o sistema continua recebendo adições vindas de cada
-partição, e quando o particionamento é resolvido o sistema realiza a união de
-todos os elementos de todas as réplicas daquele conjunto.
+tipos de dados replicados livres de conflito (\emph{Conflict-free replicated
+data type} -- CRDT) \cite{Shapiro2011a,Shapiro2011b}, que garantem a
+convergência entre réplicas. Um exemplo de CRDT é um conjunto cuja única
+operação disponível é adição. No caso de um particionamento, o sistema continua
+recebendo adições vindas de cada partição, e quando o particionamento é
+resolvido, o sistema realiza a união de todos os elementos de todas as réplicas
+daquele conjunto.
 
 O tipo de replicação escolhido impacta as expectativas que o desenvolvedor de um
 sistema tem sobre os estados resultantes das operações de leitura e escrita. As
@@ -238,13 +227,14 @@ seção.
 \section{Modelos de Consistência para Replicação}
 \label{sec:modelos_de_consistencia_para_replicacao}
 
-Um modelo de consistência define o momento em que determinada escrita será vista
-por leituras subsequentes em sistemas de memória compartilhada distribuída
-\cite{Tanenbaum2006}. Do ponto de vista do desenvolvedor, um modelo de
-consistência define a ordem global em que as operações sobre os dados parecem
-ser executadas \cite{Tanenbaum2006,Adve1995}. O modelo de consistência funciona
-como a especificação do que o sistema deve realizar, enquanto o protocolo de
-consistência define a implementação do modelo de consistência.
+Um modelo de consistência define o momento em que determinada os resultados de
+determinada escrita serão retornados por leituras subsequentes em sistemas de
+memória compartilhada distribuída \cite{Tanenbaum2006}. Do ponto de vista do
+desenvolvedor, um modelo de consistência define a ordem global em que as
+operações sobre os dados parecem ser executadas \cite{Tanenbaum2006,Adve1995}. O
+modelo de consistência funciona como a especificação do que o sistema deve
+realizar, enquanto o protocolo de consistência define a implementação do modelo
+de consistência.
 
 Modelos de consistência mais rígidos favorecem a manutenibilidade de um sistema,
 pois são mais simples de usar pelo desenvolvedor. A rigidez de um modelo de
@@ -263,13 +253,13 @@ consistência na linha do tempo, que é menos rígida que a consistência sequencial
 e mais forte que a consistência em momento indeterminado\footnote{Consistência
 na linha do tempo e causal não são comparáveis, mas ambas são menos rígidas que
 a consistência sequencial e mais rígidas que a consistência em momento
-indeterminado.}. Além desses, outros modelos de consistência podem ser
-encontrados na literatura \cite{Tanenbaum2006,Adve1995,Mosberger1993}. Nos
-diagramas de modelos de consistência a seguir, R1, R2, ..., Rn representam as
-réplicas 1, 2, ..., n; T0, T1, ..., Tn representam os instantes 0, 1, ..., n;
-W(x, a) é a operação de escrita do objeto x com o valor a; a = R(x) é a operação
-de leitura do objeto x que retorna o valor a e 0 = R(x) é a operação de leitura
-do objeto x que retorna nulo pois o objeto x não existe (nunca foi escrito).
+indeterminado.}. Além desses, outros modelos de consistência são encontrados na
+literatura \cite{Tanenbaum2006,Adve1995,Mosberger1993}. Nos diagramas de modelos
+de consistência a seguir, R1, R2, ..., Rn representam as réplicas 1, 2, ..., n;
+T0, T1, ..., Tn representam os instantes 0, 1, ..., n; W(x, a) é a operação de
+escrita do objeto x com o valor a; a = R(x) é a operação de leitura do objeto x
+que retorna o valor a e 0 = R(x) é a operação de leitura do objeto x que retorna
+nulo pois o objeto x não existe (nunca foi escrito).
 
 Consistência estrita (ou atômica) \cite{Mosberger1993} é o modelo mais rígido.
 Ele define que toda leitura deve sempre retornar o valor definido pela escrita
@@ -337,16 +327,21 @@ W(x,b)   &          &			\\ \hline R3 &        &          & b = R(x) & a = R(x)
 \\ \end{tabular} \caption{Sequência de operações válida para consistência
 sequencial.} \label{tab:consistencia_sequencial_valida} \end{center} \end{table}
 
-A consistência causal \cite{Ahamad1995} define que escritas que potencialmente
+A consistência causal \cite{Ahamad1995} define que operações que potencialmente
 possuem causas relacionadas devem ser executadas em todas as réplicas na mesma
-ordem, caso contrário podem ser executadas em ordens diferentes. Assim, a
-sequência de operações da Tabela \ref{tab:consistencia_causal_valida} é válida,
-mas a da Tabela \ref{tab:consistencia_causal_invalida} não. A implementação de
-consistência causal necessita que um grafo de operações seja mantido em toda
-réplica para que seja possível saber que operações potencialmente influenciaram
-cada escrita. A consistência causal acomoda conflitos de atualização, permitindo
-que réplicas divirjam indefinidamente, possibilitando que um cliente leia
-valores diferentes dependendo da réplica acessada.
+ordem, caso contrário, elas podem ser executadas em ordens diferentes. Por
+exemplo, um processo que escreveu $x$ após ler $y$ pode ter realizado essa
+escrita como o resultado de uma computação sobre o valore de $x$, portanto a
+escrita foi potencialmente causada pela leitura. Mas se a leitura ocorreu em um
+processo e a escrita em outro, mesmo que da mesma variável, não existe relação
+potencial de causa. A sequência de operações da Tabela
+\ref{tab:consistencia_causal_valida} é válida, mas a da Tabela
+\ref{tab:consistencia_causal_invalida} não. A implementação de consistência
+causal necessita que um grafo de operações seja mantido em toda réplica para que
+seja possível saber que operações potencialmente influenciaram cada escrita. A
+consistência causal acomoda conflitos de atualização, permitindo que réplicas
+divirjam indefinidamente, de modo que um cliente leia valores diferentes
+dependendo da réplica acessada.
 
 \begin{table}[!h] \begin{center} \begin{tabular}{c|c|c|c|c} & T0     & T1 & T2 &
 T3			\\ \hline R1 & W(x,a) &          &          &			\\ \hline R2 & &
@@ -359,24 +354,18 @@ consistência causal.} \label{tab:consistencia_causal_valida} \end{center}
 & T3       &	T4			\\ \hline R1 & W(x,a) &          &          & &				\\
 \hline R2 &        & a = R(x) & W(x,b)   &          &				\\ \hline R3 & & & &
 b = R(x) & a = R(x)	\\ \end{tabular} \caption{Sequência de operações inválida
-para consistência causal} \label{tab:consistencia_causal_invalida} \end{center}
+para consistência causal.} \label{tab:consistencia_causal_invalida} \end{center}
 \end{table}
 
-A consistência em momento indeterminado\footnote{O termo \emph{eventual
-consistency} em inglês às vezes é erroneamente traduzido para o português como
-consistência eventual. Mas \emph{eventual} é um falso cognato: \emph{eventual}
-em inglês indica algo que vai ocorrer em um momento não especificado no futuro
-(\url{http://www.thefreedictionary.com/}), enquanto em português significa
-dependente de evento incerto, eventual, fortuito
-(\url{http://michaelis.uol.com.br}). Portanto, neste trabalho é usada a tradução
-``em momento indeterminado''.} é o modelo de consistência mais relaxado
-\cite{Vogels2009,Fekete1999}. Ela garante que se nenhuma nova escrita ocorrer,
-após um período de tempo indeterminado chamado janela de inconsistência, todas
-as leituras retornarão o último valor escrito. Assim, a sequência de operações
-na Tabela \ref{tab:consistencia_em_momento_indeterminado_valida} é válida. É
-possível surgirem conflitos entre réplicas na consistência em momento
-indeterminado, portanto um sistema que use esse modelo de consistência precisa
-implementar um mecanismo de resolução de conflitos.
+A consistência em momento indeterminado é um modelo de consistência mais
+relaxado \cite{Vogels2009,Fekete1999}. Ela garante que se nenhuma nova escrita
+ocorrer, após um período de tempo indeterminado, chamado janela de
+inconsistência, todas as leituras retornarão o último valor escrito. Assim, a
+sequência de operações na Tabela
+\ref{tab:consistencia_em_momento_indeterminado_valida} é válida. É possível
+surgirem conflitos entre réplicas na consistência em momento indeterminado,
+portanto um sistema que use esse modelo de consistência precisa implementar um
+mecanismo de resolução de conflitos.
 
 \begin{table}[!h] \begin{center} \begin{tabular}{c|c|c|c|c|c} & T0     & T1 & T2
 & T3       &	T4			\\ \hline R1 & W(x,a) &          &          & b = R(x) & b
@@ -388,36 +377,37 @@ indeterminado.} \label{tab:consistencia_em_momento_indeterminado_valida}
 
 Por último, a consistência na linha do tempo \cite{Cooper2008,Alsberg1976}
 define que as escritas acontecem na mesma ordem em todas as réplicas e existem
-três possibilidades de leituras. A leitura da ``versão mais recente'' lê o último valor
-escrito. A leitura por versão garante que o valor lido é tão ou mais novo que a
-versão especificada na operação. A leitura de ``qualquer versão'' não oferece
-garantias sobre quão atual é o valor lido. Do ponto de vista da escrita, a
-consistência na linha do tempo se comporta como a consistência sequencial. Do
-ponto de vista da leitura, o seu comportamento depende do tipo de leitura: com
-leitura consistente ela se comporta como a consistência forte, com leituras por
-versão ou versão qualquer ela se comporta como a consistência em momento
-indeterminado. Esse modelo de consistência permite que existam réplicas
-desatualizadas, mas garante que não existem divergências que precisem de
-mecanismos de resolução de conflitos \cite{Saito2005}, pois todas as escritas
-obedecem uma ordem serial.
+três possibilidades de leituras. A leitura da ``versão mais recente'' lê o
+último valor escrito. A leitura por versão garante que o valor lido é tão ou
+mais novo que a versão especificada na operação. A leitura de ``versão
+qualquer'' não oferece garantias sobre quão atual é o valor lido, sendo possível
+a leitura de valores desatualizados pois a replicação do valor mais recente
+ainda não atingiu a réplica lida. Do ponto de vista da escrita, a consistência
+na linha do tempo se comporta como a consistência sequencial. Do ponto de vista
+da leitura, o seu comportamento depende do tipo de leitura: com leitura da
+``versão mais recente'', ela se comporta como a consistência forte, com leituras
+de ``versão qualquer'' ou uma versão específica, ela se comporta como a
+consistência em momento indeterminado. Esse modelo de consistência permite que
+existam réplicas desatualizadas, mas garante que não existem divergências que
+precisem de mecanismos de resolução de conflitos \cite{Saito2005}, pois todas as
+escritas obedecem uma ordem serial.
 
 O modelo de consistência de um sistema replicado impacta o seu desempenho,
 disponibilidade e manutenibilidade. Sistemas web georeplicados normalmente usam
 os modelos de consistência mais relaxados para atingir maiores desempenho e
-disponibilidade. Existem padrões arquiteturais que ajudam os desenvolvedores a
-entender as trocas entre consistência, desempenho e disponibilidade. A seção
-seguinte discute esses padrões.
+disponibilidade. Conceitos que ajudam os desenvolvedores a entender essas trocas
+são discutidos na seção seguinte.
 
 %% ------------------------------------------------------------------------- %%
 \section{Consistência, Desempenho e Disponibilidade em Sistemas Georeplicados}
 \label{sec:consistencia_desempenho_e_disponibilidade_em_sistemas_georeplicados}
 
 A maioria dos sistemas georeplicados têm fortes requisitos de escalabilidade,
-desempenho e disponibilidade. Nesse contexto, alguns padrões arquiteturais
-usados em sistemas menores deixam de ser válidos. Esta seção trata dos problemas
-enfrentados pelos desenvolvedores de sistemas de larga escala georeplicados e
-dos princípios arquiteturais usados para solucioná-los. Conhecer esses problemas
-e padrões é importante para entender a motivação e os compromissos envolvidos em
+desempenho e disponibilidade. Nesse contexto, alguns conceitos usados em
+arquiteturas de sistemas menores deixam de ser válidos. Esta seção trata dos
+problemas enfrentados pelos desenvolvedores de sistemas de larga escala
+georeplicados e de algumas soluções para eles. Conhecer esses problemas e
+soluções é importante para entender a motivação e os compromissos envolvidos em
 diferentes modelos de consistência.
 
 %% ------------------------------------------------------------------------- %%
@@ -438,7 +428,7 @@ execução, estando disponíveis para todas as futuras transações.
 
 A garantia de que essas propriedades são sempre válidas em um sistema tem um
 preço em termos de escalabilidade, desempenho e disponibilidade. Por isso,
-sistemas web de larga escala costumam abrir mão das propriedades ACID. Isso
+sistemas web de larga escala costumam abrir mão de propriedades ACID. Isso
 acontece pois implementações de transações distribuídas são dependentes de
 técnicas de sincronização que são pouco escaláveis \cite{Helland2007}. A maioria
 dos SGBDs usa algum protocolo de bloqueio (como bloqueio em 2 fases
@@ -452,7 +442,7 @@ Além disso, o uso de transações distribuídas impacta na disponibilidade do
 sistema \cite{Helland2007}, uma vez que um nó inalcançável pelos outros (seja
 por falha no nó ou particionamento na rede) torna todos os objetos armazenados
 nele indisponíveis para escrita, mesmo que esses objetos estejam replicados.
-Isso acontece pois independente do número de réplicas, o sistema está
+Isso acontece pois independente do número de réplicas, o sistema fica
 impossibilitado de garantir consistência mútua \cite{Davidson1985}. As
 consequências de abandonar as propriedades ACID impactam fortemente na forma
 como sistemas web de larga escala são projetados e implementados, algo que pode
@@ -487,15 +477,15 @@ entre disponibilidade e consistência.
 Dessa forma, desenvolvedores de sistemas web georeplicados costumam escolher
 disponibilidade e tolerância a particionamento. O caso de indisponibilidade de
 uma réplica é menos complexo, o sistema continua funcionando normalmente, mesmo
-que com alguma degradação no desempenho. O maior problema é a síndrome do
-cérebro dividido, em que um particionamento na rede ocorre e com isso abre-se a
-possibilidade de clientes de cada lado do particionamento continuarem lendo e
+que com alguma degradação no desempenho. O maior problema é a ``síndrome do
+cérebro dividido'', em que um particionamento na rede ocorre e com isso abre-se
+a possibilidade de clientes de cada lado do particionamento continuarem lendo e
 escrevendo nas réplicas a que têm acesso. Quando isso acontece, escritas vindas
 dos clientes de cada partição podem levar as réplicas de um mesmo objeto a
 estados diferentes.
 
-Existem diversos modelos de consistência que podem ser usados em sistemas que
-escolhem disponibilidade e tolerância a particionamento, consistência em momento
+Existem diversos modelos de consistência usados em sistemas que escolhem
+disponibilidade e tolerância a particionamento, consistência em momento
 indeterminado é um exemplo. Esse modelo de consistência permite inconsistências
 entre réplicas, mas garante que elas são sempre expostas e resolvidas, apesar de
 não haver garantias de tempo para tal. Quando consistência em momento

@@ -26,11 +26,12 @@ Sistemas de Computação) \cite{Jain1991}, de Raj Jain. Esse livro trata da
 análise de desempenho de sistemas de software e/ou hardware, e apresenta
 conceitos de estudos experimentais e o ferramental estatístico necessário nesse
 tipo de análise. Além disso, ele propõe uma abordagem sistemática para fazer um
-estudo experimental. A segunda referência usada sobre análise de desempenho foi \cite{Lilja2005}.
+estudo experimental. A segunda referência usada sobre análise de desempenho foi
+\cite{Lilja2005}.
 
-Neste trabalho seguimos os passos da abordagem em \cite{Jain1991}, com
-exceção do levantamento de parâmetros e a seleção de fatores, que ocorreram após
-a definição da técnica de avaliação. Isso foi feito pois essa foi a fase maior
+Neste trabalho seguimos os passos da abordagem em \cite{Jain1991}, com exceção
+do levantamento de parâmetros e a seleção de fatores, que ocorreram após a
+definição da técnica de avaliação. Isso foi feito pois essa foi a fase maior
 complexidade do estudo, inclusive estando descrita em um capítulo à parte
 (Capítulo~\ref{cap:parametros_e_fatores}).
 
@@ -88,12 +89,11 @@ baseado em cópia primária.
 
 Por limitações de escopo e recurso, este estudo analisa o sistema apenas do
 ponto de vista do desempenho. Isso significa que o estudo não considera outros
-atributos de qualidade como disponibilidade e manutenibilidade. Por isso, o
-comportamento do sistema não foi estudado com relação a presença de falhas em
-nós, por exemplo. Além disso, também foi considerada a operação do sistema em
-estado estacionário, sua operação em sobrecarga não foi estudada. Essas outras
-condições de operação podem ser estudadas em trabalho futuros (seção
-\ref{sec:trabalhos_futuros}).
+requisitos como disponibilidade e manutenibilidade. Por isso, o comportamento do
+sistema não foi estudado com relação a presença de falhas em nós, por exemplo.
+Além disso, também foi considerada a operação do sistema em estado estacionário,
+sua operação em sobrecarga não foi estudada. Essas outras condições de operação
+podem ser estudadas em trabalho futuros (seção \ref{sec:trabalhos_futuros}).
 
 %% ------------------------------------------------------------------------- %%
 \subsection{Métricas} \label{sec:metricas}
@@ -474,9 +474,9 @@ no sítio Sophia em \emph{/home/madediana/images/squeeze-x64-riak.tgz}.
 \subsection{Rede} \label{sec:rede}
 
 Os sítios do Grid5000 são conectados por redes de alta velocidade. Suas redes
-apresentam latências da ordem de centenas de nanosegundos entre nós de um mesmo
-aglomerado e da ordem de 20 ms entre sítios, e portanto não caracterizam uma
-WAN. De qualquer forma, mesmo que caracterizassem, ter controle sobre esses
+apresentam latências da ordem de centenas de microssegundos entre nós de um
+mesmo aglomerado e da ordem de 20 ms entre sítios, e portanto não caracterizam
+uma WAN. De qualquer forma, mesmo que caracterizassem, ter controle sobre esses
 valores era necessário para medir o desempenho do sistema em diferentes
 condições de rede e possibilitar a reprodutibilidade dos experimentos.
 
