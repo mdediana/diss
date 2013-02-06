@@ -57,30 +57,36 @@ baseados nesse relaxamento de consistência
 
 A consistência em momento indeterminado (\emph{eventual consistency}\footnote{O
 termo \emph{eventual consistency} às vezes é erroneamente traduzido para o
-português como consistência eventual. Mas \emph{eventual} é um falso cognato:
-\emph{eventual} em inglês indica algo que vai ocorrer em um momento não
-especificado no futuro (\url{http://www.thefreedictionary.com/}), enquanto em
-português significa dependente de evento incerto, eventual, fortuito
-(\url{http://michaelis.uol.com.br}). Portanto, neste trabalho é usada a tradução
-``em momento indeterminado''.}) é um modelo mais relaxado e se tornou
-especialmente popular após a publicação sobre o Dynamo \cite{DeCandia2007},
-sistema de armazenamento chave-valor usado tanto pela loja virtual quanto pela
-estrutura de computação em nuvem da Amazon\footnote{\url{http://www.amazon.com/}
-e \url{http://aws.amazon.com/}} \cite{Vogels2007}. A consistência em momento
-indeterminado garante que as réplicas vão sempre convergir em algum momento no
-futuro desde que novas atualizações cessem. Enquanto atualizações estiverem
-acontecendo, existe a possibilidade de surgirem inconsistências entre as
-réplicas. Como a consistência em momento indeterminado permite conflitos entre
-réplicas, clientes podem acessar dados desatualizados ou divergentes dependendo
-da réplica acessada. Os conflitos que surgem precisam ser resolvidos por
-algoritmos de detecção e resolução de conflitos e caso ações tenham sido tomadas
-com base em valores inconsistentes, ações de compensação são necessárias. O uso
-de consistência em momento indeterminado em um sistema georeplicado resulta em
-baixa latência e alta disponibilidade, tendo como contraponto uma maior
-complexidade no desenvolvimento da aplicação, que precisa estar preparada para
-lidar com inconsistências. Após o Dynamo, diversos sistemas de armazenamento que
-lidam com consistência em momento indeterminado foram implementados e colocados
-em produção, como Cassandra \cite{Lakshman2010} e Voldemort \cite{Voldemort},
+português como consistência eventual. Mas \emph{eventual} é um falso cognato: o
+dicionário de inglês Cambridge define essa palavra como ``happening or existing
+at a later time or at the end, especially after a lot of effort, problems,
+etc.'', cuja tradução para o português é ``acontecendo ou existindo em um
+instante mais tarde ou ao fim, especialmente depois de muito esforço, problemas,
+etc.''
+(\url{http://dictionary.cambridge.org/dictionary/british/eventual?q=eventual}).
+O dicionário de português Michaelis usa a definição como ``dependente de evento
+incerto, casual, fortuito, variável''
+(\url{http://michaelis.uol.com.br/moderno/portugues/index.php?lingua=portugues-portugues&palavra=eventual}).
+Portanto, neste trabalho é usada a tradução ``em momento indeterminado''.}) é um
+modelo mais relaxado e se tornou especialmente popular após a publicação sobre o
+Dynamo \cite{DeCandia2007}, sistema de armazenamento chave-valor usado tanto
+pela loja virtual quanto pela estrutura de computação em nuvem da
+Amazon\footnote{\url{http://www.amazon.com/} e \url{http://aws.amazon.com/}}
+\cite{Vogels2007}. A consistência em momento indeterminado garante que as
+réplicas vão sempre convergir em algum momento no futuro desde que novas
+atualizações cessem. Enquanto atualizações estiverem acontecendo, existe a
+possibilidade de surgirem inconsistências entre as réplicas. Como a consistência
+em momento indeterminado permite conflitos entre réplicas, clientes podem
+acessar dados desatualizados ou divergentes dependendo da réplica acessada. Os
+conflitos que surgem precisam ser resolvidos por algoritmos de detecção e
+resolução de conflitos e caso ações tenham sido tomadas com base em valores
+inconsistentes, ações de compensação são necessárias. O uso de consistência em
+momento indeterminado em um sistema georeplicado resulta em baixa latência e
+alta disponibilidade, tendo como contraponto uma maior complexidade no
+desenvolvimento da aplicação, que precisa estar preparada para lidar com
+inconsistências. Após o Dynamo, diversos sistemas de armazenamento que lidam com
+consistência em momento indeterminado foram implementados e colocados em
+produção, como Cassandra \cite{Lakshman2010} e Voldemort \cite{Voldemort},
 implementados respectivamente pelo
 Facebook\footnote{\url{http://www.facebook.com/}} e
 LinkedIn\footnote{\url{http://www.linkedin.com/}}. Outras empresas web de larga
@@ -105,7 +111,7 @@ funcionar corretamente. Por exemplo, uma aplicação de leilão não pode permitir
 conflitos no histórico de lances de um produto. Num sistema que usa consistência
 em momento indeterminado, no caso de uma falha que divida a rede em duas
 partições, usuários em cada partição têm uma visão própria do histórico de
-lances. Na prática, isso seriam dois leilões simultâneos sobre o mesmo item,
+lances. Isso seria equivalente a dois leilões simultâneos sobre o mesmo item,
 conflito que não tem como ser resolvido depois sem desprezar lances. Outro
 exemplo é um usuário de uma aplicação web de planilha, que não pode ver um valor
 que acabou de ser inserido desaparecer espontaneamente, mesmo que
@@ -142,13 +148,13 @@ seu desempenho seja aceitável. O maior fator de impacto no desempenho da
 consistência na linha do tempo é o fato de que todas as escritas e leituras
 consistentes que não são feitas no centro de dados em que está a réplica mestre
 incorrem no custo de latência da WAN.  Entretanto, em aplicações como redes
-sociais, por exemplo, é de se esperar que a localidade dos acessos seja alta (a
-maioria dos usuários acessa o sistema de um único país e tem a maioria de seus
-contatos no mesmo país) e que a relação escrita/leitura seja baixa (cada item
-criado, como uma postagem ou um comentário, seja lido diversas vezes). De fato,
-os autores do PNUTS indicam que em sua rede social 60\% dos acessos é local e a
-relação escrita/leitura observada é de 0,06 \cite{Kadambi2011}. Eles indicam
-também que outras aplicações chegam a ter 85\% dos acessos locais
+sociais, por exemplo, é de se esperar que haja uma grande quantidade de acessos
+locais (a maioria dos usuários acessa o sistema de um único país e tem a maioria
+de seus contatos no mesmo país) e que a relação escrita/leitura seja baixa (cada
+item criado, como uma postagem ou um comentário, seja lido diversas vezes). De
+fato, os autores do PNUTS indicam que em sua rede social 60\% dos acessos é
+local e a relação escrita/leitura observada é de 0,06 \cite{Kadambi2011}. Eles
+indicam também que outras aplicações chegam a ter 85\% dos acessos locais
 \cite{Cooper2008}. Dado isso, eles usam a estratégia de sempre mover
 dinamicamente a réplica mestre para o centro de dados que processa a maior
 quantidade de requisições para dado objeto.  Com isso, em uma aplicação na qual
@@ -174,8 +180,8 @@ Há diversos estudos experimentais sobre desempenho de modelos de consistência
 comparação quantitativa entre esses dois modelos mostrando como cada um se
 comporta em diferentes condições de latência de rede e carga de trabalho. Dados
 sobre essa comparação podem oferecer subsídios para desenvolvedores e
-administradores de sistemas estimarem melhor custos de desenvolvimento e fazerem
-um planejamento de capacidade mais eficaz.
+administradores de sistemas estimarem melhor os custos de desenvolvimento e
+fazerem um planejamento de capacidade mais eficaz.
 
 %% ------------------------------------------------------------------------- %%
 \section{Organização do Trabalho} \label{sec:organizacao_trabalho}
