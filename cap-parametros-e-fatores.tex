@@ -23,15 +23,17 @@ Seção~\ref{sec:fatores_selecionados}.
 
 %% ------------------------------------------------------------------------- %%
 \section{Mecanismos do TCP e Parâmetros de Rede}
-\label{sec:mecanismos_do_tcp_e_parametros_de_rede} Uma das principais diferenças
-entre redes de longa distância (WANs) e redes locais (LANs), além da área pela
-qual se estendem, diz respeito a confiabilidade do meio. LANs costumam usar
-topologias simples com poucos dispositivos e segmentos entre os nós, enquanto o
-contrário acontece em WANs. Além disso, LANs costumam ser mais homogêneas e
-terem um único administrador. No caso de WANs, um pacote de dados normalmente
-atravessa diversas redes compostas por dispositivos e administradores
-diferentes. Do ponto de vista deste trabalho, um centro de dados corresponde a
-uma LAN, enquanto a georeplicação ocorre na WAN.
+\label{sec:mecanismos_do_tcp_e_parametros_de_rede}
+
+Uma das principais diferenças entre redes de longa distância (WANs) e redes
+locais (LANs), além da área pela qual se estendem, diz respeito à confiabilidade
+do meio. LANs costumam usar topologias simples com poucos dispositivos e
+segmentos entre os nós, enquanto o oposto acontece em WANs. Além disso, LANs
+costumam ser mais homogêneas e terem um único administrador. No caso de WANs, um
+pacote de dados normalmente atravessa diversas redes compostas por dispositivos
+e administradores diferentes. Do ponto de vista deste trabalho, um centro de
+processamento de dados corresponde a uma LAN, enquanto a georeplicação ocorre na
+WAN.
 
 TCP/IP é a pilha de protocolos comumente utilizada em sistemas georeplicados. O
 protocolo IP provê os mecanismos de endereçamento e roteamento. O TCP provê
@@ -46,9 +48,9 @@ descarta pacotes, o que pode ser causado por corrupção de pacotes ou
 congestionamento da rede, como \emph{buffers} esgotados em um roteador, por
 exemplo. Reordenação ocorre quando pacotes de uma mesma conexão TCP enviados nos
 instantes T1 e T2 seguem caminhos diferentes na rede, e o pacote enviado em T2
-chega ao receptor antes do enviado em T1. Duplicação normalmente está
-relacionada a retransmissões do TCP, mas também acontece devido a balanceamento
-de carga ou problemas de hardware ou software em dispositivos intermediários.
+chega ao receptor antes do enviado em T1. Duplicação normalmente é relacionada a
+retransmissões do TCP, mas também acontece devido a balanceamento de carga ou
+problemas de hardware ou software em dispositivos intermediários.
 
 Os principais mecanismos adotados no TCP para prover comunicação confiável são
 descritos a seguir \cite{Stevens1993,RFC5861}:
@@ -102,7 +104,7 @@ números de sequência 1, 21 e 31 chegam ao receptor, ele responde com três ACKs
 com número de reconhecimento 11. O transmissor trata os primeiros ACKs em
 duplicata como reordenação de pacotes e apenas os ignora. Mas ao receber o
 terceiro, ele considera que um pacote foi perdido (o de número 21 no exemplo).
-EM vez de esperar o temporizador, o mecanismo de retransmissão rápida
+Em vez de esperar o temporizador, o mecanismo de retransmissão rápida
 retransmite o pacote imediatamente.
 
 \paragraph{Recuperação rápida}O mecanismo de retransmissão rápida ter sido
@@ -142,7 +144,7 @@ valores estão descritos na Seção~\ref{sec:parametros_fixados}. Os restantes
 foram considerados fatores e o tratamento dado a eles está na Seção
 \ref{sec:selecao_dos_fatores}.
 
-Uma última observação é que todos valores de latência relatados referem-se a
+Uma última observação é que todos valores de latência relatados referem-se à
 latência de ida e volta.
 
 %% ------------------------------------------------------------------------- %%
@@ -168,17 +170,19 @@ desempenho em disco é sempre menor.
 apresente escalabilidade linear, quanto mais nós ele tiver, menor será o
 desempenho por nó.
 
-\paragraph{Capacidade dos centros de dados}A menos que todos os centros de dados
-possuam as mesmas capacidades agregadas de processamento, armazenamento e
-largura de banda, a vazão de cada centro de dados é diferente, o que se reflete
-no desempenho das requisições.
+\paragraph{Capacidade dos centros de processamento de dados}A menos que todos os
+centros de processamento de dados possuam as mesmas capacidades agregadas de
+processamento, armazenamento e largura de banda, a vazão de cada centro de
+processamento de dados é diferente, o que se reflete no desempenho das
+requisições.
 
 \paragraph{Quantidade de instâncias do \emph{benchmark}}Considerando que cada
 instância do \emph{benchmark} gere a mesma taxa de requisições, uma quantidade
-mínima é necessária para a evitar gargalos no \emph{benchmark}.
+mínima é necessária para evitar gargalos no \emph{benchmark}.
 
-\paragraph{Quantidade de threads por instância do \emph{benchmark}}Mesma
-justificativa que para quantidade de instâncias do \emph{benchmark}.
+\paragraph{Quantidade de threads por instância do \emph{benchmark}}A mesma
+justificativa usada para quantidade de instâncias do \emph{benchmark} é válida
+para quantidade de threads por instância.
 
 \paragraph{Quantidade de objetos armazenados}A quantidade de objetos armazenados
 influencia o volume de dados no disco e no cache de disco (caso disco seja o
@@ -194,8 +198,8 @@ objetos influencia a fragmentação da memória, o que também afeta o desempenho.
 Além disso, o tamanho dos objetos afeta o comportamento da comunicação TCP, dado
 que objetos muito grandes precisam ser divididos em mais de um pacote e objetos
 muito pequenos resultam em uma carga paga (\emph{payload}) proporcionalmente
-menor. Isso tende a se refletir como diminuição da vazão e/ou aumento do tempo
-de resposta das requisições.
+menor. Isso tende a se refletir como redução da vazão e/ou aumento do tempo de
+resposta das requisições.
 
 \paragraph{Algoritmo de particionamento}O algoritmo de particionamento define a
 distribuição dos objetos pelos nós. No caso de uma distribuição desbalanceada,
@@ -208,17 +212,18 @@ seu desempenho prejudicado com relação a outros.
 tráfego de rede, o que tende a causar uma diminuição do desempenho do sistema.
 
 \paragraph{Configuração de replicação -- $R$ e $W$ (para consistência em momento
-indeterminado)}Em um ambiente com mais de um centro de dados, a configuração de
-replicação afeta a proporção entre requisições locais e remotas. Por exemplo, se
-todo centro de dados possui uma e apenas uma réplica de cada objeto, todas as
-leituras são locais para R = 1 e remotas para R = 2. Dessa forma, a configuração
-de replicação afeta o tempo de resposta das requisições.
+indeterminado)}Em um ambiente com mais de um centro de processamento de dados, a
+configuração de replicação afeta a proporção entre requisições locais e remotas.
+Por exemplo, se todo centro de processamento de dados possui uma e apenas uma
+réplica de cada objeto, todas as leituras são locais para R = 1 e remotas para R
+= 2. Dessa forma, a configuração de replicação afeta o tempo de resposta das
+requisições.
 
 \paragraph{Limiar de migração (para consistência na linha do tempo)}O limiar de
-migração é o valor no qual uma réplica mestre migra de um centro de dados para
-outro. Dependendo da carga de trabalho, valores diferentes do limiar resultam em
-proporções entre requisições locais e remotas diferentes, afetando assim o tempo
-de resposta médio das requisições.
+migração é o valor no qual uma réplica mestre migra de um centro de
+processamento de dados para outro. Dependendo da carga de trabalho, valores
+diferentes do limiar resultam em proporções entre requisições locais e remotas
+diferentes, afetando assim o tempo de resposta médio das requisições.
 
 \paragraph{Protocolo de acesso}Um protocolo mais eficiente, que envia menos
 metadados, por exemplo, resulta em desempenho das requisições mais alto.
@@ -252,20 +257,20 @@ afeta os tempos de envio e recebimento.
 \paragraph{Variação da latência da LAN}A latência em uma rede não é constante,
 dado que dentre suas causas está a dinâmica da rede
 \cite{Gurtov2002,Kraska2012}. Por exemplo, rajadas de tráfego aumentam a fila de
-pacotes a ser processados em um roteador, o que se manifesta como aumento de
-latência nas conexões passando por ele. Quando o roteador volta a sua operação
-normal, a latência diminui. A latência não vaira aleatoriamente, ela tem
+pacotes a serem processados em um roteador, o que se manifesta como aumento de
+latência nas conexões passando por ele. Quando o roteador volta à sua operação
+normal, a latência diminui. A latência não varia aleatoriamente, ela tem
 períodos de aumento e de diminuição gradual. No exemplo, a latência diminui em
 função da diminuição da fila no roteador, ela não cai imediatamente para o seu
-valor médio. Esse fato levou ao uso de correlação na variação da latência nos
-experimentos.
+valor médio.
 
-\paragraph{Largura de banda da WAN}Mesma justificativa que para largura de banda
-da LAN.
+\paragraph{Largura de banda da WAN}A mesma justificativa usada para largura de
+banda da LAN é válida para largura de banda da WAN.
 
-\paragraph{Latência da WAN}Mesma justificativa que para latência da LAN. Um
-agravante é que latências em WANs são ordens de grandeza maiores que em LANs já
-que as distâncias percorridas pelos pacotes são muito maiores.
+\paragraph{Latência da WAN}A mesma justificativa usada para latência da LAN é
+válida para latência da WAN. Um agravante é que latências em WANs são ordens de
+grandeza maiores que em LANs já que as distâncias percorridas pelos pacotes são
+muito maiores.
 
 \paragraph{Variação da latência da WAN}Mesma justificativa que para variação de
 latência na LAN. Um agravante é que requisições em uma WAN atravessam mais
@@ -298,16 +303,16 @@ receptor, o que pode afetar seu desempenho \cite{Wang2004}.
 
 \paragraph{Variação de TCP}Variações de TCP oferecem diferentes algoritmos de
 prevenção de congestionamento, responsável pelo dimensionamento da janela de
-congestionamento.  Quanto maior a janela de congestionamento, maior a quantidade
-dados em trânsito e maior a vazão do sistema.
+congestionamento. Quanto maior a janela de congestionamento, maior a quantidade
+de dados em trânsito e maior a vazão do sistema.
 
-\paragraph{Quantidade e características dos enlaces de WAN}A menos que os
-enlaces que interligam os centros de dados tenham as mesmas características, o
-tempo de resposta de uma dada requisição depende de sua origem e destino.
+\paragraph{Quantidade de enlaces de WAN}Se os diferentes enlaces tiverem
+diferentes características de rede, o tempo de resposta de uma dada requisição
+depende de sua origem e destino.
 
 Taxas de perda, de duplicação e reordenação de pacotes não foram consideradas
 para LAN pois ocorrem com menor frequência e geram pouco impacto nesse tipo de
-rede. Em WANs, esses fenômenos estão relacionados a uma maior quantidade de nós
+rede. Em WANs, esses fenômenos são relacionados a uma maior quantidade de nós
 intermediários (incluindo roteadores e \emph{proxies}) e redes heterogêneas que
 os pacotes atravessam.
 
@@ -316,13 +321,13 @@ quantidade máxima de dados em trânsito em uma conexão TCP e é comumente usado
 como medida de capacidade de enlaces de WANs em vez de latência e largura de
 banda separadamente. Neste trabalho a opção foi tratar latência e largura de
 banda separadamente pois a principal métrica do estudo é o tempo de resposta das
-requisições (Seção~\ref{sec:metricas}), que é mais facilmente comparável
-diretamente com a latência da rede. Além disso, foi considerado para estudo um
-cenário de implantação em que uma nuvem semelhante ao EC2 da Amazon fosse usada,
-então a largura de banda foi fixada nos estudos com base em valores relatados
-(ver Seção~\ref{sec:parametros_fixados}).
+requisições (Seção~\ref{sec:metricas}), que é comparável diretamente com a
+latência da rede, ao contrário do BDP. Além disso, foi considerado para estudo
+um cenário de implantação em que uma nuvem semelhante ao EC2 da Amazon fosse
+usada, então a largura de banda foi fixada nos estudos com base em valores
+relatados (ver Seção~\ref{sec:parametros_fixados}).
 
-Por último, a variação de TCP usada é definida naa configuração nos nós, e
+Por último, a variação de TCP usada é definida na configuração nos nós, e
 portanto poderia ser considerada um parâmetro de sistema. Mas como uma única
 variação foi usada em todos os nós e a análise do parâmetro fazia mais sentido
 no contexto da rede, a opção foi por classificá-lo como parâmetro de rede.
@@ -353,24 +358,26 @@ linha do tempo, em que a réplica mestre pode se tornar um gargalo nas escritas.
 \paragraph{Localidade}Cooper et al. notam um alto índice de localidade nos
 acessos aos objetos dos sistemas no Yahoo! \cite{Cooper2008}. Em uma análise
 feita no período de uma semana, foi observado que em média 85\% das escritas a
-determinado objeto vinham do mesmo centro de dados. Isso acontece por exemplo em
-uma rede social, em que os usuários costumam tanto acessar a aplicação quanto
-ter a maior parte de seus contatos na mesma localização geográfica -- usuários
-brasileiros tendem a acessar o sistema do Brasil e a maioria de seus contatos é
-brasileira. Nesse caso, é possível evitar requisições entre centros de dados se
-os objetos são particionados no sistema considerando a localização geográfica
-dos acessos mais recentes. A implementação de consistência na linha do tempo
-usada neste estudo implementa migração de réplica mestre por esse motivo.
+determinado objeto vinham do mesmo centro de processamento de dados. Isso
+acontece por exemplo em uma rede social, em que os usuários costumam tanto
+acessar a aplicação quanto ter a maior parte de seus contatos na mesma
+localização geográfica -- usuários brasileiros tendem a acessar o sistema do
+Brasil e a maioria de seus contatos é brasileira. Nesse caso, é possível evitar
+requisições entre centros de processamento de dados se os objetos são
+particionados no sistema considerando a localização geográfica dos acessos mais
+recentes. A implementação de consistência na linha do tempo usada neste estudo
+implementa migração de réplica mestre por esse motivo.
 
-\paragraph{Taxa de chegada de requisições}Mesma justificativa que para
-quantidade de instâncias do \emph{benchmark}.
+\paragraph{Taxa de chegada de requisições}A mesma justificativa usada para
+quantidade de instâncias do \emph{benchmark} é válida para a taxa de chegada de
+requisições.
 
 \paragraph{Versão requisitada nas leituras (para consistência na linha do
 tempo)}Leituras de ``qualquer versão'' apresentam tempo de resposta menor que
-leituras de ``versão mais recente'' pois têm maior probabilidade de ser
-atendidas localmente. No caso onde existe garantia de haver ao menos uma réplica
-por centro de dados, as leituras de ``qualquer versão'' só não são atendidas
-localmente em caso de falha.
+leituras de ``versão mais recente'' pois têm maior probabilidade de serem
+atendidas localmente. No caso em que existe garantia de haver ao menos uma
+réplica por centro de processamento de dados, as leituras de ``qualquer versão''
+só não são atendidas localmente em caso de falha.
 
 %% ------------------------------------------------------------------------- %%
 \section{Parâmetros Fixados} \label{sec:parametros_fixados}
@@ -381,13 +388,13 @@ o pesquisador. Um outro motivo é saber de antemão que, apesar de afetar o
 desempenho do sistema, o parâmetro é pouco relevante para o estudo.
 
 Favorecer simetria e homogeneidade nos experimentos foi um princípio que guiou
-algumas das decisões, pois isso simplificou a implementação e a análise dos
+algumas das decisões, para simplificar a implementação e a análise dos
 experimentos. A desvantagem é a possível perda de realismo, dado que sistemas
 distribuídos de larga escala não costumam ser totalmente simétricos nem
 homogêneos.
 
 Como o foco do estudo era a operação do sistema sobre uma WAN, fatores
-relacionados a rede e carga de trabalho eram prioridade. Por isso, sempre que
+relacionados à rede e à carga de trabalho eram prioridade. Por isso, sempre que
 possível, parâmetros de sistema foram fixados, mesmo quando se sabia que eles
 afetavam o desempenho.
 
@@ -408,9 +415,9 @@ a garantir homogeneidade de hardware. Além disso, do ponto de vista operacional,
 o uso de um único aglomerado simplificou a execução dos experimentos. Dado isso,
 alguns experimentos foram feitos para decidir qual aglomerado seria usado.
 
-Os aglomerados do Grid5000 considerados foram parapluie, sol e suno. A descrição
-do hardware e a quantidade de nós de cada um deles se encontra na Tabela
-\ref{tab:aglomerados_do_grid5000}.
+Os aglomerados do Grid5000 considerados foram \emph{parapluie}, \emph{sol} e
+\emph{suno}. A descrição do hardware e a quantidade de nós de cada um deles se
+encontra na Tabela \ref{tab:aglomerados_do_grid5000}.
 
 \begin{table}[!h] \begin{center}
 
@@ -418,11 +425,13 @@ do hardware e a quantidade de nós de cada um deles se encontra na Tabela
 
 Aglomerado & CPU & Memória & Disco & Nós \\ \hline
 
-parapluie & AMD Opteron 6164 HE 1.7 Ghz & 48 GB & SATA / 250 GB & 40\\ \hline
+\emph{parapluie} & AMD Opteron 6164 HE 1.7 Ghz & 48 GB & SATA / 250 GB & 40\\
+\hline
 
-sol & AMD Opteron 2218 2.6 GHz & 4 GB & SATA / 250 GB & 50\\ \hline
+\emph{sol} & AMD Opteron 2218 2.6 GHz & 4 GB & SATA / 250 GB & 50\\ \hline
 
-suno & Intel Xeon E5520 2.26 GHz & 32 GB & SAS/RAID-0 / 2x300 GB & 45\\ \hline
+\emph{suno} & Intel Xeon E5520 2.26 GHz & 32 GB & SAS/RAID-0 / 2x300 GB & 45\\
+\hline
 
 \end{tabular}
 
@@ -430,15 +439,17 @@ suno & Intel Xeon E5520 2.26 GHz & 32 GB & SAS/RAID-0 / 2x300 GB & 45\\ \hline
 
 \end{center} \end{table}
 
-Os experimentos mostraram diferenças consideráveis no desempenho do Riak entre
-esses aglomerados. Considerando que os experimentos eram limitados por E/S (e
-não por CPU) e que não havia gargalo de rede, decidiu-se checar o desempenho dos
-discos em cada aglomerado. A especificação do hardware mostrava tipos de discos
+Os experimentos mostraram diferenças consideráveis no desempenho do Riak nesses
+aglomerados. Considerando que os experimentos eram limitados por E/S (e não por
+CPU) e que não havia gargalo de rede, decidiu-se checar o desempenho dos discos
+em cada aglomerado. A especificação do hardware mostrava tipos de discos
 diferentes entre aglomerados.  Dada essa diferença, experimentos foram
 realizados para quantificá-la e tomar uma decisão mais informada.
 
 Testes de desempenho de disco foram realizados em cada aglomerado. Para medição
-do desempenho, os experimentos usaram o hdparm para acesso sequencial e o
+do desempenho, os experimentos usaram o
+hdparm\footnote{\url{http://linux.die.net/man/8/hdparm}} para acesso sequencial
+e o
 seeker\footnote{\url{http://www.linuxinsight.com/how\_fast\_is\_your\_disk.html}}
 para acesso aleatório. Os resultados confirmaram as grandes diferenças de
 desempenho, como pode ser visto na Tabela
@@ -451,11 +462,11 @@ desempenho, como pode ser visto na Tabela
 Aglomerado & Sequencial (MB/s) & Aleatório (buscas/s) & Aleatório (em ms) \\
 \hline
 
-parapluie & 103,9 & 77 & 13,0 \\ \hline
+\emph{parapluie} & 103,9 & 77 & 13,0 \\ \hline
 
-sol & 59,8 & 78 & 12,7 \\ \hline
+\emph{sol} & 59,8 & 78 & 12,7 \\ \hline
 
-suno & 242,7 & 131 & 7,6 \\ \hline
+\emph{suno} & 242,7 & 131 & 7,6 \\ \hline
 
 \end{tabular}
 
@@ -492,28 +503,29 @@ descartar a influência de desempenho do disco. Em princípio, os resultados podem
 parecer menos realistas e aplicáveis, mas na prática eles são tão limitados
 quanto com o uso de disco, já que nesse caso os resultados seriam afetados pelo
 tipo de disco e pela relação entre o tamanho do banco de dados e a memória
-livre. Um exemplo é a comparação de suno com parapluie, em que o primeiro
-aglomerado possui discos com taxas de acesso maiores que a largura de banda da
-rede (1 Gb/s) -- o gargalo em um caso seria a rede, em outro caso seria o disco.
-Efeitos do cache de disco tornariam os resultados ainda mais particulares e
-difíceis de ser generalizados.  Dessa forma, ao adotar memória como mecanismo de
-armazenamento, eliminou-se os efeitos das interações entre rede, disco e cache
-de disco e a análise foi focada apenas na rede. Trabalhos futuros podem estudar
-o efeito de disco e cache de disco no desempenho (Seção
+livre. Um exemplo é a comparação de \emph{suno} com \emph{parapluie}, em que o
+primeiro aglomerado possui discos com taxas de acesso maiores que a largura de
+banda da rede (1 Gb/s) -- o gargalo em um caso seria a rede, em outro caso seria
+o disco.  Efeitos do cache de disco tornariam os resultados ainda mais
+particulares e difíceis de serem generalizados.  Dessa forma, ao adotar memória
+como mecanismo de armazenamento, eliminou-se os efeitos das interações entre
+rede, disco e cache de disco e a análise foi focada apenas na rede. Trabalhos
+futuros podem estudar o efeito de disco e cache de disco no desempenho (Seção
 \ref{sec:trabalhos_futuros}).
 
 Ao definir que o sistema usaria memória como mecanismo de armazenamento, a
 configuração de hardware do aglomerado passou a ser menos relevante, dado que
 todos os aglomerados oferecem nós com capacidade de processamento (CPU)
-razoável, ao menos 4 GB de memória e placas de rede de 1 Gb/s. O aglomerado sol
-foi escolhido predominantemente por questões operacionais -- ele tem um tamanho
-suficiente (47 nós) e a concorrência pela reserva de seus nós é baixa.
+razoável, ao menos 4 GB de memória e placas de rede de 1 Gb/s. O aglomerado
+\emph{sol} foi escolhido predominantemente por questões operacionais -- ele tem
+um tamanho suficiente (47 nós) e a concorrência pela reserva de seus nós é
+baixa.
 
 Dessa forma, os valores fixados foram:
 
 \begin{itemize}
 
-\item Aglomerado: sol
+\item Aglomerado: \emph{sol}
 
 \item Mecanismo de armazenamento: memória
 
@@ -528,9 +540,10 @@ um comutador Foundry FastIron Super X.
 Os parâmetros inicialmente levantados que não foram considerados fatores foram
 fixados. O valores definidos foram:
 
-\paragraph{Capacidade dos centros de dados:}Os centros de dados têm a mesma
-capacidade, com a mesma quantidade de nós e os nós têm a mesma configuração de
-hardware, resultando em um sistema simétrico e homogêneo.
+\paragraph{Capacidade dos centros de processamento de dados:}Os centros de
+processamento de dados têm a mesma capacidade, com a mesma quantidade de nós e
+os nós têm a mesma configuração de hardware, resultando em um sistema simétrico
+e homogêneo.
 
 \paragraph{Algoritmo de particionamento das chaves:}O algoritmo padrão do Riak
 foi usado (espalhamento consistente), configurado com 512 partições. Esse valor
@@ -570,8 +583,8 @@ nos experimentos.
 disponível nas placas de rede dos nós do aglomerado e não foram encontrados
 indícios de que o comutador seria um gargalo. Tomando o AWS como base, estudos
 informais indicam que é essa a largura de banda observada dentro de um mesmo
-centro de dados por instâncias com perfil de E/S ``Alto'' (por exemplo, uma
-instância M1 Grande) \cite{Thorsten2007,Pujol2012}.
+centro de processamento de dados por instâncias com perfil de E/S ``Alto'' (por
+exemplo, uma instância M1 Grande) \cite{Thorsten2007,Pujol2012}.
 
 \paragraph{Latência da LAN:}Latência do aglomerado utilizado no estudo. Um teste
 com ping com 60 amostras espaçadas em 5 s no aglomerado mediu 167 $\mu$s de
@@ -584,14 +597,15 @@ de 90 $\mu$s.
 
 \paragraph{Largura de banda da WAN:} 100 Mb/s. Um estudo informal entre os
 serviços EC2 e S3 da Amazon com 9 segmentos de rede entre eles (indício de que
-estão em centros de dados diferentes) mediu 400 Mb/s \cite{Thorsten2007}. Outro
-estudo cita que é comum medir 100 Mb/s como largura de banda entre zonas de
-disponibilidade \cite{Pujol2012}.
+estão em centros de processamento de dados diferentes) mediu 400 Mb/s
+\cite{Thorsten2007}. Outro estudo cita que é comum medir 100 Mb/s como largura
+de banda entre zonas de disponibilidade \cite{Pujol2012}.
 
-\paragraph{Quantidade e características dos enlaces de WAN:} 1. Um único enlace
-significa que o estudo usou dois centros de dados. Esse valor simplificou a
-análise e a modificação do algoritmo de particionamento do Riak (ver
-Seção~\ref{sec:sistema_de_armazenamento}).
+\paragraph{Quantidade de enlaces de WAN:} 1. Um único enlace significa que o
+estudo usou dois centros de processamento de dados. Esse valor simplificou a
+modificação do algoritmo de particionamento do Riak (ver
+Seção~\ref{sec:sistema_de_armazenamento}) e a análise dos resultados, que
+precisou considerar heterogeneidade da rede.
 
 \paragraph{Taxa de chegada de requisições}15 operações/s para cada thread de
 cada instância do \emph{benchmark}. Esse valor foi usado pois esse parâmetro se
@@ -599,7 +613,7 @@ relaciona diretamente com a quantidade de threads por instância do
 \emph{benchmark}. Assim, considerando que threads por instância foi inicialmente
 considerado um fator, a taxa de chegada foi fixada.
 
-Vale notar que a LAN nos experimentos era definida pela infraestrutura do
+Vale notar que a LAN nos experimentos foi definida pela infraestrutura do
 Grid5000 usada, mas a WAN foi emulada (ver Seção~\ref{sec:rede}). Dessa forma,
 os parâmetros da LAN estavam limitados pela infraestrutura do estudo, enquanto
 os da WAN foram usados como configuração do emulador.
@@ -730,7 +744,7 @@ como um único fator chamado modo, descrito na Subseção~\ref{sec:modo}. Os
 fatores localidade e popularidade na consistência na linha do tempo impuseram a
 necessidade de uma fase de aquecimento após a carga do sistema, o processo é
 explicado na Subseção~\ref{sec:aquecimento}. Projetos de experimentos fatoriais
-2\textsuperscript{k} foram realizados para cada um dos fatores restantes e estão
+2\textsuperscript{k} foram realizados para cada um dos fatores restantes e são
 descritos nas subseções subsequentes.
 
 %% ------------------------------------------------------------------------- %%
@@ -754,18 +768,19 @@ recente
 
 Todas as configurações usam $N = 3$ (ver Seção~\ref{sec:parametros_fixados}). O
 algoritmo de particionamento garante que existe ao menos uma réplica em cada
-centro de dados (ver Subseção~\ref{sec:sistema_de_armazenamento}). Assim,
-existem sempre duas situações possíveis com relação à localização das réplicas
-do ponto de vista do coordenador: uma local e duas remotas ou duas locais e uma
-remota. Dado isso, o modo \emph{ind1} resulta em todas as leituras e escritas
-locais. O modo \emph{ind2} resulta em todas as leituras locais e metade das
-escritas locais e a outra metade remotas. O modo \emph{lt\_qqer} resulta em
-todas as leituras locais e a quantidade de escritas dependente da localidade dos
-acessos. Finalmente, o modo \emph{lt\_rec} resulta tanto em leituras quanto
-escritas dependentes da localidade.
+centro de processamento de dados (ver
+Subseção~\ref{sec:sistema_de_armazenamento}). Assim, existem sempre duas
+situações possíveis com relação à localização das réplicas do ponto de vista do
+coordenador: uma local e duas remotas ou duas locais e uma remota. Dado isso, o
+modo \emph{ind1} resulta em todas as leituras e escritas locais. O modo
+\emph{ind2} resulta em todas as leituras locais e metade das escritas local e a
+outra metade remota. O modo \emph{lt\_qqer} resulta em todas as leituras locais
+e a quantidade de escritas dependente da localidade dos acessos. Finalmente, o
+modo \emph{lt\_rec} resulta tanto em leituras quanto escritas dependentes da
+localidade.
 
 Os modos foram escolhidos de forma a representar situações encontradas em
-sistemas de produção e ao mesmo tempo limitar a quantidade de níveis. Assim,
+aplicações web e ao mesmo tempo limitar a quantidade de níveis. Assim,
 consistência na linha do tempo com leituras de versões específicas não foi
 considerada já que ela é um meio termo entre leituras de ``versão mais recente''
 e leituras de ``qualquer versão''. Consistência em momento indeterminado com $W
@@ -785,23 +800,23 @@ Como localidade era um fator, apenas a inserção de objetos na etapa de carga
 (Seção~\ref{sec:execucao_e_analise_dos_experimentos}) não era suficiente para
 que o sistema operasse no seu estado estacionário durante os experimentos para a
 consistência na linha do tempo. Isso porque ao final da carga, cada objeto no
-banco de dados tinha recebido apenas um acesso de cada centro de dados, nenhuma
-réplica mestre teria migrado por efeito da localidade até esse momento. Por
-isso, o aquecimento era necessário após a carga para a consistência na linha do
-tempo. Já a consistência em momento indeterminado não era sujeita à influência
-direta de localidade, portanto não precisava de aquecimento.
+banco de dados tinha recebido apenas um acesso de cada centro de processamento
+de dados, nenhuma réplica mestre teria migrado por efeito da localidade até esse
+momento. Por isso, o aquecimento era necessário após a carga para a consistência
+na linha do tempo. Já a consistência em momento indeterminado não era sujeita à
+influência direta de localidade, portanto não precisava de aquecimento.
 
 Uma forma de implementar o aquecimento seria usar a quantidade de atualizações
 necessárias para levar o sistema para seu estado estacionário. O problema dessa
-abordagem é a quantidade de requisições iria variar com a quantidade de objetos
-armazenados. Por isso, o aquecimento foi parametrizado por passos, onde cada
-passo correspondia a uma quantidade de atualizações igual a quantidade de
-objetos armazenados.
+abordagem é que a quantidade de requisições iria variar com a quantidade de
+objetos armazenados. Por isso, o aquecimento foi parametrizado por passos, de
+modo que cada passo correspondia a uma quantidade de atualizações igual à
+quantidade de objetos armazenados.
 
 A influência da popularidade também foi considerada pois ela afetava a
 probabilidade de um determinado objeto ser acessado. Dado isso, um estudo foi
 realizado para saber quantos passos seriam necessários para cada combinação de
-localidade e popularidade. O estudo com 20000 objetos executou 30 passos,
+localidade e popularidade. O estudo com 20.000 objetos executou 30 passos,
 medindo a quantidade de migrações ocorridas em cada um deles. Os resultados
 desse estudo estão na Figura \ref{fig:aquecimento_do_sistema}.
 
@@ -837,7 +852,7 @@ também seria usada para aquecer o cache de disco.
 \subsection{Fatores de tamanho do sistema e \emph{benchmark}}
 \label{sec:fatores_de_tamanho_do_sistema_e_benchmark}
 
-As quantidade de nós de sistema e \emph{benchmark} não só podem influenciar as
+As quantidade de nós de sistema e \emph{benchmark} não só influenciam as
 respostas, como também afetam questões operacionais, dado que quanto mais nós
 são usados, maiores as dificuldades de conseguir reservá-los no Grid5000.
 Portanto, um estudo foi feito para definir a influência desses fatores e achar
@@ -920,7 +935,7 @@ alguns limites de uso do Grid5000 são relativos ao tamanho do aglomerado usado.
 Por exemplo, uma das regras diz que, entre 9:00 e 19:00, a quantidade de nós
 reservados multiplicada pelo período da reserva deve ser menor ou igual a
 quantidade total de nós do aglomerado multiplicada por 2 horas. Dessa forma,
-experimentos que precisassem de 40 nós seriam mais difíceis de ser executados.
+experimentos que precisassem de 40 nós seriam mais difíceis de serem executados.
 
 %% ------------------------------------------------------------------------- %%
 \subsection{Fatores de banco de dados} \label{sec:fatores_de_banco_de_dados}
@@ -933,9 +948,9 @@ Os níveis selecionados foram:
 
 \begin{itemize}
 
-\item Quantidade de objetos armazenados: 64000 e 256000
+\item Quantidade de objetos armazenados: 64.000 e 256.000
 
-\item Tamanho dos objetos armazenados (bytes): 100 e 10000
+\item Tamanho dos objetos armazenados (bytes): 100 e 10.000
 
 \end{itemize}
 
@@ -960,20 +975,18 @@ escrita & 90 & 0 & 0 & \cellcolor[gray]{0.5} 100 & 0 & 0 & 0 & 0 \\ \hline
 armazenados.]{Estudo para quantidade e tamanho dos objetos armazenados. Q
 representa a quantidade de objetos armazenados, T representa o tamanho dos
 objetos armazenados e L representa a latência.}
-\label{tab:estudo_para_quantidade_e_tamanho_dos_objetos_armazenados}.
+\label{tab:estudo_para_quantidade_e_tamanho_dos_objetos_armazenados}
 \end{center} \end{table}
 
 A quantidade de objetos não afeta o desempenho do sistema. O tamanho dos objetos
-não afeta o desempenho das requisições remotas. E apesar desse fator aparecer
-com 100\% de influência nas requisições locais, o CV dessas requisições indica
-que sua influência na prática não é tão grande -- 19\% para leituras e 16\% para
-escritas. Além disso, o foco deste trabalho é o comportamento do sistema na WAN,
-onde as requisições são duas ordens de grandeza maiores. Assim, os valores
-fixados foram:
+não afeta o desempenho das requisições remotas, mas com relação às requisições
+locais aparece com 100\% de influência. Apesar disso, o CV das requisições
+locais indica que sua influência na prática não é tão grande -- 19\% para
+leituras e 16\% para escritas. Assim, os valores fixados foram:
 
 \begin{itemize}
 
-\item Quantidade de objetos armazenados: 128000
+\item Quantidade de objetos armazenados: 128.000
 
 \item Tamanho dos objetos armazenados (bytes): 500
 
@@ -981,9 +994,9 @@ fixados foram:
 
 Como o tempo de aquecimento depende da quantidade de objetos armazenados, quanto
 menor essa quantidade, mais rápida é a execução dos experimentos. Por outro
-lado, a opção foi por um número intermediário de forma a evitar um excesso de
+lado, a opção foi por um número intermediário de modo a evitar um excesso de
 conflitos. Já no caso do tamanho dos objetos armazenados, o valor foi escolhido
-baseado em estudo dos sistemas de caching distribuído no Facebook, que relata
+baseado em um estudo dos sistemas de caching distribuído no Facebook, que relata
 que 90\% dos objetos nesses sistemas são menores do que 500 bytes
 \cite{Atikoglu2012}.
 
@@ -1018,7 +1031,7 @@ Os níveis selecionados foram:
 \end{itemize}
 
 O estudo usou modo \emph{lt\_rec} e localidade de 50\%. Esses valores foram
-escolhidos pois através deles obtém-se uma quantidade balanceada de leituras e
+escolhidos pois por meio deles obtém-se uma quantidade balanceada de leituras e
 escritas locais e remotas. Para a rede, a variação de latência foi de 50\%.  A
 alta variabilidade ajuda a criar um cenário que pressiona os \emph{buffers} de
 transmissão e recepção. O resultado do estudo está na Tabela
@@ -1074,11 +1087,12 @@ motivo. Os níveis inicialmente selecionados para fatores de rede foram:
 
 \end{itemize}
 
-Os níveis da latências foram baseados em estudo que relata as latências entre os
-centros de dados dos Amazon Web Services \cite{Sovran2011}. Os centros de dados
-considerados são Califórnia (EUA -- Costa Oeste), Virginia (EUA -- Costa Leste),
-Irlanda e Singapura. A menor latência observada foi 82 ms entre os centros de
-dados dos EUA e a maior foi 277 ms entre Irlanda e Singapura.
+Os níveis da latências foram baseados em um estudo que relata as latências entre
+os centros de processamento de dados dos Amazon Web Services \cite{Sovran2011}.
+Os centros de processamento de dados considerados são Califórnia (EUA -- Costa
+Oeste), Virginia (EUA -- Costa Leste), Irlanda e Singapura. A menor latência
+observada foi 82 ms entre os centros de processamento de dados dos EUA e a maior
+foi 277 ms entre Irlanda e Singapura.
 
 O mesmo estudo usado para latência apresenta um gráfico com grandes variações de
 latência, chegando a máximos de até 3 ordens de grandeza em alguns períodos
@@ -1087,14 +1101,14 @@ Ping Fim-a-fim) é um projeto de Stanford que monitora o desempenho fim-a-fim de
 enlaces de Internet, em 700 sítios e 160 países.} \cite{Pinger2013}, por sua
 vez, mostra em janeiro de 2013 uma média de latência de 238,062 ms com desvio
 padrão de 142,996, o que resulta em uma variação de 60\%. Os 11 meses anteriores
-apresentam valores semelhantes.
+apresentavam valores semelhantes.
 
 As taxas de perda foram escolhidas com base em medidas feitas pelo projeto
 PingER, que mede desempenho de conexões fim-a-fim na Internet. A mediana das
 perdas medidas em janeiro de 2013 foi 0,119\% e a mediana do último ano foi
 0,178\%. O mesmo relatório mostra perdas bem mais altas em medições específicas,
-mas este trabalho considerou que a WAN entre os dois centros de dados é de boa
-qualidade, portanto não apresentaria taxas de perda muito altas.
+mas este trabalho considerou que a WAN entre os dois centros de processamento de
+dados é de boa qualidade, portanto não apresentaria taxas de perda muito altas.
 
 O mesmo estudo mostra taxas de duplicação de pacotes muitos baixas (0\%). Embora
 os valores usados neste estudo tenham sido muito grandes, duplicação de pacotes
@@ -1114,12 +1128,15 @@ padrão do kernel do Linux a partir da versão 2.6.19. Eles foram escolhidos pois
 são citados nas referências sobre otimizações da pilha TCP para WANs
 \cite{Jones2006,ESNet2012}.
 
-Além das configurações de cada fator, o emulador de rede tinha outras duas
-configurações fixas. O parâmetro largura de banda da WAN foi configurado com 100
-Mb/s (ver Subseção~\ref{sec:parametros_restantes}). A variação da latência foi
-configurada para obedecer uma distribuição normal, criando assim uma relação
-entre o valor de latência da cada pacote e o anterior e evitando grandes
-variações aleatórias de latência.
+
+No emulador de rede, a latência define o mínimo e a variação o máximo a que ela
+pode chegar. Por exemplo, ao fazer a configuração de 100 ms de latência e 60\%
+de variação, o emulador vai gerar valores entre 100 ms e 160 ms aleatoriamente.
+Mas redes não apresentam uma variação aleatória de latência e é possível
+configurar uma distribuição da latência no emulador. No caso deste estudo, foi
+usada a distribuição normal. Além disso, o emulador foi configurado com 100
+Mb/so como largura de banda da WAN (ver
+Subseção~\ref{sec:parametros_restantes}).
 
 O resultado do estudo está na Tabela \ref{tab:estudo_para_fatores_de_rede}. Com
 exceção dos fatores e da interação entre latência e variação de latência, todas
@@ -1205,10 +1222,7 @@ Apesar da taxa de reordenação de pacotes ser fixada, a ocorrência de alguns
 pacotes fora de ordem é possível dada a variação da latência. Por exemplo, com
 uma latência de 100 ms e uma variação de 50\%, é possível que o emulador aplique
 atrasos de 120ms para um pacote e 80 ms para um outro no mesmo milissegundo, o
-que faz com que o segundo pacote seja transmitido antes do primeiro. Mas a
-ocorrência de grandes diferenças de latência entre pacotes consecutivos é rara,
-dado que o emulador foi configurado para aplicar uma correlação na variação da
-latência usando distribuição normal.
+que faz com que o segundo pacote seja transmitido antes do primeiro.
 
 Um comentário final é que o mesmo estudo havia sido realizado anteriormente com
 níveis de perda de pacotes 0,01\% e 1\%. Nesse estudo, a perda de pacotes era
@@ -1248,8 +1262,8 @@ falha. Assim, este estudo considera situações em que ela é competitiva quando
 comparada com a consistência em momento indeterminado, por isso as relações
 leitura/escrita usadas resultavam em mais leituras que escritas. Além disso, ao
 atualizar um objeto na consistência em momento indeterminado, é necessário o
-envio do relógio-vetor, por isso uma leitura\footnote{É possível fazer
-atualizações sem relógio-vetor, mas isso cria versões concorrentes do mesmo
+envio do relógio vetorial, por isso uma leitura\footnote{É possível fazer
+atualizações sem relógio vetorial, mas isso cria versões concorrentes do mesmo
 objeto.} é realizada pelo \emph{benchmark} antes de toda atualização. Isso
 restringe a quantidade de escritas a um máximo de 50\% da carga de trabalho.
 
@@ -1257,7 +1271,7 @@ A popularidade dos objetos uniforme representa uma taxa de chegada de
 requisições média igual entre os objetos e concentrada representa uma taxa de
 chegada que segue uma distribuição Pareto.
 
-Os níveis de localidade foram escolhidos de forma a ter situações sem influência
+Os níveis de localidade foram escolhidos de modo a ter situações sem influência
 de localidade (50\%) e com localidade alta (90\%). O valor de localidade alta é
 baseado no relatado em estudo feito pelo Yahoo! em seus sistemas de produção
 \cite{Cooper2008}.
@@ -1287,22 +1301,22 @@ localidade nunca teria influência. O resultado do estudo está na Tabela
 Modo & R & X & P & L & RX & RP & RL & XP & XL & PL & RXP & RXL & RPL & XPL &
 RXPL\\ \hline
 
-\emph{ind1} & 19 & 12 & 2 & 31 & 0 & 3 & 2 & 4 & 6 & 6 & 4 & 0 & 0 & 8 & 1\\
-\hline
+\emph{ind1} & 19 & 12 & 2 & \cellcolor[gray]{0.9} 31 & 0 & 3 & 2 & 4 & 6 & 6 & 4
+& 0 & 0 & 8 & 1\\ \hline
 
-\emph{ind2} & 50 & 0 & 0 & 39 & 0 & 0 & 11 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0\\
-\hline
+\emph{ind2} & \cellcolor[gray]{0.7} 50 & 0 & 0 & \cellcolor[gray]{0.9} 39 & 0 &
+0 & 11 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0\\ \hline
 
-\emph{lt\_qqer} & 25 & 30 & 0 & 19 & 9 & 0 & 6 & 0 & 8 & 0 & 0 & 3 & 0 & 0 & 0\\
-\hline
+\emph{lt\_qqer} & \cellcolor[gray]{0.9} 25 & \cellcolor[gray]{0.9} 30 & 0 & 19 &
+9 & 0 & 6 & 0 & 8 & 0 & 0 & 3 & 0 & 0 & 0\\ \hline
 
-\emph{lt\_rec} & 0 & 53 & 0 & 34 & 0 & 0 & 0 & 0 & 13 & 0 & 0 & 0 & 0 & 0 & 0\\
-\hline
+\emph{lt\_rec} & 0 & \cellcolor[gray]{0.7} 53 & 0 & \cellcolor[gray]{0.9} 34 & 0
+& 0 & 0 & 0 & 13 & 0 & 0 & 0 & 0 & 0 & 0\\ \hline
 
 \end{tabular} \caption[Estudo para fatores de carga de trabalho.]{Estudo para
 fatores de carga de trabalho. R representa a relação leitura/escrita, X
 representa a localidade, P representa a popularidade e L representa a latência
-de rede.} \label{tab:estudo_para_fatores_de_carga_de_trabalho}.  \end{center}
+de rede.} \label{tab:estudo_para_fatores_de_carga_de_trabalho}  \end{center}
 \end{table}
 
 Como esperado, localidade e latência influenciam as respostas em geral. Uma
@@ -1330,7 +1344,7 @@ pela relação leitura/escrita. A mesma observação vale para \emph{lt\_qqer}, que
 tem todas as leituras locais e escritas dependendo da localidade, e também sofre
 impacto da relação leitura/escrita.
 
-Caso o mecanismo de armazenamento fosse disco ao invés de memória, a relação
+Caso o mecanismo de armazenamento fosse disco em vez de memória, a relação
 leitura/escrita provavelmente sofreria impacto de fato. Isso porque escritas
 seriam afetadas pelo tempo de escrita no disco, enquanto leituras poderiam ser
 mais rápidas pois parte delas seriam servidas a partir do cache de disco.  Mas

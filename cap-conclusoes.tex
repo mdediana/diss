@@ -39,16 +39,16 @@ de objetos armazenados não afeta o desempenho do sistema. Vale notar que as
 constatações feitas são válidas para o conjunto de valores de parâmetros e
 níveis testados.  Por exemplo, caso o mecanismo de armazenamento fosse disco e
 não memória, o resultado para influência da quantidade de objetos armazenados
-provavelmente seria diferente devido a interação entre disco, cache de disco e
+provavelmente seria diferente devido à interação entre disco, cache de disco e
 memória.
 
 Por último, uma consideração sobre a reprodutibilidade deste estudo. Caso um
 pesquisador queira reproduzir o estudo no Grid5000, ele tem disponíveis os
 recursos necessários para tal. Caso ele queira reproduzi-lo em outra plataforma
 (AWS, por exemplo), ele precisará criar uma nova imagem, o que é simples, dado
-que a imagem usada neste estudo tem poucos softwares instalados e está
-documentada (ver Subseção \ref{sec:ambiente}). Além disso, alguns poucos scripts
-para execução do estudo precisariam ser alterados.
+que a imagem usada neste estudo tem poucos aplicativos e ferramentas instalados
+e está documentada (ver Subseção \ref{sec:ambiente}). Além disso, alguns poucos
+scripts para execução do estudo precisariam ser alterados.
 
 %% ------------------------------------------------------------------------- %%
 \section{Contribuições} \label{sec:contribuicoes}
@@ -62,9 +62,16 @@ em um sistema operando sobre uma WAN e que apresente localidade alta. Quando
 possível, o uso da consistência na linha do tempo no lugar da consistência em
 momento indeterminado torna o desenvolvimento do sistema mais simples.
 
-\paragraph{Infraestrutura de experimentos}A segunda contribuição é a
-infraestrutura de experimentos que pode ser reaproveitada para outros estudos do
-gênero, em especial se o estudo for feito no Grid5000 e usar o Riak.
+\paragraph{Influência de fatores em sistemas de armazenamento}Conhecer que
+fatores influenciam ou não o desempenho de um sistema de armazenamento ajuda
+desenvolvedores e administradores de sistema em decisões sobre otimizações do
+sistema e do ambiente. Além disso, servem de apoio a outras decisões e
+processos, como na depuração de problemas de desempenho de um sistema, por
+exemplo.
+
+\paragraph{Infraestrutura de experimentos}A infraestrutura de experimentos pode
+ser reaproveitada (especialmente se o Riak for usado), aumentando a
+produtividade de pesquisadores realizando estudos semelhantes.
 
 %% ------------------------------------------------------------------------- %%
 \section{Lições Aprendidas} \label{sec:licoes_aprendidas}
@@ -77,10 +84,9 @@ em lições e reflexões:
 usada neste trabalho considera que a análise de desempenho é uma arte, sugerindo
 que existem atividades envolvidas nesse tipo de análise que não são facilmente
 tratáveis metodologicamente. Um exemplo disso é a experiência do autor deste
-trabalho com a
-operação no Grid5000 influenciar a decisão sobre o tamanho do sistema, uma
-limitação que não foi mensurada com exatidão, mas sim percebida pelo trabalho
-diário na plataforma (ver
+trabalho com a operação no Grid5000 influenciar a decisão sobre o tamanho do
+sistema, uma limitação que não foi mensurada com exatidão, mas sim percebida
+pelo trabalho diário na plataforma (ver
 Subseção~\ref{sec:fatores_de_tamanho_do_sistema_e_benchmark}).
 
 \paragraph{O método na análise de desempenho}Apesar de a atividade de análise de
@@ -93,25 +99,26 @@ primeira versão não usava o método e as técnicas apresentadas em
 influentes (popularidade dos objetos, por exemplo) e ignorava outros que eram
 influentes (como variação da latência de rede, por exemplo).  Além disso, era
 composta por 420 experimentos que demoravam aproximadamente 24h para serem
-executados, contra os 64 experimentos e 6,5h da segunda versão do estudo, que
+executados, contra os 64 experimentos e 6,5h da segunda versão do estudo,
 redução que aconteceu pelo uso de experimentos 2\textsuperscript{k} (ver
 Seção~\ref{sec:selecao_dos_fatores}).
 
-\paragraph{Reprodutibilidade}Além de importante para a qualidade da pesquisa, o
-a reprodutibilidade do estudo facilitou executá-lo muitas vezes para comparações
-e análises. Isso foi consequência de ter o processo automatizado e, portanto,
+\paragraph{Reprodutibilidade}Além de importante para a qualidade da pesquisa, a
+reprodutibilidade do estudo facilitou executá-lo muitas vezes para comparações e
+análises. Isso foi consequência de ter o processo automatizado e, portanto,
 reprodutível. Uma execução completa do estudo consistia em usar um script para a
 reserva dos nós, outro para a implantação da imagem e um terceiro para executar
 um estudo.
 
 \paragraph{Importância de ferramentas para pesquisa na área de sistemas}Muitas
 tecnologias foram usadas neste trabalho. Além das linguagens de programação --
-Erlang, bash, Ruby e R -- entender o funcionamento do Linux foi importante por
-dois pontos de vista. O primeiro foi a forma como ele gerencia o hardware, como
-aconteceu na discussão sobre a relação entre disco, cache de disco e memória,
-por exemplo (ver Subseção~\ref{sec:aglomerado_e_mecanismo_de_armazenamento}). O
-segundo foram suas ferramentas para tarefas de administração de sistema como
-top, vmstat, iostat, bwm-ng, etc.
+Erlang, bash, Ruby e R -- entender o funcionamento do Linux foi importante.
+Primeiro, pela questão do gerenciamento do hardware, o que foi importante, por
+exemplo, para a discussão sobre a relação entre disco, cache de disco e memória
+(ver Subseção~\ref{sec:aglomerado_e_mecanismo_de_armazenamento}). Depois, pelas
+suas ferramentas para tarefas de administração de sistema, como top, vmstat,
+iostat, bwm-ng, etc., que possibilitam um maior entendimento do sistema durante
+o processo de análise de desempenho.
 
 %% ------------------------------------------------------------------------- %%
 \section{Produções ao Longo do Mestrado}
@@ -121,11 +128,13 @@ As principais produções ao longo do mestrado foram:
 
 \begin{itemize}
 
-\item Seminário ``NoSQL: Vantagens, desvantagens e compromissos''\footnote{Slides disponíveis em
+\item Seminário ``NoSQL: Vantagens, desvantagens e
+compromissos''\footnote{Slides disponíveis em
 \url{http://www.slideshare.net/mdediana/no-sql-vantagensdesvantagensecompromissos}.}
 apresentado para o departamento de Ciência da Computação do IME.
 
-\item Apresentação ``NoSQL: Perdas e Ganhos''\footnote{Slides disponíveis em \url{http://www.slideshare.net/mdediana/no-sql-perdaseganhos}.} na The
+\item Apresentação ``NoSQL: Perdas e Ganhos''\footnote{Slides disponíveis em
+\url{http://www.slideshare.net/mdediana/no-sql-perdaseganhos}.} na The
 Developer's Conference 2010.
 
 \item Artigo curto ``NoSQL na Web 2.0: Um Estudo Comparativo de Bancos
@@ -137,9 +146,8 @@ Brasileiro de Bancos de Dados (SBBD).
 Euro-par 2012, relacionado ao estágio de quatro meses no INRIA em Nantes,
 França, sobre análise de desempenho de sistemas de arquivos distribuídos.
 
-\item Relatório de desempenho da DHT chamada BlobSeer, produzido em estágio em
-estágio de um mês no INRIA em Rennes, França, sobre análise de desempenho desse
-sistema.
+\item Relatório de desempenho da DHT chamada BlobSeer, produzido em estágio de
+um mês no INRIA em Rennes, França, sobre análise de desempenho desse sistema.
 
 \item Código para consistência na linha do tempo no Riak (a implementação ainda
 não está pronta para uso em produção).
@@ -152,16 +160,18 @@ Seção~\ref{sec:contribuicoes}.
 %% ------------------------------------------------------------------------- %%
 \section{Trabalhos Futuros} \label{sec:trabalhos_futuros}
 
-Um dos trabalhos futuros mais interessantes seria a validação ou refutação das conclusões deste
-estudo em uma outra plataforma, de preferência uma que seja usada por aplicações
-web de produção, como o AWS, por exemplo. Os resultados poderiam
-ser diferentes por influência da virtualização, devido a latência da rede não
-variar necessariamente seguindo uma distribuição normal, dentre outros fatores.
+Um dos trabalhos futuros mais interessantes seria a validação ou refutação das
+conclusões deste estudo em uma outra plataforma, de preferência uma que seja
+usada por aplicações web de produção, como o AWS, por exemplo. Os resultados
+poderiam ser diferentes por influência da virtualização, devido a latência da
+rede não variar necessariamente seguindo uma distribuição normal, dentre outros
+fatores.
 
 Outro tipo de trabalho poderia considerar diferentes discos, incluindo discos de
-estado sólido (\emph{Solid State Drives} -- SSDs), cujo uso em centros de dados
-vem crescendo. Seria interessante analisar e comparar a influência de cada um
-dos dois tipos de E/S -- rede e disco -- no desempenho do sistema.
+estado sólido (\emph{Solid State Drives} -- SSDs), cujo uso em centros de
+processamento de dados vem crescendo. Seria interessante analisar e comparar a
+influência de cada um dos dois tipos de E/S -- rede e disco -- no desempenho do
+sistema.
 
 Enquanto este trabalho era realizado, modelos de consistência com maiores
 garantias de consistência com foco em WANs foram desenvolvidos, como os

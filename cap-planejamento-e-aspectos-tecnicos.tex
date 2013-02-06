@@ -253,7 +253,7 @@ implementavam consistência em momento indeterminado. Os sistemas encontrados
 foram Dynomite \cite{Dynomite}, Cassandra \cite{Lakshman2010}, Voldemort
 \cite{Voldemort} e Riak \cite{Riak}. Todos eles usam basicamente a mesma
 arquitetura do Dynamo, provendo gerenciamento de entrada e saída de nós no
-aglomerado, relógios vetor para identificação e resolução de conflitos entre
+aglomerado, relógios vetorais para identificação e resolução de conflitos entre
 diferentes réplicas dos objetos \cite{Lamport1978} e espalhamento consistente
 para o particionamento dos objetos \cite{Karger1997a}.
 
@@ -279,19 +279,20 @@ atualização ou remoção) não era tão importante dado que eles se comportam
 basicamente da mesma forma do ponto de vista de tráfego de rede local versus
 remoto. Assim, apenas atualizações foram implementadas de forma completa e
 eficiente, distinguindo a localização de cada nó com relação aos centros de
-dados. As inserções para uma dada chave ocorrem sempre pela mesma réplica, mesmo
-que isso signifique encaminhar para outro centro de dados uma requisição que, em
-princípio, poderia ser tratada localmente. Esse procedimento eliminou a
-necessidade de implementação de um mecanismo para evitar conflitos de inserção.
-Apesar de inserções serem ineficientes, isso não afetou os resultados, dado que
-os experimentos usam inserção apenas na carga e aquecimento do sistema (ver o
-fluxo de trabalho na Subseção~\ref{sec:execucao_e_analise_dos_experimentos}).
-Remoções não foram implementadas.
+processamento de dados. As inserções para uma dada chave ocorrem sempre pela
+mesma réplica, mesmo que isso signifique encaminhar para outro centro de
+processamento de dados uma requisição que, em princípio, poderia ser tratada
+localmente. Esse procedimento eliminou a necessidade de implementação de um
+mecanismo para evitar conflitos de inserção.  Apesar de inserções serem
+ineficientes, isso não afetou os resultados, dado que os experimentos usam
+inserção apenas na carga e aquecimento do sistema (ver o fluxo de trabalho na
+Subseção~\ref{sec:execucao_e_analise_dos_experimentos}).  Remoções não foram
+implementadas.
 
 O PNUTS conta com uma heurística que explora a localidade de requisições,
 simples mas importante para o desempenho da consistência na linha do tempo: a
-réplica mestre migra para o centro de dados de onde vieram as últimas escritas.
-Essa heurística foi implementada no Riak para este estudo.
+réplica mestre migra para o centro de processamento de dados de onde vieram as
+últimas escritas.  Essa heurística foi implementada no Riak para este estudo.
 
 A implementação da consistência na linha do tempo foi baseada na da consistência
 em momento indeterminado já disponível no Riak. Durante a implementação houve a
@@ -349,23 +350,25 @@ indeterminado. As modificações feitas no riak\_kv se encontram em
 
 %% ------------------------------------------------------------------------- %%
 \subsubsection{Implementação de algoritmo de particionamento para centros de
-dados}
+processamento de dados}
 
 Além do riak\_kv, outro módulo alterado foi o riak\_core, responsável pelo
 roteamento de requisições em um aglomerado de Riak. Quando o Riak recebe uma
 requisição, ele define qual o nó responsável por tratá-la por meio do algoritmo
 de espalhamento consistente, que se baseia no valor da chave do objeto. O Riak
-foi projetado para ser implantado em um único centro de dados\footnote{A versão
-Enterprise do Riak implementa replicação entre centros de dados, mas é paga.},
-portanto o algoritmo não leva em consideração os centros de dados no momento de
-decidir para qual das réplicas a requisição deve seguir. Dessa forma, algumas
-modificações foram necessárias no riak\_core para que ele priorizasse nós do
-mesmo centro de dados em que a requisição chegou. Além disso, modificações foram
-feitas para garantir que existisse ao menos uma réplica de cada objeto em cada
-centro de dados. A implementação é muito simples e pouco versátil, funcionando
-apenas para o cenário do estudo, de apenas dois centros de dados (ver seção
-\ref{sec:parametros_fixados}) e baseada nos nomes dos nós para saber em qual
-centro de dados cada um deles se encontra.
+foi projetado para ser implantado em um único centro de processamento de
+dados\footnote{A versão Enterprise do Riak implementa replicação entre centros
+de processamento de dados, mas é paga.}, portanto o algoritmo não leva em
+consideração os centros de processamento de dados no momento de decidir para
+qual das réplicas a requisição deve seguir. Dessa forma, algumas modificações
+foram necessárias no riak\_core para que ele priorizasse nós do mesmo centro de
+processamento de dados em que a requisição chegou. Além disso, modificações
+foram feitas para garantir que existisse ao menos uma réplica de cada objeto em
+cada centro de processamento de dados. A implementação é muito simples e pouco
+versátil, funcionando apenas para o cenário do estudo, de apenas dois centros de
+processamento de dados (ver seção \ref{sec:parametros_fixados}) e baseada nos
+nomes dos nós para saber em qual centro de processamento de dados cada um deles
+se encontra.
 
 A partir do momento em que o git passou a ser usado para controle de versão,
 foram 106 linhas inseridas e 17 removidas nos seguintes 3 arquivos:
@@ -387,7 +390,7 @@ As modificações feitas no riak\_core se encontram em
 \subsubsection{Testes da implementação}
 
 Os testes foram executados manualmente. Os principais cenários testados (CD se
-refere a centro de dados):
+refere a centro de processamento de dados):
 
 \begin{itemize}
 
@@ -396,7 +399,7 @@ refere a centro de dados):
 \item Requisição de inserção a partir do CD1 sendo redirecionada para o CD2
 
 \item Verificação de que inserções resultavam em ao menos uma réplica em cada
-centro de dados
+centro de processamento de dados
 
 \item Requisição de leitura/atualização a partir do CD1 sempre ocorrendo no CD1
 para consistência em momento indeterminado (local)
@@ -547,9 +550,10 @@ valores era necessário para medir o desempenho do sistema em diferentes
 condições de rede e possibilitar a reprodutibilidade dos experimentos.
 
 Por isso, os experimentos emularam uma WAN pelo uso da ferramenta traffic
-control (tc). Essa ferramenta é usada para manipulação das filas de saída de
-pacotes de uma interface de rede em sistemas Linux, priorizando um determinado
-tipo de tráfego, por exemplo. Mais especificamente para emulação da WAN, o
+control\footnote{\url{http://linux.die.net/man/8/tc}} (tc). Essa ferramenta é
+usada para manipulação das filas de saída de pacotes de uma interface de rede em
+sistemas Linux, priorizando um determinado tipo de tráfego, por exemplo. Mais
+especificamente para emulação da WAN, o
 netem\footnote{\url{http://www.linuxfoundation.org/collaborate/workgroups/networking/}}
 foi usado. Ele provê funcionalidade para inserção de latência de rede, variação
 da latência, perda de pacotes, pacotes duplicados, corrompidos e/ou fora de
@@ -566,14 +570,15 @@ sempre que os parâmetros da WAN foram alterados, um script para ajuste da pilha
 TCP foi usado (para mais detalhes, ver Seção~\ref{sec:fatores_de_rede}).
 
 %% ------------------------------------------------------------------------- %%
-\subsubsection{Centros de dados}
+\subsubsection{Centros de processamento de dados}
 
-Os experimentos foram planejados para usar dois centros de dados simulados (ver
-Seção~\ref{sec:parametros_fixados}). Para simular os centros de dados, em cada
-experimento os nós que compunham o sistema eram divididos em dois conjuntos CD1
-e CD2, cada um representando um centro de dados. Além dos nós, duas sub-redes
-SR1 e SR2 eram reservadas. Cada nó de CD1 recebia, além de seu IP da rede do
-Grid5000, um IP de SR1, o mesmo valendo para CD2 e SR2.
+Os experimentos foram planejados para usar dois centros de processamento de
+dados simulados (ver Seção~\ref{sec:parametros_fixados}). Para simular os
+centros de processamento de dados, em cada experimento os nós que compunham o
+sistema eram divididos em dois conjuntos CD1 e CD2, cada um representando um
+centro de processamento de dados. Além dos nós, duas sub-redes SR1 e SR2 eram
+reservadas. Cada nó de CD1 recebia, além de seu IP da rede do Grid5000, um IP de
+SR1, o mesmo valendo para CD2 e SR2.
 
 Sistemas Linux usam o arquivo /etc/hosts como fonte primária para resolução de
 nomes, consultando um DNS apenas quando não encontram um nome definido ali (o
@@ -584,15 +589,16 @@ experimentos, dois arquivos hosts1 e hosts2 eram criados e substituíam o
 nomes dos nós de CD2 sendo resolvidos para os IPs de SR2, o mesmo valendo para
 hosts2, CD1 e SR1. Com isso, os nós de CD1 resolviam os nomes dos nós de CD2
 para os IPs de SR2 e vice-versa. O resultado dessa configuração é que todas as
-requisições que saíam de um centro de dados para o outro usavam o IP da sub-rede
-de destino, enquanto as requisições para o mesmo centro de dados usavam o IP da
-rede do Grid5000.
+requisições que saíam de um centro de processamento de dados para o outro usavam
+o IP da sub-rede de destino, enquanto as requisições para o mesmo centro de
+processamento de dados usavam o IP da rede do Grid5000.
 
 A partir dessa configuração foi possível adicionar um filtro baseado em
 sub-redes ao tc de modo que as características de WAN eram aplicadas às
-requisições que saíam para o outro centro de dados, enquanto as requisições para
-o mesmo centro de dados saíam inalteradas. Esse processo é executado pelo script
-net (ver Subseção \ref{sec:execucao_e_analise_dos_experimentos}).
+requisições que saíam para o outro centro de processamento de dados, enquanto as
+requisições para o mesmo centro de processamento de dados saíam inalteradas.
+Esse processo é executado pelo script net (ver Subseção
+\ref{sec:execucao_e_analise_dos_experimentos}).
 
 %% ------------------------------------------------------------------------- %%
 \subsection{Execução e análise dos experimentos}
@@ -705,8 +711,8 @@ implantação de imagens do Grid5000.
 \paragraph{Configuração dos nós (srvs)}Essa etapa consiste em separar os nós
 reservados entre nós de Riak e instâncias do \emph{benchmark}, a partir das
 quantidades de cada um definidas para o estudo. Nesse momento, os nós de Riak
-também são dividos entre os centros de dados a serem usados e os IPs das
-sub-redes são alocados (script net).
+também são dividos entre os centros de processamento de dados a serem usados e
+os IPs das sub-redes são alocados (script net).
 
 \paragraph{Configuração do Riak (riak)}Essa etapa consiste no envio dos arquivos
 de configuração do Riak para cada nó. Nesse momento ocorre a configuração do

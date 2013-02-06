@@ -8,7 +8,7 @@ resultantes. Embora alguns conceitos descritos não sejam exclusivos de sistemas
 georeplicados, eles são necessários para um entendimento mais profundo do
 contexto em que opera o tipo de sistema estudado neste trabalho.
 
-Este trabalho usa o termo ``sistema de armazenamento'' para se referir de forma
+Este trabalho usa o termo ``sistemas de armazenamento'' para se referir de forma
 geral a sistemas distribuídos que armazenam e gerenciam dados, como SGBDDs,
 tabelas de espalhamento distribuídas (\emph{Distributed hash table} -- DHT) e
 sistemas de arquivos distribuídos. Um motivo para isso é que às vezes a
@@ -27,9 +27,7 @@ diversos tipos de modelos de consistência, incluindo os dois que são alvo deste
 trabalho. A
 Seção~\ref{sec:consistencia_desempenho_e_disponibilidade_em_sistemas_georeplicados}
 mostra algumas implicações dos diferentes modelos de consistência na arquitetura
-de de sistemas de larga escala. Por fim, a
-Seção~\ref{sec:trabalhos_relacionados} apresenta os trabalhos relacionados a
-este.
+de de sistemas de larga escala.
 
 %% ------------------------------------------------------------------------- %%
 \section{Estratégias para Escalabilidade de Aplicações Web}
@@ -106,14 +104,15 @@ Replicação de dados é o processo de criar cópias de uma coleção de dados
 \cite{Saito2005}. A primeira é a diminuição da latência por meio da replicação
 de dados para localizações mais próximas de onde esses dados são usados. Isso é
 especialmente para longas distâncias, quando se replica dados entre centros de
-dados em diferentes localizações geográficas \cite{DeCandia2007,Cooper2008} --
-redes locais (\emph{Local area network} -- LANs) apresentam latências da ordem
-centenas de microssegundos \cite{Rumble2011}. A segunda razão para replicar
-dados é aumentar a vazão do sistema por meio do balanceamento de carga entre
-diferentes servidores, possibilitando que o mesmo dado seja servido por mais de
-um servidor simultaneamente. Finalmente, a terceira razão é o aumento da
-disponibilidade do sistema, pois determinado dado continua sendo acessado pelos
-clientes mesmo quando algumas das réplicas encontram-se indisponíveis.
+processamento de dados em diferentes localizações geográficas
+\cite{DeCandia2007,Cooper2008} -- redes locais (\emph{Local area network} --
+LANs) apresentam latências da ordem centenas de microssegundos
+\cite{Rumble2011}. A segunda razão para replicar dados é aumentar a vazão do
+sistema por meio do balanceamento de carga entre diferentes servidores,
+possibilitando que o mesmo dado seja servido por mais de um servidor
+simultaneamente. Finalmente, a terceira razão é o aumento da disponibilidade do
+sistema, pois determinado dado continua sendo acessado pelos clientes mesmo
+quando algumas das réplicas encontram-se indisponíveis.
 
 A replicação pode usar um esquema mestre-escravo (ou cópia primária), em que
 apenas uma das réplicas é responsável por receber atualizações e distribuí-las
@@ -183,17 +182,18 @@ Quando esse tipo de replicação é utilizado são necessários mecanismos de
 resolução de conflitos. Esses mecanismos podem ser simples como a regra de
 escrita de Thomas \cite{Johnson1975}, em que o sistema implementa uma semântica
 de ``a última escrita ganha''. Mas existem mecanismos de identificação e
-resolução de conflitos mais sofisticados, como é o caso de relógios vetor
-\cite{Fidge1988,Parker1983}, que mantêm um histórico de quais nós foram
-responsáveis por quais atualizações em determinado objeto, tornando assim
-possível definir o(s) nó(s) que possui(em) o valor correto em caso de conflito.
-Em casos mais extremos, a complexidade semântica dos conflitos impossibilita que
-a resolução seja realizada pelo sistema de armazenamento -- por exemplo, caso um
-mesmo objeto tenha sido atualizado simultaneamente com valores divergentes em
-duas réplicas. Nesses casos, as respostas do sistema de armazenamento para
-leituras feitas pela aplicação contêm os valores divergentes. Isso implica que,
-para resolver os conflitos, os desenvolvedores precisam prever que eles podem
-acontecer e preparar a aplicação para resolvê-los \cite{Davidson1985}.
+resolução de conflitos mais sofisticados, como é o caso de relógios vetoriais
+(\emph{Vector clocks}) \cite{Fidge1988,Parker1983}, que mantêm um histórico de
+quais nós foram responsáveis por quais atualizações em determinado objeto,
+tornando assim possível definir o(s) nó(s) que possui(em) o valor correto em
+caso de conflito.  Em casos mais extremos, a complexidade semântica dos
+conflitos impossibilita que a resolução seja realizada pelo sistema de
+armazenamento -- por exemplo, caso um mesmo objeto tenha sido atualizado
+simultaneamente com valores divergentes em duas réplicas. Nesses casos, as
+respostas do sistema de armazenamento para leituras feitas pela aplicação contêm
+os valores divergentes. Isso implica que, para resolver os conflitos, os
+desenvolvedores precisam prever que eles podem acontecer e preparar a aplicação
+para resolvê-los \cite{Davidson1985}.
 
 Um problema que torna uma aplicação ainda mais complexa na presença de conflitos
 acontece quando não é possível perceber os conflitos imediatamente, e ações são
@@ -607,65 +607,22 @@ ganhos de desempenho \cite{Abadi2010}. PACELC significa ``se houver
 particionamento (P), troque disponibilidade (A) por consistência (C), caso
 contrário (E -- \emph{else}), troque latência (L) por consistência (C)''. Em uma
 rede local, a latência da rede é muitas vezes desprezível, mas em um sistema
-geograficamente distribuído as latências entre diferentes centros de dados são
-grandes. Garantir consistência mútua por meio de replicação pessimista nesse
-contexto implica que toda operação apresentará um tempo de resposta relacionado
-com a latência do enlace mais lento entre as réplicas, algo muitas vezes
-inaceitável por sistemas desse porte \cite{DeCandia2007,Cooper2008}.
+geograficamente distribuído as latências entre diferentes centros de
+processamento de dados são grandes. Garantir consistência mútua por meio de
+replicação pessimista nesse contexto implica que toda operação apresentará um
+tempo de resposta relacionado com a latência do enlace mais lento entre as
+réplicas, algo muitas vezes inaceitável por sistemas desse porte
+\cite{DeCandia2007,Cooper2008}.
 
 A partir da observação dos teoremas CAP e PACELC é possível criar heurísticas
 para otimização de um modelo de consistência. Por exemplo, uma heurística
 implementada no PNUTS \cite{Cooper2008} que favorece tanto disponibilidade
 quanto desempenho da consistência na linha do tempo é a migração do mestre de um
-objeto para o centro de dados no qual ele é escrito mais frequentemente.
+objeto para o centro de processamento de dados no qual ele é escrito mais
+frequentemente.
 
-%% ------------------------------------------------------------------------- %%
-\section{Trabalhos relacionados} \label{sec:trabalhos_relacionados}
-
-Uma abordagem comum na literatura de sistemas distribuídos é a proposta de um
-novo conceito e a implementação de um sistema que use esse conceito seguida de
-uma análise de seu desempenho. Tanto o artigo sobre o Dynamo \cite{DeCandia2007}
-quanto o sobre o PNUTS \cite{Cooper2008} apresentam análises de desempenho,
-sendo que apenas o segundo faz uma análise baseada na carga de trabalho. Existe
-uma segunda publicação com experimentos com o PNUTS que analisa o consumo de
-banda de diferentes políticas de replicação em uma WAN \cite{Kadambi2011}.
-
-Existem muitos trabalhos que apresentam análises de desempenho de sistemas de
-armazenamento que usam replicação sobre WANs. Na maior parte dos casos o
-objetivo desses sistemas é provar outros conceitos além da eficiência do modelo
-de consistência escolhido por eles. O COPS usa consistência causal+, que é
-semelhante à consistência causal com algumas garantia a mais, e implementa
-transações \cite{Lloyd2011}. O Scatter propõe uma arquitetura ao mesmo tempo
-escalável e com consistência forte \cite{Glendenning2011}. O Zeno usa
-consistência em momento indeterminado e é tolerante a falhas bizantinas
-\cite{Singh2009}. O Windows Azure provê um sistema de armazenamento na nuvem com
-consistência forte \cite{Calder2011}. O Megastore usa Paxos para implementar
-consistência forte \cite{Baker2011}. Nenhum desses trabalhos apresenta
-comparações com outros sistemas ou com outros modelos de consistência. Como eles
-não usam uma aplicação para execução de testes ou ambiente comum, é difícil
-fazer qualquer comparação a partir desses trabalhos.
-
-Beyer et al. realizaram testes para analisar a relação entre as diferentes
-configurações de consistência no Cassandra e sua disponibilidade e desempenho
-\cite{Beyer2011}. Como esperado, eles notam que configurações que oferecem
-consistência mais rígida apresentam pior desempenho.  Renesse e Schneider
-apresentam resultados experimentais comparando desempenho e disponibilidade de
-replicação mestre-escravo e replicação em cadeia, cada uma delas usando
-consistência forte e consistência em momento indeterminado
-\cite{VanRenesse2004}. Nenhum desses dois experimentos leva em consideração
-operação sobre WAN nem diferentes cargas de trabalho. Yu e Vahdat realizaram uma
-análise sobre a relação entre disponibilidade e níveis de consistência em
-sistemas replicados em WANs \cite{Yu2001}. Eles comparam a disponibilidade de um
-sistema usando consistência forte e consistência contínua, usando diferentes
-protocolos de consistência como cópia primária e votação, por exemplo. Esse
-trabalho não testa consistência em momento indeterminado nem consistência na
-linha do tempo e não observa o desempenho dos modelos de consistência
-analisados.
-
-Uma publicação com uma proposta mais próxima da deste trabalho é a comparação
-feita entre Cassandra, HBase, PNUTS e MySQL particionado horizontalmente usando
-diferentes cargas de trabalho \cite{Cooper2010}. Os resultados servem como uma
-comparação entre esses sistemas, mas dizem menos sobre seus modelos de
-consistência, dado que os sistemas apresentam arquiteturas e configurações
-diferentes. Além disso, os testes são feitos em uma rede local, não em uma WAN.
-
+Este trabalho lidou com a questão da troca feita entre desempenho e consistência
+em sistemas georeplicados. Para isso, foram realizados experimentos com um
+sistema usando consistência em momento indeterminado e na linha do tempo em
+diferentes condições. O capítulo a seguir trata do planejamento dos experimentos
+e de como foram implementados.

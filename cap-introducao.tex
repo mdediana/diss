@@ -3,31 +3,32 @@
 
 Para atender centenas de milhares de usuários ininterruptamente em sistemas web
 de larga escala, dados são replicados em milhares de servidores distribuídos em
-múltiplos centros de dados em diferentes localizações geográficas. A replicação
-de dados objetiva a redução da latência, o aumento da vazão e/ou disponibilidade
-\cite{Saito2005}. O tempo de resposta de requisições torna-se menor devido à
-localidade dos dados, pois a réplica usada para a resposta é a mais próxima do
-usuário que faz a requisição. A vazão aumenta pois o sistema é capaz de receber
-uma quantidade maior de requisições simultâneas para o mesmo dado já que há mais
-servidores disponíveis para atendê-las. A disponibilidade aumenta pois caso um
-servidor ou até um centro de dados inteiro fique indisponível, outros ainda
-podem atender requisições. A durabilidade também é mais alta, pois os dados não
-se perdem no caso em que um nó fique permanentemente indisponível, o que pode
-acontecer devido a uma falha em um disco rígido ou até mesmo a destruição de um
-centro de dados inteiro.
+múltiplos centros de processamento de dados em diferentes localizações
+geográficas. A replicação de dados objetiva a redução da latência, o aumento da
+vazão e/ou disponibilidade \cite{Saito2005}. O tempo de resposta de requisições
+torna-se menor devido à localidade dos dados, pois a réplica usada para a
+resposta é a mais próxima do usuário que faz a requisição. A vazão aumenta pois
+o sistema é capaz de receber uma quantidade maior de requisições simultâneas
+para o mesmo dado já que há mais servidores disponíveis para atendê-las. A
+disponibilidade aumenta pois caso um servidor ou até um centro de processamento
+de dados inteiro fique indisponível, outros ainda podem atender requisições. A
+durabilidade também é mais alta, pois os dados não se perdem no caso em que um
+nó fique permanentemente indisponível, o que pode acontecer devido a uma falha
+em um disco rígido ou até mesmo a destruição de um centro de processamento de
+dados inteiro.
 
 O principal problema do uso de replicação em redes de longa distância
 (\emph{Wide area networks} -- WANs) é que manter as réplicas sempre consistentes
 entre si implica em sacrificar outros requisitos também importantes, como
 desempenho ou disponibilidade. Um motivo para divergência entre réplicas é que a
-replicação entre centros de dados pode apresentar centenas de milissegundos de
-latência, período durante o qual as réplicas podem divergir. Essa latência é
-resultado não só das distâncias físicas entre os nós, mas também de limitações
-na largura de banda disponível, congestionamento de rede e perda de pacotes.
-Outro motivo que pode gerar divergência entre réplicas é a falha temporária de
-um nó, que deixa de receber atualizações por um período de tempo. Um terceiro
-motivo é a falha em um equipamento ou enlace de rede que impeça a comunicação
-entre réplicas.
+replicação entre centros de processamento de dados pode apresentar centenas de
+milissegundos de latência, período durante o qual as réplicas podem divergir.
+Essa latência é resultado não só das distâncias físicas entre os nós, mas também
+de limitações na largura de banda disponível, congestionamento de rede e perda
+de pacotes.  Outro motivo que pode gerar divergência entre réplicas é a falha
+temporária de um nó, que deixa de receber atualizações por um período de tempo.
+Um terceiro motivo é a falha em um equipamento ou enlace de rede que impeça a
+comunicação entre réplicas.
 
 Com isso, desenvolvedores e administradores de sistemas web de larga escala
 precisam buscar um balanço entre disponibilidade, desempenho e consistência dos
@@ -146,21 +147,21 @@ web toleram indisponibilidades, a consistência na linha do tempo pode ser uma
 opção interessante por oferecer um modelo de programação mais simples, desde que
 seu desempenho seja aceitável. O maior fator de impacto no desempenho da
 consistência na linha do tempo é o fato de que todas as escritas e leituras
-consistentes que não são feitas no centro de dados em que está a réplica mestre
-incorrem no custo de latência da WAN.  Entretanto, em aplicações como redes
-sociais, por exemplo, é de se esperar que haja uma grande quantidade de acessos
-locais (a maioria dos usuários acessa o sistema de um único país e tem a maioria
-de seus contatos no mesmo país) e que a relação escrita/leitura seja baixa (cada
-item criado, como uma postagem ou um comentário, seja lido diversas vezes). De
-fato, os autores do PNUTS indicam que em sua rede social 60\% dos acessos é
-local e a relação escrita/leitura observada é de 0,06 \cite{Kadambi2011}. Eles
-indicam também que outras aplicações chegam a ter 85\% dos acessos locais
-\cite{Cooper2008}. Dado isso, eles usam a estratégia de sempre mover
-dinamicamente a réplica mestre para o centro de dados que processa a maior
-quantidade de requisições para dado objeto.  Com isso, em uma aplicação na qual
-a quantidade de leituras é muito maior do que a quantidade de escritas, o custo
-de latência pode ser baixo, em especial se as leituras não precisarem
-necessariamente do valor mais recente.
+consistentes que não são feitas no centro de processamento de dados em que está
+a réplica mestre incorrem no custo de latência da WAN.  Entretanto, em
+aplicações como redes sociais, por exemplo, é de se esperar que haja uma grande
+quantidade de acessos locais (a maioria dos usuários acessa o sistema de um
+único país e tem a maioria de seus contatos no mesmo país) e que a relação
+escrita/leitura seja baixa (cada item criado, como uma postagem ou um
+comentário, seja lido diversas vezes). De fato, os autores do PNUTS indicam que
+em sua rede social 60\% dos acessos é local e a relação escrita/leitura
+observada é de 0,06 \cite{Kadambi2011}. Eles indicam também que outras
+aplicações chegam a ter 85\% dos acessos locais \cite{Cooper2008}. Dado isso,
+eles usam a estratégia de sempre mover dinamicamente a réplica mestre para o
+centro de processamento de dados que processa a maior quantidade de requisições
+para dado objeto.  Com isso, em uma aplicação na qual a quantidade de leituras é
+muito maior do que a quantidade de escritas, o custo de latência pode ser baixo,
+em especial se as leituras não precisarem necessariamente do valor mais recente.
 
 Consistência em momento indeterminado é bastante difundida em sistemas web de
 larga escala. Ela é item de destaque em padrões arquiteturais usados por esse

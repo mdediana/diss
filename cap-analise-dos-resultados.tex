@@ -2,25 +2,25 @@
 \chapter{Análise dos Resultados} \label{cap:analise_dos_resultados}
 
 O estudo final foi um estudo fatorial completo (ver
-Subseção~\ref{sec:experimentos_fatoriais}). A sua execução foi rápida e usou poucos
-recursos devido aos estudos fatoriais 2\textsuperscript{k} feitos para triagem
-dos fatores -- a execução de uma repetição do estudo final demorava 6,5 horas. O
-pequeno número de fatores e níveis foi importante para uma análise consistente
-dos resultados. Esse fato é enfatizado pela principal referência metodológica
-usada neste trabalho \cite{Jain1991} e também foi sugerido para o autor deste
-trabalho em
-conversa com o pesquisador visitante no IME Jean-Marc Vincent, que possui grande
-experiência em estudos de desempenho.
+Subseção~\ref{sec:experimentos_fatoriais}). A sua execução foi rápida e usou
+poucos recursos devido aos estudos fatoriais 2\textsuperscript{k} feitos para
+triagem dos fatores -- a execução de uma repetição do estudo final demorava 6,5
+horas. O pequeno número de fatores e níveis foi importante para uma análise
+consistente dos resultados. Esse fato é enfatizado pela principal referência
+metodológica usada neste trabalho \cite{Jain1991} e também foi sugerido para o
+autor deste trabalho em conversa com o pesquisador visitante no IME Jean-Marc
+Vincent, que possui grande experiência em estudos de desempenho.
 
 Este estudo tinha duas hipóteses principais que estão descritas na
 Seção~\ref{sec:hipoteses}. A seguir, a
-Seção~\ref{sec:nivel_de_confianca,_exatidao_e_tamanho_da_amostra} descreve o o
+Seção~\ref{sec:nivel_de_confianca,_exatidao_e_tamanho_da_amostra} descreve o
 nível de confiança do estudo relativo ao tamanho da amostra. A
 Seção~\ref{sec:analise_dos_tempos_de_resposta} mostra a análise dos tempos de
 resposta, a Seção~\ref{sec:analise_dos_conflitos} mostra a análise dos conflitos
-e a Seção~\ref{sec:analise_das_migracoes} mostra a análise das migrações. Por
-fim, a Seção~\ref{sec:ameacas_a_validade} descreve as ameaças à validade
-levantadas.
+e a Seção~\ref{sec:analise_das_migracoes} mostra a análise das migrações. A
+Seção~\ref{sec:ameacas_a_validade} descreve as ameaças à validade levantadas e
+por fim, a Seção~\ref{sec:trabalhos_relacionados} apresenta os trabalhos
+relacionados a este.
 
 %% ------------------------------------------------------------------------- %%
 \section{Hipóteses} \label{sec:hipoteses}
@@ -38,13 +38,13 @@ distribuição acumulada dos tempos de resposta para cada modo usado no estudo.
 Outra hipótese é que as proporções de conflitos identificados durante as
 leituras em ambos os modelos de consistência seriam próximas. Conflitos na
 consistência na linha do tempo aparecem pois atualizações são enfileiradas na
-réplica mestre. Existe um intervalo de tempo em que a atualização foi aplicada
-na réplica mestre mas ainda não foi enviada para as outras réplicas, esse
-intervalo é a janela de inconsistência. A consistência em momento indeterminado
-apresenta conflitos por motivo semelhante, com a diferença que a atualização
-pode ser aplicada em qualquer réplica. Desse fato resulta que a consistência em
-momento indeterminado permite atualizações simultâneas e divergentes, o que não
-é permitido pela consistência na linha do tempo. Assim, os conflitos no caso da
+réplica mestre. Há um intervalo de tempo em que a atualização foi aplicada na
+réplica mestre mas ainda não foi enviada para as outras réplicas, esse intervalo
+é a janela de inconsistência. A consistência em momento indeterminado apresenta
+conflitos por motivo semelhante, com a diferença que a atualização pode ser
+aplicada em qualquer réplica. Desse fato resulta que a consistência em momento
+indeterminado permite atualizações simultâneas e divergentes, o que não é
+permitido pela consistência na linha do tempo. Assim, os conflitos no caso da
 consistência em momento indeterminado são mais graves.
 
 %% ------------------------------------------------------------------------- %%
@@ -89,12 +89,12 @@ houvesse um balanço entre requisições locais e remotas. Por isso, a opção foi
 executar todos os experimentos e depois verificar se o tamanho da amostra estava
 adequado para cada um deles.
  
-A configuração do \emph{benchmark} era baseada em duração , e não em quantidade
-de requisições. Testes exploratórios foram feitos para identificar o tempo que
-os experimentos deveriam usar. Usando tempo de 3 min e repetindo os experimentos
-percebeu-se que havia pouca variação de média e erro padrão. O valor mínimo de
-quantidade de requisições de um experimento foi 76137, para \emph{lt\_rec},
-localidade de 50\% e latência de rede de 300 ms.
+A configuração do \emph{benchmark} era baseada em duração, e não em quantidade
+de requisições, por isso testes exploratórios foram feitos para identificar que
+duração deveria ser configurada para os experimentos. Com tempo de 3 min e
+repetindo os experimentos percebeu-se que havia pouca variação de média e erro
+padrão. O valor mínimo de quantidade de requisições de um experimento foi 76137,
+para \emph{lt\_rec}, localidade de 50\% e latência de rede de 300 ms.
 
 Dados esses resultados, foram verificados os tamanhos da amostra dos
 experimentos. Para nível de confiança de 99\% e exatidão de 2\%, todos os
@@ -118,15 +118,15 @@ aquecimento, mas não foi usada nos experimentos}.
 \label{sec:analise_dos_tempos_de_resposta}
 
 A principal métrica usada neste estudo foi o tempo de resposta. Tomou-se o
-cuidado de evitar sobrecarregar o sistema, de forma que os tempos de resposta
+cuidado de evitar sobrecarregar o sistema, de modo que os tempos de resposta
 representassem o comportamento do sistema no estado estacionário. As figuras
 desta seção apresentam duas linhas de grade para auxiliar na interpretação: a
 linha vertical indica a latência de rede e a horizontal indica a localidade.
 
 Os gráficos das FDAs dos tempos de resposta quando a latência é 0 ms está na
 Figura \ref{fig:fda_dos_tempos_de_resposta_para_latencia_de_rede_de_0_ms}. Como
-esperado, as requisições se comportam como se fossem locais. Um fato a se
-notar é um degrau nos percentis mais altos das leituras em todos os modos. Uma
+esperado, as requisições se comportam como se fossem locais. Um fato a se notar
+é um degrau nos percentis mais altos das leituras em todos os modos. Uma
 explicação possível seria algum tipo de sobrecarga no sistema, mas nesse caso
 seria esperado ver comportamento semelhante nas escritas.
 
@@ -179,21 +179,22 @@ apresentando o mesmo perfil que para localidade 50\%.
 
 Uma investigação dos degraus que apareceram nos gráficos para leituras mostra
 que em torno do percentil 90 o tempo de resposta aumenta em 10 vezes -- por
-exemplo, para \emph{ind1}, localidade 50\% e latência 0 ms, o percentil 91 é 3,8 ms e o
-percentil 92 é 38,0 ms. A partir daí, os tempos de resposta crescem linearmente,
-como pode ser visto na
+exemplo, para \emph{ind1}, localidade 50\% e latência 0 ms, o percentil 91 é 3,8
+ms e o percentil 92 é 38,0 ms. A partir daí, os tempos de resposta crescem
+linearmente, como pode ser visto na
 Figura~\ref{fig:aproximacao_da_fda_dos_tempos_de_resposta_para_latencia_de_rede_de_0_ms}.
 
 \begin{figure}[!t] \centering
 
 \includegraphics[width=0.5\textwidth]{ecdf_zoom.png}
 
-\caption{Aproximação da FDA dos tempos de resposta para latência de rede de 0 ms.}
+\caption{Aproximação da FDA dos tempos de resposta para latência de rede de 0
+ms.}
 \label{fig:aproximacao_da_fda_dos_tempos_de_resposta_para_latencia_de_rede_de_0_ms}
 \end{figure}
 
 Os ganhos e perdas relativos para requisições remotas da consistência na linha
-do tempo com relação a consistência em momento indeterminado com $W = 2$ e
+do tempo com relação à consistência em momento indeterminado com $W = 2$ e
 latência de rede de 200 ms se encontram na
 Tabela~\ref{tab:ganhos_e_perdas_relativos_das_requisicoes_remotas}.
 
@@ -219,11 +220,11 @@ Com relação ao percentil 75 e localidade 50\%, os ganhos são tão altos pois as
 requisições são locais para \emph{lt\_qqer} e \emph{lt\_rec} e são remotas para
 \emph{ind2}.
 
-Com exceção dos degraus que aparecem nos gráficos para leituras, todos os modos apresentaram o
-comportamento esperado. A hipótese de que a consistência na linha do tempo é
-competitiva em termos de desempenho com a consistência em momento indeterminado
-se confirma para o caso em que a localidade é alta e principalmente caso
-leituras de ``qualquer versão'' sejam usadas.
+Com exceção dos degraus que aparecem nos gráficos para leituras, todos os modos
+apresentaram o comportamento esperado. A hipótese de que a consistência na linha
+do tempo é competitiva em termos de desempenho com a consistência em momento
+indeterminado se confirma para o caso em que a localidade é alta e
+principalmente caso leituras de ``qualquer versão'' sejam usadas.
 
 %% ------------------------------------------------------------------------- %%
 \section{Análise dos Conflitos} \label{sec:analise_dos_conflitos}
@@ -247,11 +248,12 @@ rede é 0 ms, o \emph{benchmark} envia uma leitura, o coordenador a repassa para
 as réplicas que retornam em instantes muito próximos. Na sequência, o
 \emph{benchmark} envia a escrita. No caso em que a latência é diferente de 0 ms
 e a variação é 0\%, o tempo para uma ou duas das leituras retornarem do outro
-centro de dados é grande, portanto a escrita acontece no centro de dados local
-antes. Já no caso em que a variação da latência é 60\%, existe uma chance
-razoável de a escrita chegar ao outro centro de dados antes da leitura. Nesses
-casos, a leitura que aconteceu antes da escrita lê o valor remoto mais novo,
-compara com o mais antigo e portanto resulta em conflito.
+centro de processamento de dados é grande, portanto a escrita acontece no centro
+de processamento de dados local antes. Já no caso em que a variação da latência
+é 60\%, existe uma chance razoável de a escrita chegar ao outro centro de
+processamento de dados antes da leitura. Nesses casos, a leitura que aconteceu
+antes da escrita lê o valor remoto mais novo, compara com o mais antigo e
+portanto resulta em conflito.
 
 Para testar essa hipótese, um estudo foi feito com variação de latência de 30\%.
 TODO: resultado
@@ -279,10 +281,9 @@ consistência na linha do tempo para localidade de 50\% são todas da ordem de
 
 Muitos parâmetros foram fixados e fatores tidos como influentes foram
 desconsiderados (ver Capítulo~\ref{cap:parametros_e_fatores}). Com isso, estudos
-que usem outros valores para os parâmetros ou considerem outros fatores devem
-apresentar resultados diferentes. Em particular, estudos envolvendo mais nós de
-sistema podem apresentar resultados diferentes, dado que o fator quantidade de
-nós do sistema apareceu com influência relativamente alta (ver
+que usem outros valores para os parâmetros ou considerem outros fatores podem
+apresentar resultados diferentes, particularmente a quantidade de nós do
+sistema, que apareceu com influência relativamente alta (ver
 Subseção~\ref{sec:fatores_de_tamanho_do_sistema_e_benchmark}). Além disso, um
 estudo é limitado pelos níveis usados \cite{Jain1991}.  Por exemplo, um estudo
 2\textsuperscript{k} havia mostrado influência alta da perda de pacotes usando
@@ -293,8 +294,8 @@ perda de pacotes nesse nível.
 Os experimentos consideram que todos os nós sempre operam sem falhas (ver
 Subseçao~\ref{sec:metas_do_estudo}). Os resultados de experimentos com o sistema
 operando em algum modo de falha (desde a falha de um nó até de um centro de
-dados inteiro) devem ser diferentes dos obtidos nesse estudo. Observação
-semelhante vale para a carga do sistema.
+processamento de dados inteiro) devem ser diferentes dos obtidos nesse estudo.
+Observação semelhante vale para a carga do sistema.
 
 O Riak usa uma arquitetura muito semelhante à descrita no artigo sobre o Dynamo.
 Com isso, os modelos de consistência usados nos experimentos podem apresentar
@@ -302,3 +303,55 @@ resultados diferentes em sistemas que usem outras arquiteturas, embora o
 desempenho analisado neste estudo foi mais afetado for fatores de rede e carga
 de trabalho.
 
+%% ------------------------------------------------------------------------- %%
+\section{Trabalhos relacionados} \label{sec:trabalhos_relacionados}
+
+Uma abordagem comum na literatura de sistemas distribuídos é a proposta de um
+novo conceito e a implementação de um sistema que use esse conceito seguida de
+uma análise de seu desempenho. Tanto o artigo sobre o Dynamo \cite{DeCandia2007}
+quanto o sobre o PNUTS \cite{Cooper2008} apresentam análises de desempenho,
+sendo que apenas o segundo faz uma análise baseada na carga de trabalho. Há uma
+segunda publicação com experimentos com o PNUTS que analisa o consumo de banda
+de diferentes políticas de replicação em uma WAN \cite{Kadambi2011}.
+
+Muitos trabalhos apresentam análises de desempenho de sistemas de armazenamento
+que usam replicação sobre WANs. Na maior parte dos casos, o objetivo desses
+sistemas é provar outros conceitos além da eficiência do modelo de consistência
+escolhido por eles. O COPS usa consistência causal+, que é semelhante à
+consistência causal com algumas garantia a mais, e implementa transações
+\cite{Lloyd2011}. O Scatter propõe uma arquitetura ao mesmo tempo escalável e
+com consistência forte \cite{Glendenning2011}. O Zeno usa consistência em
+momento indeterminado e é tolerante a falhas bizantinas\footnote{Falhas
+bizantinas fazem com que o sistema falhe de uma forma diferente que apenas parar
+de responder requisições. O envio de respostas com valores errados para os
+clientes é um exemplo de falha bizantina.} \cite{Singh2009}. O Windows Azure
+provê um sistema de armazenamento na nuvem com consistência forte
+\cite{Calder2011}. O Megastore usa Paxos para implementar consistência forte
+\cite{Baker2011}. Nenhum desses trabalhos apresenta comparações com outros
+sistemas ou com outros modelos de consistência. Como eles não usam uma aplicação
+para execução de testes ou ambiente comum, é difícil fazer qualquer comparação a
+partir desses trabalhos.
+
+Beyer et al. realizaram testes para analisar a relação entre as diferentes
+configurações de consistência no Cassandra e sua disponibilidade e desempenho
+\cite{Beyer2011}. Como esperado, eles notam que configurações que oferecem
+consistência mais rígida apresentam pior desempenho.  Renesse e Schneider
+apresentam resultados experimentais comparando desempenho e disponibilidade de
+replicação mestre-escravo e replicação em cadeia, cada uma delas usando
+consistência forte e consistência em momento indeterminado
+\cite{VanRenesse2004}. Nenhum desses dois experimentos leva em consideração
+operação sobre WAN nem diferentes cargas de trabalho. Yu e Vahdat realizaram uma
+análise sobre a relação entre disponibilidade e níveis de consistência em
+sistemas replicados em WANs \cite{Yu2001}. Eles comparam a disponibilidade de um
+sistema usando consistência forte e consistência contínua, usando diferentes
+protocolos de consistência como cópia primária e votação, por exemplo. Esse
+trabalho não testa consistência em momento indeterminado nem consistência na
+linha do tempo e não observa o desempenho dos modelos de consistência
+analisados.
+
+Uma publicação com uma proposta mais próxima da deste trabalho é a comparação
+feita entre Cassandra, HBase, PNUTS e MySQL particionado horizontalmente usando
+diferentes cargas de trabalho \cite{Cooper2010}. Os resultados servem como uma
+comparação entre esses sistemas, mas dizem menos sobre seus modelos de
+consistência, dado que os sistemas apresentam arquiteturas e configurações
+diferentes. Além disso, os testes são feitos em uma rede local, não em uma WAN.
