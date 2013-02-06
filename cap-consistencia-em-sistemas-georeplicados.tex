@@ -412,7 +412,9 @@ sequência de operações na Tabela
 \ref{tab:consistencia_em_momento_indeterminado_valida} é válida. É possível
 surgirem conflitos entre réplicas na consistência em momento indeterminado,
 portanto um sistema que use esse modelo de consistência precisa implementar um
-mecanismo de resolução de conflitos.
+mecanismo de resolução de conflitos. Detalhes do funcionamento desse modelo de
+consistência estão na
+Subseção~\ref{sec:consistencia_disponibilidade_tolerancia_a_particionamento}.
 
 \begin{table}[!h] \begin{center} \begin{tabular}{c|c|c|c|c|c}
 
@@ -443,6 +445,8 @@ versão específica, ela se comporta como a consistência em momento indeterminado.
 Esse modelo de consistência permite que existam réplicas desatualizadas, mas
 garante que não existem divergências que precisem de mecanismos de resolução de
 conflitos \cite{Saito2005}, pois todas as escritas obedecem uma ordem serial.
+Detalhes do funcionamento desse modelo de consistência estão na
+Subseção~\ref{sec:consistencia_disponibilidade_tolerancia_a_particionamento}.
 
 O modelo de consistência de um sistema replicado impacta o seu desempenho,
 disponibilidade e manutenibilidade. Sistemas web georeplicados normalmente usam
@@ -509,20 +513,21 @@ O teorema CAP ou conjectura de Brewer diz que é impossível um sistema
 distribuído prover consistência, disponibilidade e tolerância a particionamento
 de rede simultaneamente, sendo necessário escolher quaisquer duas propriedades
 em detrimento da terceira \cite{Brewer2000,Gilbert2002}. A consistência a que o
-teorema se refere é a consistência mútua. A disponibilidade aqui é definida como
-a garantia de resposta de uma requisição recebida por qualquer nó que não
+teorema se refere é a consistência mútua. A disponibilidade é definida como a
+garantia de resposta de uma requisição recebida por qualquer nó que não
 apresente falha. A tolerância a particionamento é a capacidade do sistema
 continuar atendendo requisições mesmo quando uma quantidade arbitrária de
 mensagens entre os nós é perdida, o que representa a divisão do sistema em duas
 ou mais partições. A perda de mensagem pode ocorrer pela falha de qualquer
 equipamento ou estrutura de rede, como um roteador ou um enlace, ou por
-problemas comuns em redes de longa distância como perda de pacotes, por exemplo.
+problemas comuns em redes de longa distância, como perda de pacotes, por
+exemplo.
 
 A possibilidade de particionamento da rede não é uma característica do sistema,
 mas sim da rede na qual ele opera -- particionamentos em redes locais são raros,
 mas são comuns em WANs \cite{DeCandia2007,Hale2010,Amir1996}. Assim, em sistemas
 georeplicados, boa parte da rede está fora do controle dos administradores do
-sistema. Essa é a essência do teorema CAP: em um sistema no qual existe a
+sistema. Essa é a essência do teorema CAP: em um sistema no qual há a
 possibilidade de particionamento da rede, resta aos desenvolvedores escolher
 entre disponibilidade e consistência.
 
@@ -536,7 +541,7 @@ escrevendo nas réplicas a que têm acesso. Quando isso acontece, escritas vindas
 dos clientes de cada partição podem levar as réplicas de um mesmo objeto a
 estados diferentes.
 
-Existem diversos modelos de consistência usados em sistemas que escolhem
+Há diversos modelos de consistência usados em sistemas que escolhem
 disponibilidade e tolerância a particionamento, sendo a consistência em momento
 indeterminado um exemplo. Esse modelo de consistência permite inconsistências
 entre réplicas, mas garante que elas são sempre expostas e resolvidas, apesar de
@@ -546,18 +551,18 @@ ser implementados para forçar a convergência dos valores das réplicas após um nó
 se recuperar de uma falha ou o particionamento da rede ser resolvido. Um exemplo
 de algoritmo de detecção de conflitos é a correção na leitura
 \cite{DeCandia2007}. Por esse algoritmo, todas as réplicas de um objeto são
-lidas em todas as leituras desse objeto, e ao perceber divergência entre elas, o
-sistema ativa mecanismos de resolução de conflitos (comentados na Subseção
-\ref{sec:replicacao_otimista}).
+acessadas a cada requisição de leitura para o objeto, e ao perceber divergência
+entre elas, o sistema ativa mecanismos de resolução de conflitos (comentados na
+Subseção \ref{sec:replicacao_otimista}).
 
 Os compromissos apresentados pelo teorema CAP são complexos, não representando
 apenas situações binárias (disponível x indisponível, consistente x
 inconsistente). Um exemplo disso é o uso de quóruns, bastante utilizados na
 implementação do controle de consistência em sistemas distribuídos. Esse
-protocolo pode ser utilizado para evitar ou diminuir a possibilidade de
-conflitos, com diminuição da disponibilidade do sistema sempre que o quórum para
-determinada operação não for atingido \cite{Gifford1979,Vogels2009,Yu2001}. Por
-esse protocolo, um sistema usa um subconjunto das réplicas disponíveis para um
+protocolo é utilizado para evitar ou diminuir a possibilidade de conflitos, com
+diminuição da disponibilidade do sistema sempre que o quórum para determinada
+operação não for atingido \cite{Gifford1979,Vogels2009,Yu2001}. Por esse
+protocolo, um sistema usa um subconjunto das réplicas disponíveis para um
 balanço entre consistência e disponibilidade ao atender as requisições dos
 clientes. Seja o fator de replicação N a quantidade de réplicas existentes de um
 determinado objeto, R a quantidade de réplicas que precisam concordar com o
@@ -575,7 +580,7 @@ para leitura e escrita. Essa leitura seria mal sucedida se $R = 2$, por exemplo.
 O contraponto nesse caso é que a disponibilidade do sistema foi diminuída. A
 questão sobre que valores de $N$, $R$ e $W$ escolher se torna ainda mais
 complexa ao se considerar outros fatores, como durabilidade. Por exemplo, ao
-usar $W = 1$, a durabilidade está comprometida caso ocorra uma falha permanente
+usar $W = 1$, a durabilidade fica comprometida caso ocorra uma falha permanente
 em um nó que recebeu uma escrita mas falhou antes de enviá-la para as outras
 réplicas.
 
@@ -610,9 +615,9 @@ inaceitável por sistemas desse porte \cite{DeCandia2007,Cooper2008}.
 
 A partir da observação dos teoremas CAP e PACELC é possível criar heurísticas
 para otimização de um modelo de consistência. Por exemplo, uma heurística
-proposta em \cite{Cooper2008} que favorece tanto disponibilidade quanto
-desempenho da consistência na linha do tempo é a migração do mestre de um objeto
-para o centro de dados no qual ele é escrito mais frequentemente.
+implementada no PNUTS \cite{Cooper2008} que favorece tanto disponibilidade
+quanto desempenho da consistência na linha do tempo é a migração do mestre de um
+objeto para o centro de dados no qual ele é escrito mais frequentemente.
 
 %% ------------------------------------------------------------------------- %%
 \section{Trabalhos relacionados} \label{sec:trabalhos_relacionados}
