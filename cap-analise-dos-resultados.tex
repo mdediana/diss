@@ -99,7 +99,7 @@ para \emph{lt\_rec}, localidade de 50\% e latência de rede de 300 ms.
 Dados esses resultados, foram verificados os tamanhos da amostra dos
 experimentos. Para nível de confiança de 99\% e exatidão de 2\%, todos os
 experimentos tinham o tamanho da amostra suficiente. Com precisão de 1\%, apenas
-os experimentos para \emph{lt\_rec}, localidade 50\% e latência de rede 300 ms
+os experimentos para \emph{lt\_rec}, localidade de 50\% e latência de rede 300 ms
 não tinham tamanho da amostra suficiente -- para variação de latência de 0\% o
 experimento precisaria de 127789 amostras mas tinha 115175, e para variação de
 latência 60\% ele precisaria de 83030 mas tinha 76137.
@@ -143,12 +143,12 @@ opção foi fazer a análise para um deles apenas. O gráfico para latência de rede
 de 200 ms está na Figura
 \ref{fig:fda_dos_tempos_de_resposta_para_latencia_de_rede_de_200_ms}.
 
-No caso de leituras e localidade 50\%, apenas \emph{lt\_rec} apresenta
+No caso de leituras e localidade de 50\%, apenas \emph{lt\_rec} apresenta
 requisições remotas. Uma porção pequena dessas leituras tem tempo de resposta
 menor que a latência da rede, o que se explica pela variação da latência de até
 60\%.
 
-Para leituras e localidade 90\%, \emph{lt\_rec} é beneficiado, mas continua
+Para leituras e localidade de 90\%, \emph{lt\_rec} é beneficiado, mas continua
 apresentando tempos de resposta mais altos que os outros modos para parte das
 requisições. O degrau que aparecia nos gráficos para latência de 0 ms permanece,
 mas no caso de \emph{lt\_rec} ele surge próximo do percentil equivalente a
@@ -156,16 +156,16 @@ localidade (50 ou 90). Isso sugere que esse é um efeito que sempre acontece com
 requisições locais, independente da proporção que representem do total de
 requisições.
 
-No caso de escritas e localidade 50\%, \emph{lt\_rec} apresenta um desempenho um
+No caso de escritas e localidade de 50\%, \emph{lt\_rec} apresenta um desempenho um
 pouco melhor que \emph{ind2} e \emph{lt\_qqer}. A explicação provável para isso
 é o sistema estar menos carregado para esse modo do que os outros, o que
 acontece pois as leituras de \emph{lt\_rec} são mais lentas. Esse fato é
 comprovado pela vazão dos modos \emph{lt\_rec}, ev2 e \emph{lt\_qqer},
 respectivamente, 594, 1072, 941 operações/s.
 
-Para escritas e localidade 90\%, \emph{lt\_rec} e \emph{lt\_qqer} apresentam
+Para escritas e localidade de 90\%, \emph{lt\_rec} e \emph{lt\_qqer} apresentam
 melhor desempenho devido à localidade, enquanto \emph{ind2} continua
-apresentando o mesmo perfil que para localidade 50\%.
+apresentando o mesmo perfil que para localidade de 50\%.
 
 % grep 0.5,uni,2:1,200,60 res.1/summary.csv | cut -d, -f1,11
 
@@ -179,7 +179,7 @@ apresentando o mesmo perfil que para localidade 50\%.
 
 Uma investigação dos degraus que apareceram nos gráficos para leituras mostra
 que em torno do percentil 90 o tempo de resposta aumenta em 10 vezes -- por
-exemplo, para \emph{ind1}, localidade 50\% e latência 0 ms, o percentil 91 é 3,8
+exemplo, para \emph{ind1}, localidade de 50\% e latência de 0 ms, o percentil 91 é 3,8
 ms e o percentil 92 é 38,0 ms. A partir daí, os tempos de resposta crescem
 linearmente, como pode ser visto na
 Figura~\ref{fig:aproximacao_da_fda_dos_tempos_de_resposta_para_latencia_de_rede_de_0_ms}.
@@ -216,7 +216,7 @@ relação a \emph{ind2} para latência de 200 ms. As perdas são indicadas pelo
 sinal negativo} \label{tab:ganhos_e_perdas_relativos_das_requisicoes_remotas}
 \end{center} \end{table}
 
-Com relação ao percentil 75 e localidade 50\%, os ganhos são tão altos pois as
+Com relação ao percentil 75 e localidade de 50\%, os ganhos são tão altos pois as
 requisições são locais para \emph{lt\_qqer} e \emph{lt\_rec} e são remotas para
 \emph{ind2}.
 
@@ -230,7 +230,7 @@ principalmente caso leituras de ``qualquer versão'' sejam usadas.
 \section{Análise dos Conflitos} \label{sec:analise_dos_conflitos}
 
 A análise dos conflitos indicou uma proporção muito alta de conflitos, da ordem
-de 30\%, para todos os casos com latência de rede diferente de 0 ms e variação
+de 30\%, para todos os casos com latência diferente de 0 ms e variação
 de latência de 60\%. Para variação de latência de 0\%, os conflitos são da ordem
 de 0,1\%.
 

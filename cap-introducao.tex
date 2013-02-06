@@ -6,40 +6,40 @@ de larga escala, dados são replicados em milhares de servidores distribuídos em
 múltiplos centros de processamento de dados em diferentes localizações
 geográficas. A replicação de dados objetiva a redução da latência, o aumento da
 vazão e/ou disponibilidade \cite{Saito2005}. O tempo de resposta de requisições
-torna-se menor devido à localidade dos dados, pois a réplica usada para a
-resposta é a mais próxima do usuário que faz a requisição. A vazão aumenta pois
-o sistema é capaz de receber uma quantidade maior de requisições simultâneas
-para o mesmo dado já que há mais servidores disponíveis para atendê-las. A
-disponibilidade aumenta pois caso um servidor ou até um centro de processamento
-de dados inteiro fique indisponível, outros ainda podem atender requisições. A
-durabilidade também é mais alta, pois os dados não se perdem no caso em que um
-nó fique permanentemente indisponível, o que pode acontecer devido a uma falha
-em um disco rígido ou até mesmo a destruição de um centro de processamento de
-dados inteiro.
+torna-se menor devido à localidade dos dados, pois a réplica usada para fornecer
+a resposta é a mais próxima do usuário que faz a requisição. A vazão aumenta
+pois o sistema é capaz de receber uma quantidade maior de requisições
+simultâneas para o mesmo dado já que há mais servidores disponíveis para
+atendê-las. A disponibilidade aumenta pois caso um servidor ou até um centro de
+processamento de dados inteiro fique indisponível, outros ainda podem atender
+requisições. A durabilidade também é mais alta, pois os dados não se perdem no
+caso em que um nó fique permanentemente indisponível, o que pode acontecer
+devido a uma falha em um disco rígido ou até mesmo a destruição de um centro de
+processamento de dados inteiro.
 
 O principal problema do uso de replicação em redes de longa distância
-(\emph{Wide area networks} -- WANs) é que manter as réplicas sempre consistentes
-entre si implica em sacrificar outros requisitos também importantes, como
-desempenho ou disponibilidade. Um motivo para divergência entre réplicas é que a
-replicação entre centros de processamento de dados pode apresentar centenas de
-milissegundos de latência, período durante o qual as réplicas podem divergir.
-Essa latência é resultado não só das distâncias físicas entre os nós, mas também
-de limitações na largura de banda disponível, congestionamento de rede e perda
-de pacotes.  Outro motivo que pode gerar divergência entre réplicas é a falha
+(\emph{Wide Area Network} -- WAN) é que manter as réplicas sempre consistentes
+entre si tipicamente implica em sacrificar outros requisitos também importantes,
+como desempenho ou disponibilidade. Um motivo para divergência entre réplicas é
+que a replicação entre centros de processamento de dados pode apresentar
+centenas de milissegundos de latência, período durante o qual as réplicas podem
+divergir.  Essa latência é resultado não só das distâncias físicas entre os nós,
+mas também de limitações na largura de banda disponível, congestionamento de
+rede e perda de pacotes. Outro motivo de divergência entre réplicas é a falha
 temporária de um nó, que deixa de receber atualizações por um período de tempo.
 Um terceiro motivo é a falha em um equipamento ou enlace de rede que impeça a
 comunicação entre réplicas.
 
 Com isso, desenvolvedores e administradores de sistemas web de larga escala
-precisam buscar um balanço entre disponibilidade, desempenho e consistência dos
-dados. Uma decisão comum a vários desses sistemas é o relaxamento da
-consistência em troca de alta disponibilidade e baixa latência. Há diversos
-modelos de consistência propostos na literatura, cada um com diferentes
-garantias e condições em que as réplicas dos dados podem ficar inconsistentes.
-Os modelos mais rígidos, que oferecem mais garantias, são mais simples de serem
-usados pelos desenvolvedores. Modelos que oferecem menos garantias de
-consistência possibilitam réplicas com dados desatualizados e/ou o aparecimento
-de divergências e conflitos entre elas. Com isso, esses conflitos precisam ser
+buscam um balanço entre disponibilidade, desempenho e consistência dos dados.
+Uma decisão comum em vários desses sistemas é o relaxamento da consistência em
+troca de alta disponibilidade e baixa latência. Há diversos modelos de
+consistência propostos na literatura, cada um com diferentes garantias e
+condições em que as réplicas dos dados podem ficar inconsistentes.  Os modelos
+mais rígidos, que oferecem mais garantias, são mais simples de serem usados
+pelos desenvolvedores. Modelos que oferecem menos garantias de consistência
+possibilitam réplicas com dados desatualizados e/ou o aparecimento de
+divergências e conflitos entre elas. Com isso, esses conflitos precisam ser
 detectados e corrigidos e ações de compensação podem ser necessárias devido a
 ações no sistema tomadas a partir de dados inconsistentes. Isso afeta
 negativamente a manutenibilidade do sistema, já que sua lógica torna-se mais
@@ -134,8 +134,8 @@ apenas uma de suas réplicas, evitando assim a possibilidade de conflitos ao
 mesmo tempo em que evita o uso de bloqueios (\emph{locks}) e propagação de
 atualizações síncrona. Com a propagação assíncrona, réplicas podem ter valores
 desatualizados devido à latência de rede ou falhas, mas a qualquer instante
-sabe-se qual é a réplica com o valor mais recente. Os clientes podem escolher em
-cada acesso se aceitam como resposta apenas o valor mais recente ou se aceitam
+sabe-se qual é a réplica com o valor mais recente. Os clientes escolhem em cada
+acesso se aceitam como resposta apenas o valor mais recente ou se aceitam
 valores desatualizados. A principal desvantagem da consistência na linha do
 tempo é que a existência de uma réplica mestre implica que escritas e leituras
 consistentes (leituras do valor mais recente) ficam indisponíveis em caso de uma
@@ -180,23 +180,23 @@ Há diversos estudos experimentais sobre desempenho de modelos de consistência
 \cite{DeCandia2007,Cooper2008,Lloyd2011,Beyer2011}, mas não foi encontrada uma
 comparação quantitativa entre esses dois modelos mostrando como cada um se
 comporta em diferentes condições de latência de rede e carga de trabalho. Dados
-sobre essa comparação podem oferecer subsídios para desenvolvedores e
-administradores de sistemas estimarem melhor os custos de desenvolvimento e
-fazerem um planejamento de capacidade mais eficaz.
+sobre essa comparação são úteis para desenvolvedores e administradores de
+sistemas estimarem melhor os custos de desenvolvimento e fazerem um planejamento
+de capacidade mais eficaz.
 
 %% ------------------------------------------------------------------------- %%
 \section{Organização do Trabalho} \label{sec:organizacao_trabalho}
 
 Este trabalho está dividido em cinco capítulos. O
 Capítulo~\ref{cap:consistencia_em_sistemas_georeplicados} apresenta os
-fundamentos necessários para o entendimento da motivação, dos problemas e das
-soluções oferecidas pela replicação de dados em sistemas georeplicados. Os três
-capítulos seguintes seguem a ordem em que as atividades do estudo experimental
-foram realizadas. O Capítulo~\ref{cap:planejamento_e_aspectos_tecnicos}
-contempla o planejamento dos experimentos e os aspectos técnicos de sua
-implementação. A seguir, o Capítulo~\ref{cap:parametros_e_fatores} descreve o
-processo usado para definir quais características do sistema, do ambiente e da
-carga de trabalho foram consideradas e quais foram desconsideradas no estudo.  O
+fundamentos para o entendimento da motivação, dos problemas e das soluções
+oferecidas pela replicação de dados em sistemas georeplicados. Os três capítulos
+seguintes seguem a ordem em que as atividades do estudo experimental foram
+realizadas. O Capítulo~\ref{cap:planejamento_e_aspectos_tecnicos} contempla o
+planejamento dos experimentos e os aspectos técnicos de sua implementação. A
+seguir, o Capítulo~\ref{cap:parametros_e_fatores} descreve o processo usado para
+definir quais características do sistema, do ambiente e da carga de trabalho
+foram consideradas e quais foram desconsideradas no estudo.  O
 Capítulo~\ref{cap:analise_dos_resultados} aborda a análise dos resultados
 obtidos nos experimentos. Por fim, o Capítulo~\ref{cap:conclusoes} traz as
 conclusões deste trabalho.

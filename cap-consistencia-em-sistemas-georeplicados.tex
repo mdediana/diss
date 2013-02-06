@@ -10,13 +10,13 @@ contexto em que opera o tipo de sistema estudado neste trabalho.
 
 Este trabalho usa o termo ``sistemas de armazenamento'' para se referir de forma
 geral a sistemas distribuídos que armazenam e gerenciam dados, como SGBDDs,
-tabelas de espalhamento distribuídas (\emph{Distributed hash table} -- DHT) e
+tabelas de espalhamento distribuídas (\emph{Distributed Hash Table} -- DHT) e
 sistemas de arquivos distribuídos. Um motivo para isso é que às vezes a
 distinção entre esses tipos de sistemas não é clara. Além disso, eles lidam com
 questões semelhantes, como replicação, por exemplo, o que faz com que muitas
 técnicas surgidas em um contexto sejam aplicadas em outro.
 
-Seção~\ref{sec:estrategias_para_escalabilidade_de_aplicacoes_web} apresenta
+A Seção~\ref{sec:estrategias_para_escalabilidade_de_aplicacoes_web} apresenta
 conceitos de escalabilidade de aplicações web. Uma estratégia comum para
 escalabilidade é o uso de replicação, a
 Seção~\ref{sec:replicacao_de_dados_e_seus_compromissos} mostra diferentes tipos
@@ -27,7 +27,7 @@ diversos tipos de modelos de consistência, incluindo os dois que são alvo deste
 trabalho. A
 Seção~\ref{sec:consistencia_desempenho_e_disponibilidade_em_sistemas_georeplicados}
 mostra algumas implicações dos diferentes modelos de consistência na arquitetura
-de de sistemas de larga escala.
+de sistemas de larga escala.
 
 %% ------------------------------------------------------------------------- %%
 \section{Estratégias para Escalabilidade de Aplicações Web}
@@ -89,7 +89,7 @@ de servidores usados por uma organização devido a um aumento na eficiência de
 sua utilização.}, diminuindo assim o custo operacional do sistema. Do ponto de
 vista dos desenvolvedores e administradores, pouca coisa muda com escalabilidade
 diagonal dado que a arquitetura do sistema deve ter sido criada para escalar
-horizontalmente de qualquer forma.
+horizontalmente.
 
 Para escalar um sistema horizontalmente, além do particionamento dos dados,
 outra técnica importante é a replicação de dados. As diferentes estratégias de
@@ -102,14 +102,12 @@ replicação, suas vantagens e consequências são apresentadas na seção seguinte.
 Replicação de dados é o processo de criar cópias de uma coleção de dados
 \cite{Liu2009a} e é usada em sistemas distribuídos por três razões
 \cite{Saito2005}. A primeira é a diminuição da latência por meio da replicação
-de dados para localizações mais próximas de onde esses dados são usados. Isso é
-especialmente para longas distâncias, quando se replica dados entre centros de
+de dados para localizações mais próximas de onde esses dados são usados --
+especialmente válido no caso de longas distâncias, como é o caso de centros de
 processamento de dados em diferentes localizações geográficas
-\cite{DeCandia2007,Cooper2008} -- redes locais (\emph{Local area network} --
-LANs) apresentam latências da ordem centenas de microssegundos
-\cite{Rumble2011}. A segunda razão para replicar dados é aumentar a vazão do
-sistema por meio do balanceamento de carga entre diferentes servidores,
-possibilitando que o mesmo dado seja servido por mais de um servidor
+\cite{DeCandia2007,Cooper2008}. A segunda razão para replicar dados é aumentar a
+vazão do sistema por meio do balanceamento de carga entre diferentes servidores,
+possibilitando que o mesmo dado seja acessado em mais de um servidor
 simultaneamente. Finalmente, a terceira razão é o aumento da disponibilidade do
 sistema, pois determinado dado continua sendo acessado pelos clientes mesmo
 quando algumas das réplicas encontram-se indisponíveis.

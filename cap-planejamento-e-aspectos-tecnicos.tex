@@ -7,7 +7,7 @@ of Computer Systems Performance Analysis} (A Arte da Análise de Desempenho de
 Sistemas de Computação) \cite{Jain1991}, de Raj Jain. Esse livro trata da
 análise de desempenho de sistemas de software e/ou hardware, e apresenta
 conceitos de estudos experimentais e o ferramental estatístico necessário nesse
-tipo de análise. Além disso, ele propõe uma abordagem sistemática para fazer um
+tipo de estudo. Além disso, ele propõe uma abordagem sistemática para fazer um
 estudo experimental. A segunda referência usada sobre análise de desempenho foi
 \cite{Lilja2005}.
 
@@ -95,7 +95,7 @@ quantidade de conflitos (ambas dadas pela porcentagem com relação ao total de
 operações do experimento). A quantidade de migrações, exclusiva da consistência
 na linha do tempo, oferece uma visão da dinâmica de um sistema usando esse
 modelo de consistência. A quantidade de conflitos proporciona uma noção da
-frequência com que cliente leem valores desatualizados.  Uma diferença entre
+frequência com que cliente acessam valores desatualizados.  Uma diferença entre
 conflitos nos dois modelos é que na consistência na linha do tempo eles são
 causados apenas por atualizações que ainda não chegaram a todas as réplicas,
 portanto serão automaticamente resolvidos em algum momento no futuro. Já na
@@ -152,15 +152,10 @@ Mas quanto maior a quantidade de fatores e de níveis em um estudo experimental,
 maior a quantidade de recursos necessários para sua execução. Normalmente os
 fatores não afetam igualmente as variáveis de resposta, pelo contrário, é comum
 alguns poucos fatores explicarem a maior parte dos efeitos na resposta
-\cite{Jain1991}.
-
-Para esses casos, um tipo particular de projeto de experimentos fatoriais
-completo é utilizado para fazer uma triagem dos fatores, identificando quais
-deles são os mais influentes. Esse tipo está descrito na subseção a seguir.
-
-%% ------------------------------------------------------------------------- %%
-\subsection{Projeto de experimentos fatoriais 2\textsuperscript{k}}
-\label{sec:projeto_de_experimentos_fatoriais_2k}
+\cite{Jain1991}. Para esses casos, um projeto de experimentos fatoriais
+2\textsuperscript{k}, que é um tipo de projeto de experimentos completo, é
+utilizado para fazer uma triagem dos fatores, identificando quais deles são os
+mais influentes.
 
 Em um projeto de experimentos fatoriais 2\textsuperscript{k}, todos os fatores
 inicialmente selecionados são usados, mas apenas com dois níveis cada
@@ -292,7 +287,7 @@ implementadas.
 O PNUTS conta com uma heurística que explora a localidade de requisições,
 simples mas importante para o desempenho da consistência na linha do tempo: a
 réplica mestre migra para o centro de processamento de dados de onde vieram as
-últimas escritas.  Essa heurística foi implementada no Riak para este estudo.
+últimas escritas. Essa heurística foi implementada no Riak para este estudo.
 
 A implementação da consistência na linha do tempo foi baseada na da consistência
 em momento indeterminado já disponível no Riak. Durante a implementação houve a

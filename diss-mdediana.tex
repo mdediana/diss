@@ -47,7 +47,7 @@
 \tikzstyle{cloud} = [draw, ellipse,fill=red!20, node distance=3cm,
     minimum height=2em]
 
-\hyphenation{mo-ni-to-ra-men-to ro-te-a-do-res e-xem-plo}
+\hyphenation{mo-ni-to-ra-men-to ro-te-a-do-res e-xem-plo u-sa-do}
 
 % ---------------------------------------------------------------------------- %
 % Cabeçalhos similares ao TAOCP de Donald E. Knuth
@@ -250,43 +250,44 @@ Universidade de São Paulo, São Paulo, 2013.
 \\
 
 Sistemas web de larga escala são distribuídos em milhares de servidores em
-múltiplos centros de processamento de dados em diferentes localizações geográficas, operando
-sobre redes de longa distância (WANs). Várias técnicas são usadas para atingir
-os altos níveis de escalabilidade requeridos por esses sistemas. Replicação de
-dados está entre as principais delas, e tem por objetivo diminuir a latência,
-aumentar a vazão e/ou aumentar a disponibilidade do sistema. O principal
-problema do uso de replicação em sistemas georeplicados é a dificuldade de
-garantir consistência entre as réplicas sem prejudicar consideravelmente o
-desempenho e a disponibilidade do sistema. O desempenho do sistema é afetado
-pelas latências da ordem de centenas de milissegundos da WAN, enquanto a
-disponibilidade é afetada por falhas que impedem a comunicação entre as
-réplicas. Quanto mais rígido o modelo de consistência de um sistema de
+múltiplos centros de processamento de dados em diferentes localizações
+geográficas, operando sobre redes de longa distância (WANs). Várias técnicas são
+usadas para atingir os altos níveis de escalabilidade requeridos por esses
+sistemas. Replicação de dados está entre as principais delas, e tem por objetivo
+diminuir a latência, aumentar a vazão e/ou aumentar a disponibilidade do
+sistema. O principal problema do uso de replicação em sistemas georeplicados é a
+dificuldade de garantir consistência entre as réplicas sem prejudicar
+consideravelmente o desempenho e a disponibilidade do sistema. O desempenho do
+sistema é afetado pelas latências da ordem de centenas de milissegundos da WAN,
+enquanto a disponibilidade é afetada por falhas que impedem a comunicação entre
+as réplicas. Quanto mais rígido o modelo de consistência de um sistema de
 armazenamento, mais simples é o desenvolvimento do sistema que o usa, mas
 menores são seu desempenho e disponibilidade.
 
 Entre os modelos de consistência mais relaxados e mais difundidos em sistemas
 web georeplicados está a consistência em momento indeterminado (\emph{eventual
-consistency}). Esse modelo de consistência garante que as réplicas convergem
-após as escritas terem cessado. Um modelo mais rígido e menos difundido é a
-consistência na linha do tempo. Esse modelo de consistência usa uma réplica
-mestre para garantir que não ocorram conflitos na escrita. Nas leituras os
-clientes podem ler os valores mais recentes a partir da cópia mestre, ou optar
-explicitamente por ler valores desatualizados para obter maior desempenho ou
-disponibilidade (em caso de falha que impeça a comunicação com a cópia mestre).
-É possível perceber analiticamente que a consistência na linha do tempo
-apresenta disponibilidade menor que a consistência em momento indeterminado, mas
-não existem dados comparando o desempenho de ambas.
+consistency}). Esse modelo de consistência garante que em algum momento as
+réplicas convergem após as escritas terem cessado. Um modelo mais rígido e menos
+difundido é a consistência na linha do tempo. Esse modelo de consistência usa
+uma réplica mestre para garantir que não ocorram conflitos na escrita. Nas
+leituras, os clientes podem ler os valores mais recentes a partir da cópia
+mestre, ou optar explicitamente por ler valores possivelmente desatualizados
+para obter maior desempenho ou disponibilidade.  É possível perceber
+analiticamente que a consistência na linha do tempo apresenta disponibilidade
+menor que a consistência em momento indeterminado, mas ainda não há dados
+comparando o desempenho de ambas.
 
 O objetivo principal deste trabalho é a comparação do desempenho de sistemas de
-armazenamento georeplicados usando esses dois modelos de consistência. Para
-cada modelo de consistência, são realizados experimentos que medem o tempo de
+armazenamento georeplicados usando esses dois modelos de consistência. Para cada
+modelo de consistência, são realizados experimentos que medem o tempo de
 resposta e a vazão do sistema sob diferentes cargas de trabalho e diferentes
-latências entre centros de processamento de dados. Esse comparativo pode auxiliar desenvolvedores
-e administradores de sistemas no processo de planejamento de capacidade e nas
-estimativas do custo de desenvolvimento de um sistema georeplicado.\\
+latências entre centros de processamento de dados. Esse comparativo pode
+auxiliar desenvolvedores e administradores de sistemas no processo de
+planejamento de capacidade e nas estimativas do custo de desenvolvimento de um
+sistema georeplicado.\\
 
 \noindent \textbf{Palavras-chave:} Sistemas distribuídos, modelos de
-consistência, sistemas web de larga escala, desempenho.
+consistência, sistemas web de larga escala, análise de desempenho.
 
 % ---------------------------------------------------------------------------- %
 % Abstract
@@ -299,40 +300,39 @@ Universidade de São Paulo, São Paulo, 2013.
 \\
 
 Large scale web systems are distributed among thousands of servers spread over
-multiple data centers in geographically different locations operating over
-wide-area networks (WANs). Several techniques are employed to achieve the high
-levels of scalability required by such systems. One of the main techniques is
-data replication, which aims to reduce latency, increase throughput and/or
-increase availability. The main drawback of replication in geo-replicated
-systems is that it is hard to guarantee consistency between replicas without
-considerably impacting system performance and availability. System performance
-is affected by WAN latencies of hundreds of miliseconds, while system
-availability is affected by failures cutting off communication between replicas.
-The more rigid the consistency model provided by a storage system, the simpler
-the development of the system using it, but the lower its performance and
+multiple data centers in geographically different locations operating over wide
+area networks (WANs). Several techniques are employed to achieve the high levels
+of scalability required by such systems. One of the main techniques is data
+replication, which aims to reduce latency, increase throughput and/or increase
+availability. The main drawback of replication in geo-replicated systems is that
+it is hard to guarantee consistency between replicas without considerably
+impacting system performance and availability. System performance is affected by
+WAN latencies, typically of hundreds of miliseconds, while system availability
+is affected by failures cutting off communication between replicas.  The more
+rigid the consistency model provided by a storage system, the simpler the
+development of the system using it, but the lower its performance and
 availability.
 
 Eventual consistency is one of the more relaxed and most widespread consistency
 models among geo-replicated systems. This consistency model guarantees that all
 replicas converge at some unspecified time after writes have stopped. A model
 that is more rigid and less widespread is timeline consistency. This consistency
-model uses a master replica to guarantee that no write conflicts occur. When
-reading, clients can read the most up-to-date values from the master replica, or
-they can explicitly choose to read stale values to obtain greater performance or
-availability (in case of a failure stopping communication with the master
-replica). It is possible to see analytically that timeline consistency shows
-lower availability than eventual consistency, but there are no data comparing
-their performance.
+model uses a master replica to guarantee that no write conflicts occur. Clients
+can read the most up-to-date values from the master replica, or they can
+explicitly choose to read stale values to obtain greater performance or
+availability. It is possible to see analytically that timeline consistency shows
+lower availability than eventual consistency, but still there are nodata
+comparing their performance.
 
 The main goal of this work is to compare the performance of a geo-replicated
 storage system using these consistency models. For each consistency model,
-experiments are run to measure system response time and throughput under
-different workloads and different latencies between data centers. This
-study can help developers and system administrators on capacity
-planning and when estimating development cost of geo-replicated systems.\\
+experiments were run to measure system response time and throughput under
+different workloads and different latencies between data centers. This study may
+help developers and system administrators on capacity planning and when
+estimating development cost of geo-replicated systems.\\
 
 \noindent \textbf{Keywords:} Distributed systems, consistency models, large
-scale web systems, performance.
+scale web systems, performance analysis.
 
 % ---------------------------------------------------------------------------- %
 % Sumário
@@ -344,15 +344,17 @@ scale web systems, performance.
   ACID	& Atomicidade, Consistência, Isolamento, Durabilidade\\
   CAP		& Consistência, Disponibilidade, Tolerância a particionamento de rede\\
  				& (\emph{Consistency, Availability, Partition tolerance})\\
-  CV  & Coeficiente de variação\\
- 		DHT		& Tabela de espalhamento distribuída (\emph{Distributed hash table})\\
-  FDA & Função distribuição acumulada\\
-  LAN & Rede local (\emph{Local area network})\\
+  CRDT  & Tipos de Dados Replicados Livres de Conflito\\
+        & (\emph{Conflict-free Replicated Data Type})\\
+  CV  & Coeficiente de Variação\\
+ 		DHT		& Tabela de Espalhamento Distribuída (\emph{Distributed Hash Table})\\
+  FDA & Função Distribuição Acumulada\\
+  LAN & Rede Local (\emph{Local Area Network})\\
   PACELC	& Particionamento, Disponibilidade, Consistência. Senão, Latência, Consistência\\
  				& (\emph{Partition, Availability, Consistency. Else, Latency, Consistency})\\
-  SGBD	& Sistema gerenciador de bancos de dados\\
-  SGBDD	& Sistema gerenciador de bancos de dados distribuído\\
-  WAN		& Rede de longa distância (\emph{Wide area network})\\
+  SGBD	& Sistema Gerenciador de Bancos de Dados\\
+  SGBDD	& Sistema Gerenciador de Bancos de Dados Distribuído\\
+  WAN		& Rede de Longa Distância (\emph{Wide Area Network})\\
 \end{tabular}
 
 % ---------------------------------------------------------------------------- %

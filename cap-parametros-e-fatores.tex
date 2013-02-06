@@ -814,7 +814,13 @@ modo que cada passo correspondia a uma quantidade de atualizações igual à
 quantidade de objetos armazenados.
 
 A influência da popularidade também foi considerada pois ela afetava a
-probabilidade de um determinado objeto ser acessado. Dado isso, um estudo foi
+probabilidade de um determinado objeto ser acessado. Foram feitos testes com os
+dois valores de popularidade usados nos experimentos (ver
+Subseção~\ref{sec:fatores_de_carga_de_trabalho}). Na popularidade uniforme
+os objetos armazenados têm chances iguais de serem acessados,
+enquanto na concentrada os acessos obedecem uma distribuição Pareto.
+
+Dado isso, um estudo foi
 realizado para saber quantos passos seriam necessários para cada combinação de
 localidade e popularidade. O estudo com 20.000 objetos executou 30 passos,
 medindo a quantidade de migrações ocorridas em cada um deles. Os resultados
@@ -827,9 +833,9 @@ desse estudo estão na Figura \ref{fig:aquecimento_do_sistema}.
 \caption{Aquecimento do sistema.} \label{fig:aquecimento_do_sistema}
 \end{figure}
 
-A quantidade de migrações aumenta nos primeiros passos. Para localidade 50\%, a
-quantidade de migrações estabiliza após o 3\textsuperscript{o} passo e a
-popularidade não influencia. Já para localidade 90\%, a estabilização demora
+A quantidade de migrações aumenta nos primeiros passos. Para localidade de 50\%,
+a quantidade de migrações estabiliza após o 3\textsuperscript{o} passo e a
+popularidade não influencia. Já para localidade de 90\%, a estabilização demora
 cerca de 17 passos e as curvas são diferentes para popularidade apenas nos
 primeiros passos. Com isso, a fase de aquecimento nos estudos foi configurada
 para usar uma quantidade de passos de acordo com a localidade. Os valores para
@@ -1289,11 +1295,11 @@ média do tempo de resposta de todas as requisições (leituras e escritas). Isso
 porque o primeiro fator diz respeito à composição entre leituras e escritas e o
 segundo à composição entre requisições locais e remotas, portanto esses fatores
 não fazem sentido nos percentis separados por tipo de requisição. Por exemplo,
-com localidade 50\% percebe-se que o percentil 70 representa requisições
-remotas, enquanto com localidade 90\% o mesmo percentil representa requisições
-locais. Se a análise fosse feita por percentis, essa informação se perderia e
-localidade nunca teria influência. O resultado do estudo está na Tabela
-\ref{tab:estudo_para_fatores_de_carga_de_trabalho}
+com localidade de 50\% percebe-se que o percentil 70 representa requisições
+remotas, enquanto com localidade de 90\% o mesmo percentil representa
+requisições locais. Se a análise fosse feita por percentis, essa informação se
+perderia e localidade nunca teria influência. O resultado do estudo está na
+Tabela \ref{tab:estudo_para_fatores_de_carga_de_trabalho}
 
 \begin{table}[!h] \begin{center}
 \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|} \hline
