@@ -13,8 +13,8 @@ Vincent, que possui grande experiência em estudos de desempenho.
 
 Este estudo tinha duas hipóteses principais que estão descritas na
 Seção~\ref{sec:hipoteses}. A seguir, a
-Seção~\ref{sec:nivel_de_confianca,_exatidao_e_tamanho_da_amostra} descreve o
-nível de confiança do estudo relativo ao tamanho da amostra. A
+Seção~\ref{sec:nivel_de_confianca_exatidao_tamanho_da_amostra_e_replicacoes}
+descreve o nível de confiança do estudo relativo ao tamanho da amostra. A
 Seção~\ref{sec:analise_dos_tempos_de_resposta} mostra a análise dos tempos de
 resposta, a Seção~\ref{sec:analise_dos_conflitos} mostra a análise dos conflitos
 e a Seção~\ref{sec:analise_das_migracoes} mostra a análise das migrações. A
@@ -48,8 +48,8 @@ permitido pela consistência na linha do tempo. Assim, os conflitos no caso da
 consistência em momento indeterminado são mais graves.
 
 %% ------------------------------------------------------------------------- %%
-\section{Nível de Confiança, Exatidão e Tamanho da Amostra}
-\label{sec:nivel_de_confianca,_exatidao_e_tamanho_da_amostra}
+\section{Nível de Confiança, Exatidão, Tamanho da Amostra e Replicações}
+\label{sec:nivel_de_confianca_exatidao_tamanho_da_amostra_e_replicacoes}
 
 O tamanho da amostra de um experimento é dado por:
 
@@ -112,6 +112,19 @@ menos tempo caso o \emph{benchmark} fosse limitado por quantidade de requisições
 em vez de tempo\footnote{A limitação da quantidade de requisições foi
 implementada no \emph{benchmark} pois era necessária para a etapa de
 aquecimento, mas não foi usada nos experimentos}.
+
+Normalmente, experimentos são replicados para estimar a variabilidade do
+fenômeno observado e calcular os erros experimentais. Replicação estatística
+costuma ser usada quando mais de um grupo é usado como objeto do estudo. Este
+não é o caso deste estudo, já que o objeto do estudo foi sempre o mesmo. Mas
+alguma variabilidade poderia ser causada por variação entre os nós usados. Outra
+causa seria variação no desempenho na LAN do Grid5000 em diferentes momentos.
+
+Assim, uma replicação do estudo foi feita para estimar a variabilidade dos
+experimentos. Isso foi feito calculando-se o coeficiente de variabilidade entre
+as duas replicações de cada experimento. A média dos CVs de todos os
+experimentos foi 1\% para leituras e 0,8\% para escritas, e o máximo foi 8\%
+para leituras e 5\% para escritas.
 
 %% ------------------------------------------------------------------------- %%
 \section{Análise dos Tempos de Resposta}
