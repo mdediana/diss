@@ -384,34 +384,34 @@ As modificações feitas no riak\_core se encontram em
 %% ------------------------------------------------------------------------- %%
 \subsubsection{Testes da implementação}
 
-Os testes foram executados manualmente. Os principais cenários testados (CD se
+Os testes foram executados manualmente. Os principais cenários testados (CPD se
 refere a centro de processamento de dados):
 
 \begin{itemize}
 
-\item Requisição de inserção a partir do CD1 ocorrendo no CD1
+\item Requisição de inserção a partir do CPD1 ocorrendo no CPD1
 
-\item Requisição de inserção a partir do CD1 sendo redirecionada para o CD2
+\item Requisição de inserção a partir do CPD1 sendo redirecionada para o CPD2
 
 \item Verificação de que inserções resultavam em ao menos uma réplica em cada
 centro de processamento de dados
 
-\item Requisição de leitura/atualização a partir do CD1 sempre ocorrendo no CD1
-para consistência em momento indeterminado (local)
+\item Requisição de leitura/atualização a partir do CPD1 sempre ocorrendo no
+CPD1 para consistência em momento indeterminado (local)
 
-\item Requisição de leitura de ``qualquer versão'' a partir do CD1 sempre
-ocorrendo no CD1 para consistência na linha do tempo (local)
-
-\item Requisição de leitura da ``versão mais recente''/atualização a partir do
-CD1 sendo redirecionada para a réplica mestre no CD1 para consistência na linha
-do tempo (local)
+\item Requisição de leitura de ``qualquer versão'' a partir do CPD1 sempre
+ocorrendo no CPD1 para consistência na linha do tempo (local)
 
 \item Requisição de leitura da ``versão mais recente''/atualização a partir do
-CD1 sendo redirecionada para a réplica mestre no CD2 para consistência na linha
-do tempo (remota)
+CPD1 sendo redirecionada para a réplica mestre no CPD1 para consistência na
+linha do tempo (local)
 
-\item \emph{LM} requisições de atualização a partir do CD1 de um objeto no CD2
-resultando em migração da réplica mestre para o CD2, onde \emph{LM} é o limiar
+\item Requisição de leitura da ``versão mais recente''/atualização a partir do
+CPD1 sendo redirecionada para a réplica mestre no CPD2 para consistência na
+linha do tempo (remota)
+
+\item \emph{LM} requisições de atualização a partir do CPD1 de um objeto no CPD2
+resultando em migração da réplica mestre para o CPD2, onde \emph{LM} é o limiar
 de migração
 
 \item Requisição de atualização sendo redirecionada para uma réplica mestre ao
@@ -570,19 +570,19 @@ TCP foi usado (para mais detalhes, ver Seção~\ref{sec:fatores_de_rede}).
 Os experimentos foram planejados para usar dois centros de processamento de
 dados simulados (ver Seção~\ref{sec:parametros_fixados}). Para simular os
 centros de processamento de dados, em cada experimento os nós que compunham o
-sistema eram divididos em dois conjuntos CD1 e CD2, cada um representando um
+sistema eram divididos em dois conjuntos CPD1 e CPD2, cada um representando um
 centro de processamento de dados. Além dos nós, duas sub-redes SR1 e SR2 eram
-reservadas. Cada nó de CD1 recebia, além de seu IP da rede do Grid5000, um IP de
-SR1, o mesmo valendo para CD2 e SR2.
+reservadas. Cada nó de CPD1 recebia, além de seu IP da rede do Grid5000, um IP
+de SR1, o mesmo valendo para CPD2 e SR2.
 
 Sistemas Linux usam o arquivo /etc/hosts como fonte primária para resolução de
 nomes, consultando um DNS apenas quando não encontram um nome definido ali (o
 que é a situação mais comum). Todos os nós no Grid5000 possuem um nome
 registrado no DNS que aponta para o seu IP da rede do Grid5000. Nos
 experimentos, dois arquivos hosts1 e hosts2 eram criados e substituíam o
-/etc/hosts dos nós de CD1 e CD2 respectivamente. O conteúdo de hosts1 eram os
-nomes dos nós de CD2 sendo resolvidos para os IPs de SR2, o mesmo valendo para
-hosts2, CD1 e SR1. Com isso, os nós de CD1 resolviam os nomes dos nós de CD2
+/etc/hosts dos nós de CPD1 e CPD2 respectivamente. O conteúdo de hosts1 eram os
+nomes dos nós de CPD2 sendo resolvidos para os IPs de SR2, o mesmo valendo para
+hosts2, CPD1 e SR1. Com isso, os nós de CPD1 resolviam os nomes dos nós de CPD2
 para os IPs de SR2 e vice-versa. O resultado dessa configuração é que todas as
 requisições que saíam de um centro de processamento de dados para o outro usavam
 o IP da sub-rede de destino, enquanto as requisições para o mesmo centro de

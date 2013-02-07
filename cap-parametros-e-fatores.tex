@@ -139,7 +139,93 @@ sempre consideraram todas as situações possíveis em que ele afeta o desempenho
 do sistema, em alguns casos uma única razão foi considerada suficiente para
 tratá-lo como parâmetro.
 
-Alguns parâmetros das listas a seguir foram fixados, as justificativas e seus
+Os 15 parâmetros de sistema levantados foram:
+
+\begin{itemize}
+
+\item Configuração de hardware (CPU, memória, disco e placa de rede)
+
+\item Mecanismo de armazenamento -- memória ou disco
+
+\item Quantidade de nós do sistema
+
+\item Capacidade dos centros de processamento de dados
+
+\item Quantidade de instâncias do \emph{benchmark}
+
+\item Quantidade de threads por instância do \emph{benchmark}
+
+\item Quantidade de objetos armazenados
+
+\item Tamanho dos objetos armazenados
+
+\item Algoritmo de particionamento
+
+\item Modelo de consistência
+
+\item Fator de replicação ($N$)
+
+\item Configuração de replicação -- $R$ e $W$ (para consistência em momento
+indeterminado)
+
+\item Limiar de migração (para consistência na linha do tempo)
+
+\item Protocolo de acesso
+
+\item Nível de log
+
+\end{itemize}
+
+Os 13 parâmetros de rede levantados foram:
+
+\begin{itemize}
+
+\item Configuração de hardware dos dispositivos de rede intermediários
+
+\item Topologia da rede
+
+\item Largura de banda da LAN
+
+\item Latência da LAN
+
+\item Variação da latência da LAN
+
+\item Largura de banda da WAN
+
+\item Latência da WAN
+
+\item Variação da latência da WAN
+
+\item Taxa de perda de pacotes na WAN
+
+\item Taxa de duplicação de pacotes na WAN
+
+\item Taxa de reordenação de pacotes na WAN
+
+\item Variação de TCP
+
+\item Quantidade de enlaces de WAN
+
+\end{itemize}
+
+Os 5 parâmetros de carga de trabalho levantados foram:
+
+\begin{itemize}
+
+\item Relação leitura/escrita
+
+\item Popularidade dos objetos
+
+\item Localidade
+
+\item Taxa de chegada de requisições
+
+\item Versão requisitada nas leituras (para consistência na linha do tempo)
+
+\end{itemize}
+
+Cada um desses parâmetros é explicado nas subseções a seguir. Os parâmetros que
+foram fixados, as justificativas para tal e seus
 valores estão descritos na Seção~\ref{sec:parametros_fixados}. Os restantes
 foram considerados fatores e o tratamento dado a eles está na Seção
 \ref{sec:selecao_dos_fatores}.
