@@ -1,0 +1,331 @@
+%% ------------------------------------------------------------------------- %%
+\chapter{Aspectos Técnicos} \label{cap:aspectos_tecnicos}
+
+A preparação dos experimentos envolveu predominantemente atividades de
+programação e administração de sistemas, como implementação da consistência na
+linha do tempo e de scripts para a execução e análise dos experimentos. A
+reprodutibilidade do estudo foi um ponto levado em consideração em diversos
+momentos da implementação, em especial no caso dos scripts.
+
+A Seção~\ref{sec:modificacoes_no_riak} trata da implementação da consistência na
+linha do tempo e de outras modificações no Riak. A Seção~\ref{sec:benchmark}
+descreve as modificações feitas no Basho Bench, \emph{benchmark} usado nos
+experimentos. A Seção~\ref{sec:ambiente_e_imagem} apresenta o ambiente em que os
+experimentos foram executados. A Seção~\ref{sec:rede} trata da emulação da WAN.
+Por fim, a Seção~\ref{sec:execucao_e_analise_dos_experimentos} trata dos usados
+na automatização dos experimentos e da análise.
+
+%% ------------------------------------------------------------------------- %%
+\section{Modificações no Riak} \label{sec:modificacoes_no_riak}
+
+Consistência na linha do tempo foi implementada no Riak pelo autor deste
+trabalho, no módulo riak\_kv. Para os experimentos, a distinção entre leituras e
+escritas era importante. Mas a distinção entre os tipos de escrita (inserção,
+atualização ou remoção) não era tão importante dado que eles se comportam
+basicamente da mesma forma do ponto de vista de tráfego de rede local versus
+remoto. Assim, apenas atualizações foram implementadas de forma completa e
+eficiente, distinguindo a localização de cada nó com relação aos centros de
+processamento de dados. As inserções para uma dada chave ocorrem sempre pela
+mesma réplica, mesmo que isso signifique encaminhar para outro centro de
+processamento de dados uma requisição que, em princípio, poderia ser tratada
+localmente. Esse procedimento eliminou a necessidade de implementação de um
+mecanismo para evitar conflitos de inserção.  Apesar de inserções serem
+ineficientes, isso não afetou os resultados, dado que os experimentos usam
+inserção apenas na carga e aquecimento do sistema (ver o fluxo de trabalho na
+Subseção~\ref{sec:execucao_e_analise_dos_experimentos}). Remoções não foram
+implementadas.
+
+O PNUTS conta com uma heurística que explora a localidade de requisições,
+simples mas importante para o desempenho da consistência na linha do tempo: a
+réplica mestre migra para o centro de processamento de dados de onde vieram as
+últimas escritas. Essa heurística foi implementada no Riak para este estudo.
+
+A implementação da consistência na linha do tempo foi baseada na da consistência
+em momento indeterminado já disponível no Riak. Durante a implementação houve a
+preocupação em manter o código das duas o mais próximo possível de forma a
+eliminar diferenças dos tempos de execução dos dois modelos.
+
+Por último, outras alterações menores no riak\_kv foram o tratamento de
+parâmetros extras na interface HTTP, necessários para a consistência na linha do
+tempo, e a implementação de estatísticas de migrações.
+
+A versão do riak\_kv usada como base foi a 1.1. Durante a fase inicial de
+desenvolvimento as modificações feitas não estavam em um sistema de controle de
+versão. A partir do momento em que o git passou a ser usado, foram 2011 linhas
+inseridas e 222 removidas nos seguintes 11 arquivos:
+
+% git log --author="mdediana" --pretty=tformat: --numstat | awk '{ add += $1;
+% del += $2 } END { print add, del }
+
+%git shortlog --author="mdediana" --numbered --summary
+
+\begin{itemize}
+
+\item \emph{riak\_client.erl}
+
+\item \emph{riak\_kv\_get\_fsm.erl}
+
+\item \emph{riak\_kv\_get\_fsm\_sup.erl}
+
+\item \emph{riak\_kv\_put\_fsm\_sup.erl}
+
+\item \emph{riak\_kv\_put\_fsm.erl}
+
+\item \emph{riak\_kv\_stat.erl}
+
+\item \emph{riak\_kv\_timeline\_get\_core.erl}
+
+\item \emph{riak\_kv\_timeline\_get\_fsm.erl}
+
+\item \emph{riak\_kv\_timeline\_put\_fsm.erl}
+
+\item \emph{riak\_kv\_wm\_raw.hrl}
+
+\item \emph{riak\_kv\_wm\_worker.erl}
+
+\end{itemize}
+
+Desses arquivos, os únicos que não estavam originalmente no riak\_kv são os três
+com a implementação da consistência na linha do tempo:
+\emph{riak\_kv\_timeline\_get\_core.erl} (237 linhas),\\
+\emph{riak\_kv\_timeline\_get\_fsm.erl} (528 linhas) e
+\emph{riak\_kv\_timeline\_put\_fsm.erl} (900 linhas). A maior parte dessas
+linhas foi retirada da implementação original da consistência em momento
+indeterminado. As modificações feitas no riak\_kv se encontram em
+\url{https://github.com/mdediana/riak\_kv.git}.
+
+Além do riak\_kv, outro módulo alterado foi o riak\_core, responsável pelo
+roteamento de re-quisições em um aglomerado de Riak. Quando o Riak recebe uma
+requisição, ele define qual o nó responsável por tratá-la por meio do algoritmo
+de espalhamento consistente, que se baseia no valor da chave do objeto. O Riak
+foi projetado para ser implantado em um único centro de processamento de
+dados\footnote{A versão Enterprise do Riak implementa replicação entre centros
+de processamento de dados, mas é paga.}, portanto o algoritmo não leva em
+consideração os centros de processamento de dados no momento de decidir para
+qual das réplicas a requisição deve seguir. Dessa forma, algumas modificações
+foram necessárias no riak\_core para que ele priorizasse nós do mesmo centro de
+processamento de dados em que a requisição chegou. Além disso, modificações
+foram feitas para garantir que existisse ao menos uma réplica de cada objeto em
+cada centro de processamento de dados. A implementação é muito simples e pouco
+versátil, funcionando apenas para o cenário do estudo, de apenas dois centros de
+processamento de dados (ver seção \ref{sec:parametros_fixados}) e baseada nos
+nomes dos nós para saber em qual centro de processamento de dados cada um deles
+se encontra.
+
+A partir do momento em que o git passou a ser usado para controle de versão,
+foram 106 linhas inseridas e 17 removidas nos seguintes 3 arquivos:
+
+\begin{itemize}
+
+\item \emph{riak\_core.app} (diretório \emph{ebin})
+
+\item \emph{riak\_core\_apl.erl}
+
+\item \emph{riak\_core\_claim\_2\_dcs.erl}
+
+\end{itemize}
+
+As modificações feitas no riak\_core se encontram em
+\url{https://github.com/mdediana/riak\_core.git}.
+
+Por fim, os testes foram executados manualmente. Os principais cenários testados
+(CPD se refere a centro de processamento de dados) foram:
+
+\begin{itemize}
+
+\item Requisição de inserção a partir do CPD1 ocorrendo no CPD1
+
+\item Requisição de inserção a partir do CPD1 sendo redirecionada para o CPD2
+
+\item Verificação de que inserções resultavam em ao menos uma réplica em cada
+centro de processamento de dados
+
+\item Requisição de leitura/atualização a partir do CPD1 sempre ocorrendo no
+CPD1 para consistência em momento indeterminado (local)
+
+\item Requisição de leitura de ``qualquer versão'' a partir do CPD1 sempre
+ocorrendo no CPD1 para consistência na linha do tempo (local)
+
+\item Requisição de leitura da ``versão mais recente''/atualização a partir do
+CPD1 sendo redirecionada para a réplica mestre no CPD1 para consistência na
+linha do tempo (local)
+
+\item Requisição de leitura da ``versão mais recente''/atualização a partir do
+CPD1 sendo redirecionada para a réplica mestre no CPD2 para consistência na
+linha do tempo (remota)
+
+\item \emph{LM} requisições de atualização a partir do CPD1 de um objeto no CPD2
+resultando em migração da réplica mestre para o CPD2, onde \emph{LM} é o limiar
+de migração
+
+\item Requisição de atualização sendo redirecionada para uma réplica mestre ao
+mesmo tempo em que a réplica mestre migra (a requisição é redirecionada para a
+nova réplica mestre)
+
+\end{itemize}
+
+%% ------------------------------------------------------------------------- %%
+\section{\emph{Benchmark}} \label{sec:benchmark}
+
+O \emph{benchmark} usado foi o Basho Bench \cite{Basho}, específico para o Riak.
+Ele provê configurações para quantidade de clientes concorrentes (threads),
+relação leitura/escrita, popularidade dos objetos acessados, entre outras. O
+\emph{benchmark} originalmente não era distribuído, portanto foi modificado pois
+mais de uma instância precisava ser executada simultaneamente nos experimentos.
+Além de evitar gargalos no \emph{benchmark}, isso era importante para a
+implementação de localidade. Além disso, foi necessária a implementação de um
+pequeno programa em Erlang (basho\_bench\_dist) para a consolidação dos dados
+obtidos pelas diversas instâncias do Basho Bench. Parte dessa consolidação
+envolveu a fusão de histogramas usados pelo Basho Bench, que por sua vez usavam
+o projeto basho\_stats, que também precisou ser modificado.
+
+Outro \emph{benchmark} considerado foi o
+YCSB\footnote{\url{git://github.com/brianfrankcooper/YCSB.git}}
+\cite{Cooper2010}.  Apesar de possuir mais flexibilidade que o Basho Bench nas
+suas configurações, ele não estava preparado para acessar o Riak, acesso esse
+que precisaria ser implementado. Além disso, ele também não oferecia muitas das
+funcionalidades necessárias para os experimentos, que precisariam ser
+implementadas.
+
+% desconsidera 23 linhas de examples/locality.config
+A partir do momento em que o git passou a ser usado para controle de versão,
+foram 90 linhas inseridas e 17 removidas nos seguintes 3 arquivos do Basho
+Bench:
+
+\begin{itemize}
+
+\item \emph{basho\_bench.app.src}
+
+\item \emph{basho\_bench\_driver\_http\_raw.erl}
+
+\item \emph{basho\_bench\_keygen.erl}
+
+\item \emph{basho\_bench\_stats.erl}
+
+\item \emph{basho\_bench\_worker.erl}
+
+\end{itemize}
+
+No basho\_stats, foram 77 linhas inseridas e 35 removidas nos seguintes 2
+arquivos:
+
+\begin{itemize}
+
+\item \emph{basho\_stats\_histogram.erl}
+
+\item \emph{basho\_stats\_sample.erl}
+
+\end{itemize}
+
+Por último, o basho\_bench\_dist é composto por um único arquivo
+(\emph{basho\_bench\_dist.erl}) de 149 linhas, muitas das quais foram copiadas
+do Basho Bench.
+
+As alteração feitas no Basho Bench estão em
+\url{https://github.com/mdediana/basho\_bench.git}, o basho\_bench\_dist se
+encontra em \url{https://github.com/mdediana/basho\_bench\_dist.git} e as
+modificações do basho\_stats em
+\url{https://github.com/mdediana/basho\_stats.git}.
+
+%% ------------------------------------------------------------------------- %%
+\section{Ambiente e Imagem} \label{sec:ambiente_e_imagem}
+
+A operação no Grid5000 se dá através do acesso ssh ao frontend de cada sítio.
+Nele o usuário encontra seu diretório home, onde ele armazena seus scripts e
+dados dos experimentos, e tem acesso a ferramentas específicas da
+infraestrutura. Como o Grid5000 é compartilhado por diversos pesquisadores, ele
+oferece um conjunto de ferramentas (OAR\footnote{\url{http://oar.imag.fr/}}) e
+regras para que um pesquisador reserve nós para seu uso exclusivo por um
+determinado período de tempo. Além dos nós, é possível reservar IPs para compor
+sub-redes, recurso utilizado nos experimentos (ver Subseção~\ref{sec:rede}).
+Outra ferramenta bastante utilizada é o
+kadeploy\footnote{\url{http://kadeploy.imag.fr/}}, responsável pela implantação
+de imagens nos nós reservados pelo usuário.
+
+A imagem usada nos experimentos foi um Debian GNU/Linux 6.0 (Squeeze) com kernel
+2.6.32-5-amd64 baseado em uma imagem pré-configurada disponibilizada pelo
+Grid5000 (squeeze-x64-base). Além do conteúdo da imagem base, a imagem usada nos
+experimentos possui o Erlang R14B04 instalado a partir do fonte, o Riak e o
+Basho Bench modificados e algumas ferramentas de monitoração e análise de
+desempenho como
+sysstat\footnote{\url{http://sebastien.godard.pagesperso-orange.fr/}},
+bwm-ng\footnote{\url{http://www.gropp.org/?id=projects&sub=bwm-ng}} e
+iperf\footnote{\url{http://iperf.sourceforge.net/}}. Uma única imagem foi usada,
+sendo que a distinção entre nós executando instâncias do Riak ou do Basho Bench
+foi feita pelos scripts que gerenciam os experimentos (subseção
+\ref{sec:execucao_e_analise_dos_experimentos}).
+
+Pesquisadores com acesso ao Grid5000 podem acessar essa imagem, que se encontra
+no sítio Sophia em \emph{/home/madediana/images/squeeze-x64-riak.tgz}.
+
+%% ------------------------------------------------------------------------- %%
+\section{Rede} \label{sec:rede}
+
+Os experimentos emularam uma WAN pelo uso da ferramenta traffic
+control\footnote{\url{http://linux.die.net/man/8/tc}} (tc). Essa ferramenta é
+usada para manipulação das filas de saída de pacotes de uma interface de rede em
+sistemas Linux, priorizando um determinado tipo de tráfego, por exemplo. Mais
+especificamente para emulação da WAN, o
+netem\footnote{\url{http://www.linuxfoundation.org/collaborate/workgroups/networking/}}
+foi usado. Ele provê funcionalidade para inserção de latência de rede, variação
+da latência, perda de pacotes, pacotes duplicados, corrompidos e/ou fora de
+ordem. Outras ferramentas, como o
+dummynet\footnote{\url{http://info.iet.unipi.it/~luigi/dummynet/}}
+\cite{Carbone2010} e o
+NISTNet\footnote{\url{http://snad.ncsl.nist.gov/itg/nistnet/}}, foram
+desconsideradas dado que o netem já vem integrado ao tc e satisfazia os
+requisitos funcionais dos experimentos.
+
+Existem recomendações sobre otimizações de sistemas Linux para quando esses se
+comunicam por meio de WANs \cite{Jones2006,ESNet2012}. Durante os experimentos,
+sempre que os parâmetros da WAN foram alterados, um script para ajuste da pilha
+TCP foi usado (para mais detalhes, ver Seção~\ref{sec:fatores_de_rede}).
+
+%% ------------------------------------------------------------------------- %%
+\subsection{Centros de processamento de dados}
+
+Os experimentos foram planejados para usar dois centros de processamento de
+dados simulados (ver Seção~\ref{sec:parametros_fixados}). Para simular os
+centros de processamento de dados, em cada experimento os nós que compunham o
+sistema eram divididos em dois conjuntos CPD1 e CPD2, cada um representando um
+centro de processamento de dados. Além dos nós, duas sub-redes SR1 e SR2 eram
+reservadas. Cada nó de CPD1 recebia, além de seu IP da rede do Grid5000, um IP
+de SR1, o mesmo valendo para CPD2 e SR2.
+
+Sistemas Linux usam o arquivo \emph{/etc/hosts} como fonte primária para
+resolução de nomes, consultando um DNS apenas quando não encontram um nome
+definido ali (o que é a situação mais comum). Todos os nós no Grid5000 possuem
+um nome registrado no DNS que aponta para o seu IP da rede do Grid5000. Nos
+experimentos, dois arquivos \emph{hosts1} e \emph{hosts2} eram criados e
+substituíam o \emph{/etc/hosts} dos nós de CPD1 e CPD2 respectivamente. O
+conteúdo de \emph{hosts1} eram os nomes dos nós de CPD2 sendo resolvidos para os
+IPs de SR2, o mesmo valendo para \emph{hosts2}, CPD1 e SR1. Com isso, os nós de
+CPD1 resolviam os nomes dos nós de CPD2 para os IPs de SR2 e vice-versa. O
+resultado dessa configuração é que todas as requisições que saíam de um centro
+de processamento de dados para o outro usavam o IP da sub-rede de destino,
+enquanto as requisições para o mesmo centro de processamento de dados usavam o
+IP da rede do Grid5000.
+
+A partir dessa configuração foi possível adicionar um filtro baseado em
+sub-redes ao tc de modo que as características de WAN eram aplicadas às
+requisições que saíam para o outro centro de processamento de dados, enquanto as
+requisições para o mesmo centro de processamento de dados saíam inalteradas.
+Esse processo é executado pelo script net (ver Subseção
+\ref{sec:execucao_e_analise_dos_experimentos}).
+
+%% ------------------------------------------------------------------------- %%
+\subsection{Execução e Análise dos Experimentos}
+\label{sec:execucao_e_analise_dos_experimentos}
+
+A automatização dos experimentos foi feita com dois conjuntos de scripts. O
+primeiro (cmb) foi usado para gerenciamento e execução dos experimentos --
+reserva de nós, implantação da imagem, gerenciamento do sistema de
+armazenamento, configuração e execução do \emph{benchmark} e coleta dos
+resultados. Os scripts se localizavam no frontend do Grid5000 e foram escritos
+em bash. Esses scripts implementavam o fluxo de trabalho do estudo (ver
+Seção~\ref{sec:fluxo_de_trabalho_dos_experimentos}). O segundo conjunto
+(cmb-local) foi usado na análise dos dados, se localizava no computador do autor
+deste trabalho e era composto por scripts em bash, Ruby e R.
+
+Os scripts em cmb se encontram em \url{https://github.com/mdediana/cmb.git} e os
+em cmb-local se encontram em \url{https://github.com/mdediana/cmb-local.git}.

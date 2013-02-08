@@ -11,9 +11,7 @@ metodológica usada neste trabalho \cite{Jain1991} e também foi sugerido para o
 autor deste trabalho em conversa com o pesquisador visitante no IME Jean-Marc
 Vincent, que possui grande experiência em estudos de desempenho.
 
-Este estudo tinha duas hipóteses principais que estão descritas na
-Seção~\ref{sec:hipoteses}. A seguir, a
-Seção~\ref{sec:nivel_de_confianca_exatidao_tamanho_da_amostra_e_replicacoes}
+A Seção~\ref{sec:nivel_de_confianca_exatidao_tamanho_da_amostra_e_replicacoes}
 descreve o nível de confiança do estudo relativo ao tamanho da amostra. A
 Seção~\ref{sec:analise_dos_tempos_de_resposta} mostra a análise dos tempos de
 resposta, a Seção~\ref{sec:analise_dos_conflitos} mostra a análise dos conflitos
@@ -21,31 +19,6 @@ e a Seção~\ref{sec:analise_das_migracoes} mostra a análise das migrações. A
 Seção~\ref{sec:ameacas_a_validade} descreve as ameaças à validade levantadas e
 por fim, a Seção~\ref{sec:trabalhos_relacionados} apresenta os trabalhos
 relacionados a este.
-
-%% ------------------------------------------------------------------------- %%
-\section{Hipóteses} \label{sec:hipoteses}
-
-A principal hipótese deste trabalho era que um sistema georeplicado usando
-consistência na linha do tempo apresentaria um desempenho competitivo com a
-consistência em momento indeterminado para algumas cargas de trabalho, como uma
-que apresentasse localidade alta, por exemplo. Essa hipótese se baseava em uma
-segunda hipótese, a de que os tempos de resposta das requisições para o sistema
-seriam dominadas pela latência (e variação da latência) da WAN. Um exemplo de
-fenômeno que poderia invalidar a hipótese seria a réplica mestre se comportar
-como gargalo na consistência na linha do tempo. Essa hipótese é verificada pela
-distribuição acumulada dos tempos de resposta para cada modo usado no estudo.
-
-Outra hipótese é que as proporções de conflitos identificados durante as
-leituras em ambos os modelos de consistência seriam próximas. Conflitos na
-consistência na linha do tempo aparecem pois atualizações são enfileiradas na
-réplica mestre. Há um intervalo de tempo em que a atualização foi aplicada na
-réplica mestre mas ainda não foi enviada para as outras réplicas, esse intervalo
-é a janela de inconsistência. A consistência em momento indeterminado apresenta
-conflitos por motivo semelhante, com a diferença que a atualização pode ser
-aplicada em qualquer réplica. Desse fato resulta que a consistência em momento
-indeterminado permite atualizações simultâneas e divergentes, o que não é
-permitido pela consistência na linha do tempo. Assim, os conflitos no caso da
-consistência em momento indeterminado são mais graves.
 
 %% ------------------------------------------------------------------------- %%
 \section{Nível de Confiança, Exatidão, Tamanho da Amostra e Replicações}

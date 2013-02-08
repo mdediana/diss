@@ -1,0 +1,428 @@
+%% ------------------------------------------------------------------------- %%
+\chapter{Planejamento} \label{cap:planejamento}
+
+Este trabalho usa como principal referência metodológica o livro \emph{The Art
+of Computer Systems Performance Analysis} (A Arte da Análise de Desempenho de
+Sistemas de Computação) \cite{Jain1991}, de Raj Jain. Esse livro trata da
+análise de desempenho de sistemas de software e/ou hardware, e apresenta
+conceitos de estudos experimentais e o ferramental estatístico necessário nesse
+tipo de estudo. Além disso, ele propõe uma abordagem sistemática para fazer um
+estudo experimental. A segunda referência usada sobre análise de desempenho foi
+\cite{Lilja2005}.
+
+A definição do estudo seguiu os passos da abordagem de Jain em \cite{Jain1991},
+com exceção do levantamento de parâmetros e a seleção de fatores, que ocorreram
+após a definição da técnica de avaliação. Isso foi feito pois essa foi a fase de
+maior complexidade do estudo e está descrita no
+Capítulo~\ref{cap:parametros_e_fatores}.
+
+A Seção~\ref{sec:nomenclatura} apresenta definições de termos usados em
+experimentação. A Seção~\ref{sec:metas_do_estudo} apresenta as metas do estudo.
+As métricas são definidas na Seção~\ref{sec:metricas} e a técnica de avaliação é
+definida na Seção~\ref{sec:tecnica_de_avaliacao}. A seguir, a
+Seção~\ref{sec:sistema_de_armazenamento} descreve o processo de escolha do
+sistema usado no estudo, a Seção~\ref{sec:plataforma_de_experimentacao} descreve
+a plataforma de experimentação e a
+Seção~\ref{sec:fluxo_de_trabalho_dos_experimentos} descreve as etapas de cada
+experimento. Por fim, a Seção~\ref{sec:experimentos_fatoriais} apresenta os
+tipos de experimentos usados neste trabalho.
+
+%% ------------------------------------------------------------------------- %%
+\section{Nomenclatura} \label{sec:nomenclatura}
+
+A literatura sobre experimentos apresenta alguns termos importantes para a
+comunicação de objetivos, procedimentos e resultados \cite{Jain1991}. Termos
+usados frequentemente neste e nos próximos capítulos são:
+
+\paragraph{Estudo:} Um conjunto de experimentos relacionados. O plural
+``experimentos'' também é usado no lugar de ``estudo'' ao longo deste trabalho.
+
+\paragraph{Variáveis de resposta:} Resultados de um experimento (variáveis
+dependentes). No caso deste estudo, as variáveis de resposta são as métricas de
+desempenho.
+
+\paragraph{Parâmetros:} Características do sistema (hardware e software) e da
+carga de trabalho (requisições para o sistema) que afetam o desempenho do
+sistema.  Exemplos de parâmetros são CPU, latência da rede e relação
+leitura/escrita.
+
+\paragraph{Fatores:} Parâmetros que são variados nos experimentos (variáveis
+independentes) e cujo efeito no desempenho é analisado. Parâmetros que não são
+fatores possuem um único valor em todos os experimentos (variáveis fixas e
+constantes).
+
+\paragraph{Níveis:} Valores assumidos pelos fatores nos experimentos.
+
+\paragraph{Interação entre fatores:} Dois ou mais fatores interagem se a
+influência que um deles tem no desempenho depende do nível dos outros. Por
+exemplo, um software é testado nas combinações das CPUs A e B e 4 GB e 8 GB de
+memória. Se ao mudar a CPU de A para B o desempenho sempre aumenta em 10\%, por
+exemplo, independente do tamanho da memória, é dito que CPU e memória não
+interagem. Mas se ao mudar a CPU de A para B o desempenho aumenta em 10\% quando
+o sistema tem 4 GB, mas 30\% quando tem 8 GB, é dito que CPU e memória
+interagem.
+
+\paragraph{Ordem de uma interação entre fatores:} A quantidade de fatores
+envolvidos na interação -- por exemplo, uma interação de terceira ordem é uma
+interação entre três fatores.
+
+\paragraph{Projeto dos experimentos:} Especificação do número de experimentos e
+das combinações de fatores e níveis usados.
+
+%% ------------------------------------------------------------------------- %%
+\section{Metas do estudo} \label{sec:metas_do_estudo}
+
+A meta deste estudo foi comparar o desempenho de um sistema de armazenamento
+georeplicado usando consistência em momento indeterminado e consistência na
+linha do tempo.
+
+A principal hipótese deste trabalho era que um sistema georeplicado usando
+consistência na linha do tempo apresentaria um desempenho competitivo com a
+consistência em momento indeterminado para algumas cargas de trabalho, como uma
+que apresentasse localidade alta, por exemplo. Essa hipótese se baseava em uma
+segunda hipótese, a de que os tempos de resposta das requisições para o sistema
+seriam dominadas pela latência (e variação da latência) da WAN. Um exemplo de
+fenômeno que poderia invalidar a hipótese seria a réplica mestre se comportar
+como gargalo na consistência na linha do tempo. Essa hipótese é verificada pela
+distribuição acumulada dos tempos de resposta para cada modo usado no estudo.
+
+Outra hipótese é que as proporções de conflitos identificados durante as
+leituras em ambos os modelos de consistência seriam próximas. Conflitos na
+consistência na linha do tempo aparecem pois atualizações são enfileiradas na
+réplica mestre. Há um intervalo de tempo em que a atualização foi aplicada na
+réplica mestre mas ainda não foi enviada para as outras réplicas, esse intervalo
+é a janela de inconsistência. A consistência em momento indeterminado apresenta
+conflitos por motivo semelhante, com a diferença que a atualização pode ser
+aplicada em qualquer réplica. Desse fato resulta que a consistência em momento
+indeterminado permite atualizações simultâneas e divergentes, o que não é
+permitido pela consistência na linha do tempo. Assim, os conflitos no caso da
+consistência em momento indeterminado são mais graves.
+
+Por limitações de escopo e recurso, este estudo analisa o sistema apenas do
+ponto de vista do desempenho. Isso significa que o estudo não considera outros
+requisitos como disponibilidade e manutenibilidade. Por isso, o comportamento do
+sistema não foi estudado com relação a presença de falhas em nós, por exemplo.
+Além disso, também foi considerada a operação do sistema em estado estacionário,
+sua operação em sobrecarga não foi estudada. Essas outras condições de operação
+podem ser estudadas em trabalho futuros (Seção \ref{sec:trabalhos_futuros}).
+
+%% ------------------------------------------------------------------------- %%
+\section{Métricas} \label{sec:metricas}
+
+A principal métrica é o tempo de resposta das requisições (em s). Quanto menor o
+tempo de resposta, melhor é o desempenho de um modelo de consistência. Além do
+tempo de resposta, outras métricas observadas foram quantidade de migrações e
+quantidade de conflitos (ambas dadas pela porcentagem com relação ao total de
+operações do experimento). A quantidade de migrações, exclusiva da consistência
+na linha do tempo, oferece uma visão da dinâmica de um sistema usando esse
+modelo de consistência. A quantidade de conflitos proporciona uma noção da
+frequência com que cliente acessam valores desatualizados.  Uma diferença entre
+conflitos nos dois modelos é que na consistência na linha do tempo eles são
+causados apenas por atualizações que ainda não chegaram a todas as réplicas,
+portanto serão automaticamente resolvidos em algum momento no futuro. Já na
+consistência em momento indeterminado eles podem ser mais graves, dado que esse
+modelo permite que duas atualizações simultâneas ocorram em réplicas diferentes,
+criando assim uma situação em que um mecanismo de resolução de conflitos precisa
+atuar.
+
+%% ------------------------------------------------------------------------- %%
+\section{Técnica de avaliação} \label{sec:tecnica_de_avaliacao}
+
+A escolha da técnica de avaliação depende em parte dos parâmetros e fatores
+\cite{Jain1991}. Apesar de o levantamento de parâmetros e a seleção de fatores
+terem sido completados depois desse passo, a escolha da técnica de avaliação foi
+feita com base em uma lista preliminar. Essa lista era composta por parâmetros
+diretamente ligados à meta deste trabalho, como os relacionados a carga de
+trabalho e rede.
+
+Três técnicas são comumente usadas na análise de desempenho de sistemas:
+simulação, modelagem analítica e medição \cite{Jain1991}. Dada a complexidade
+dos sistemas considerados neste estudo e do ambiente em que operam, é difícil
+criar simuladores ou modelos que considerem muitos dos parâmetros que afetam seu
+desempenho. Para serem viáveis nesse contexto, essas técnicas fazem uso de
+diversas simplificações que afetam a precisão dos resultados do estudo. Por
+outro lado, as principais dificuldades para o uso de medição são a necessidade
+de um sistema pronto para ser usado, o tempo disponível para o estudo e as
+ferramentas disponíveis. No caso deste estudo, nenhum dos três representava
+empecilho, portanto medição foi escolhida.
+
+%% ------------------------------------------------------------------------- %%
+\section{Sistema de Armazenamento} \label{sec:sistema_de_armazenamento}
+
+Considerando que medição foi a técnica de avaliação escolhida, era necessária a
+escolha do sistema que seria o objeto do estudo (chamado de sistema sob teste
+por \cite{Jain1991}). Uma opção para a comparação dos dois modelos de
+consistência seria o uso de um sistema de armazenamento já existente que
+implementasse ambos, mas tal sistema não foi encontrado. A partir disso, outra
+opção seria o uso de sistemas diferentes, cada um implementando um modelo de
+consistência. Apesar de existirem experimentos que fizeram essa opção
+\cite{Cooper2008,Stonebraker2007,Pavlo2009}, dois problemas foram identificados.
+O primeiro é que o desempenho de cada sistema é afetado por parâmetros
+particulares do sistema que não o modelo de consistência, como a tecnologia
+utilizada, detalhes de configuração, entre outros. No caso de uso de mais de um
+sistema, esses fatores, pouco importantes para este estudo, precisariam ser
+levados em conta. O segundo problema é que apesar de existirem sistemas de
+armazenamento de software livre que implementam consistência em momento
+indeterminado, não foram encontrados sistemas que implementassem consistência na
+linha do tempo.
+
+Assim, decidiu-se usar um único sistema para os experimentos. Uma opção para tal
+era implementar um sistema de armazenamento distribuído específico para os
+experimentos. O problema é que esse tipo de sistema é bastante complexo, já que
+precisa prover funcionalidades como controle de entrada e saída dos nós no
+aglomerado, algoritmos de particionamento, etc.
+
+Para evitar a implementação completa de um sistema de armazenamento e tornar
+este trabalho mais realista, algumas opções de software livre foram analisadas.
+A seleção das opções foi feita considerando modelos de consistência,
+estabilidade da solução e simplicidade de desenvolvimento. Como não foram
+encontrados sistemas de armazenamento de software livre que implementavam
+consistência na linha do tempo, as soluções avaliadas foram aquelas que
+implementavam consistência em momento indeterminado. Os sistemas encontrados
+foram Dynomite \cite{Dynomite}, Cassandra \cite{Lakshman2010}, Voldemort
+\cite{Voldemort} e Riak \cite{Riak}. Todos eles usam basicamente a mesma
+arquitetura do Dynamo, provendo gerenciamento de entrada e saída de nós no
+aglomerado, relógios vetoriais para identificação e resolução de conflitos entre
+diferentes réplicas dos objetos \cite{Lamport1978} e espalhamento consistente
+para o particionamento dos objetos \cite{Karger1997a}.
+
+O Dynomite foi descartado pois o projeto foi abandonado pela comunidade em um
+estado ainda instável. O Cassandra por outro lado possui estabilidade e uma
+comunidade bastante ativa, mas é mais complexo que os outros sistemas dado que
+também implementa características de SGBDs orientados a colunas
+\cite{Chang2006}. Dos dois sistemas restantes, o Riak foi escolhido por ser
+implementado em Erlang, linguagem voltada para o desenvolvimento de sistemas
+distribuídos, apresentando assim maior facilidade para o desenvolvimento do
+modelo de consistência na linha do tempo. Um indício dessa facilidade é que o
+riak\_kv, o módulo do Riak usado na implementação do novo modelo de
+consistência, apresenta aproximadamente 20 mil linhas de código contra
+aproximadamente 85 mil do Voldemort. Além disso, o Riak já tinha um
+\emph{benchmark} implementado, o Basho Bench \cite{Basho}.
+
+Detalhes das modificações feitas no Riak encontram-se na
+Seção~\ref{sec:modificacoes_no_riak}.
+
+%% ------------------------------------------------------------------------- %%
+\section{Plataforma de Experimentação} \label{sec:plataforma_de_experimentacao}
+
+Os experimentos foram executados no
+Grid5000\footnote{\url{http://www.grid5000.fr/}}, uma plataforma para criação,
+execução e monitoramento de experimentos de sistemas paralelos e distribuídos.
+Em janeiro de 2013, a plataforma possuía mais de 5000 núcleos de processamento
+distribuídos em 10 sítios na França e um no Brasil.
+
+Outras plataformas como o OpenCirrus\footnote{\url{http://opencirrus.org/}} e
+PlanetLab\footnote{\url{http://www.planet-lab.org/}} também foram consideradas,
+mas foram descartadas por uma questão de conveniência, já que o autor deste
+trabalho utilizou o Grid5000 em dois estágios de mestrado de respectivamente
+quatro meses e um mês pelo INRIA na França. A experiência no ambiente adquirida
+nesse período foi reutilizada neste trabalho, tornando o projeto e a execução
+dos experimentos mais produtivos. O Amazon Web Services (AWS)
+\footnote{\url{http://aws.amazon.com/}} também foi considerado, mas foi
+descartado por se tratar de ambiente virtualizado, o que dificultaria a análise
+dos resultados e a reprodutibilidade dos experimentos.
+
+Os sítios do Grid5000 são conectados por redes de alta velocidade. Suas redes
+apresentam latências da ordem de centenas de microssegundos entre nós de um
+mesmo aglomerado e da ordem de 20 ms entre sítios, e portanto não caracterizam
+uma WAN. De qualquer forma, mesmo que caracterizassem, ter controle sobre esses
+valores era necessário para medir o desempenho do sistema em diferentes
+condições de rede e possibilitar a reprodutibilidade dos experimentos. Por isso,
+a WAN foi emulada nos experimentos (ver Seção~\ref{sec:rede}).
+
+%% ------------------------------------------------------------------------- %%
+\section{Fluxo de Trabalho dos Experimentos}
+\label{sec:fluxo_de_trabalho_dos_experimentos}
+
+A execução de um estudo compreendia diversas etapas. Cada uma delas compunha o
+fluxo de trabalho, apresentado na Figura
+\ref{fig:fluxo_de_trabalho_da_execucao_do_estudo}.
+
+\begin{figure}[!htb] \centering
+
+\begin{tikzpicture}[node distance = 2cm, auto]
+    % Place nodes
+    \node [block] (reserve) {Reserva dos nós};
+
+    \node [block, right of=reserve, node distance=8em] (deploy) {Implantação da
+imagem nos nós};
+
+    \node [block, below of=deploy] (srvs) {Configuração dos nós};
+
+    \node [block, below of=srvs] (riak) {Configuração do Riak};
+
+    \node [block, below of=riak] (start) {Inicialização do Riak};
+
+    \node [block, below of=start] (load) {Carga e aquecimento do sistema};
+
+    \node [block, below of=load] (wan) {Configuração da WAN emulada};
+
+    \node [block, below of=wan, node distance=10em] (run) {Execução de um
+experimento};
+
+    \node [decision, right of=run, node distance=10em] (loop) {Último
+experimento?};
+
+    \node [decision, above of=loop, node distance=10em] (reconf) {Consistência
+ou localidade mudaram?};
+
+    \node [block, right of=loop, node distance=10em] (stop1) {Término do Riak};
+
+    \node [block, right of=riak, node distance=10em] (stop2) {Término do Riak};
+
+    \node [block, right of=stop1, node distance=8em] (end) {Fim};
+
+    % Draw edges
+    \path [line] (reserve) -- (deploy);
+
+    \path [line] (deploy) -- (srvs);
+
+    \path [line] (srvs) -- (riak);
+
+    \path [line] (riak) -- (start);
+
+    \path [line] (start) -- (load);
+
+    \path [line] (load) -- (wan);
+
+    \path [line] (wan) -- (run);
+
+    \path [line] (run) -- (loop);
+
+    \path [line] (loop) -- node [near start] {não} (reconf);
+
+    \path [line] (loop) -- node [near start] {não} (reconf);
+
+    \path [line] (loop) -- node [near start] {sim}(stop1);
+
+    \path [line] (reconf) -- node [near start] {não} (wan);
+
+    \path [line] (reconf) -- node [near start] {sim}(stop2);
+
+    \path [line] (stop2) -- (riak);
+
+    \path [line] (stop1) -- (end);
+
+\end{tikzpicture}
+
+\caption{Fluxo de trabalho da execução do estudo.}
+\label{fig:fluxo_de_trabalho_da_execucao_do_estudo} \end{figure}
+
+\paragraph{Reserva dos nós}Nessa etapa, escolhe-se o aglomerado, a quantidade de
+nós, o período da reserva e o instante em que ela ocorrerá (pode ser
+imediatamente ou em algum momento futuro).
+
+\paragraph{Implantação da imagem nos nós}Essa etapa usa a lista de nós definida
+na reserva e lida com situações em que os nós não foram corretamente
+implantados, algo relativamente comum.
+
+\paragraph{Configuração dos nós}Essa etapa consiste em separar os nós reservados
+entre nós de Riak e instâncias do \emph{benchmark}, a partir das quantidades de
+cada um definidas para o estudo.
+
+\paragraph{Configuração do Riak}Essa etapa consiste no envio dos arquivos de
+configuração do Riak para cada nó. Nesse momento ocorre a configuração do modelo
+de consistência a ser usado em um dado experimento.
+
+\paragraph{Inicialização do Riak}Essa etapa corresponde à inicialização das
+instâncias de Riak em cada nó e à entrada de cada uma no aglomerado de Riaks.
+
+\paragraph{Carga e aquecimento do sistema}Essa etapa consiste em popular o banco
+de dados do Riak antes dos experimentos. Para a consistência na linha do tempo,
+a fase de aquecimento do sistema é necessária (detalhes na subseção
+\ref{sec:aquecimento}).
+
+\paragraph{Configuração da WAN emulada}Nessa etapa as interfaces de rede dos nós
+são configuradas com latência de rede, perda de pacotes, etc. para a WAN
+emulada. Além disso, as otimizações para WAN são aplicadas.
+
+\paragraph{Execução de um experimento}Essa etapa começa pela aquisição de
+informações do sistema, como as condições de memória e disco dos nós e latência
+da LAN. Após isso, a execução do \emph{benchmark} propriamente dita ocorre. Por
+fim, arquivos com os resultados dos experimentos, logs e arquivos de
+configuração são salvos para serem usados na análise dos resultados
+posteriormente.
+
+\paragraph{Término do Riak}Essa etapa é responsável por encerrar o Riak.
+
+%% ------------------------------------------------------------------------- %%
+\section{Experimentos Fatoriais} \label{sec:experimentos_fatoriais}
+
+São alguns os tipos de experimentos usados em um estudo experimental. A escolha
+entre eles se dá principalmente pelo balanço entre recursos utilizados na sua
+execução (tempo, dinheiro, energia, etc.) e quantidade de informação adquirida.
+
+Experimentos fatoriais consistem da combinação de dois ou mais fatores em cada
+experimento que compõe o estudo. Um projeto que considere todos os fatores em
+todos os níveis é chamado completo, caso contrário é chamado fracionado
+\cite{Jain1991}.
+
+Um projeto de experimentos fatoriais completo é constituído por experimentos com
+todas as combinações possíveis de fatores e seus níveis. Assim, a quantidade
+total de experimentos é dada por:
+
+$n = \prod_{i=1}^k{n_i}$,
+
+onde k é o número de fatores e $n_i$ é a quantidade de níveis do
+i$^{\textrm{\'esimo}}$ fator.
+
+Esse tipo de projeto de experimentos tem a vantagem de identificar com precisão
+a influência de todos os fatores e suas interações nas variáveis de resposta.
+Mas quanto maior a quantidade de fatores e de níveis em um estudo experimental,
+maior a quantidade de recursos necessários para sua execução. Normalmente os
+fatores não afetam igualmente as variáveis de resposta, pelo contrário, é comum
+alguns poucos fatores explicarem a maior parte dos efeitos na resposta
+\cite{Jain1991}. Para esses casos, um projeto de experimentos fatoriais
+2\textsuperscript{k}, que é um tipo de projeto de experimentos completo, é
+utilizado para fazer uma triagem dos fatores, identificando quais deles são os
+mais influentes.
+
+Em um projeto de experimentos fatoriais 2\textsuperscript{k}, todos os fatores
+inicialmente selecionados são usados, mas apenas com dois níveis cada
+(normalmente o mínimo e o máximo), resultando em um total de
+2\textsuperscript{k} experimentos. O desempenho em função dos fatores é expresso
+por um modelo de regressão não-linear da forma:
+
+$y = q_0 + q_Ax_A + q_Bx_B + q_Cx_C + ... + q_{AB}x_Ax_B + q_{AC}x_Ax_C +
+q_{BC}x_Bx_C... + q_{ABC}x_Ax_Bx_C + ...$,
+
+onde $y$ é o desempenho medido, $q_0$, $q_A$, $q_B$, etc. são os coeficientes do
+modelo e $x_A$, $x_B$, $x_C$, etc. representam respectivamente os níveis dos
+fatores A, B, C, etc. Os termos compostos pela multiplicação de dois ou mais
+fatores representam as interações entre eles.
+
+Usando as respostas dos 2\textsuperscript{k} experimentos, é possível calcular o
+valor dos coeficientes por meio de um sistema de 2\textsuperscript{k} equações
+em que os 2\textsuperscript{k} coeficientes são as variáveis. Para tal,
+define-se uma relação entre os níveis dos fatores e os valores -1 ou 1.  Por
+exemplo, pode-se definir que a latência de 100 ms valerá -1 e a latência de 300
+ms valerá 1.
+
+Com os coeficientes, é possível fazer a alocação de variação dos fatores, que é
+o cálculo da importância de cada um deles na resposta. A importância de cada um
+é dada pela proporção da variação total pela qual ele é responsável. A variação
+total da resposta (ou soma total dos quadrados) é dada por:
+
+$STQ = \sum_{i = 1}^{n} (y_i - \bar{y})^2$,
+
+onde $n$ é a quantidade de respostas, $y_i$ é resposta medida e $\bar{y}$ é a
+média das respostas.
+
+Para um projeto de experimentos 2\textsuperscript{k}, a soma total dos quadrados
+é dada por (para a derivação dessa equação a partir da anterior, ver
+\cite{Jain1991}):
+
+$STQ = SQA + SQB + SQC + ... + SQAB + SQAC + SQBC + ... + SQABC + ...$,
+
+onde cada $SQX$ é dado por:
+
+$SQX = 2^kq_X$
+
+Cada $SQX$ é a porção da variação total explicada pelo fator ou pela interação
+entre fatores X. A partir disso, é possível finalmente calcular a fração da
+variação explicada por cada X por:
+
+$FSQX = SQX / STQ$
+
+Ordenando os $FSQX$s é possível descobrir quais são os fatores e interações
+entre eles que mais afetam os resultados dos experimentos.
