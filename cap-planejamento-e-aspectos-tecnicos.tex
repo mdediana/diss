@@ -206,6 +206,7 @@ $FSQX = SQX / STQ$
 
 Ordenando os $FSQX$s é possível descobrir quais são os fatores e interações
 entre eles que mais afetam os resultados dos experimentos.
+
 %% ------------------------------------------------------------------------- %%
 \section{Aspectos Técnicos} \label{sec:aspectos_tecnicos}
 
@@ -575,19 +576,19 @@ centro de processamento de dados. Além dos nós, duas sub-redes SR1 e SR2 eram
 reservadas. Cada nó de CPD1 recebia, além de seu IP da rede do Grid5000, um IP
 de SR1, o mesmo valendo para CPD2 e SR2.
 
-Sistemas Linux usam o arquivo \emph{/etc/hosts} como fonte primária para resolução de
-nomes, consultando um DNS apenas quando não encontram um nome definido ali (o
-que é a situação mais comum). Todos os nós no Grid5000 possuem um nome
-registrado no DNS que aponta para o seu IP da rede do Grid5000. Nos
-experimentos, dois arquivos \emph{hosts1} e \emph{hosts2} eram criados e substituíam o
-\emph{/etc/hosts} dos nós de CPD1 e CPD2 respectivamente. O conteúdo de
-\emph{hosts1} eram os
-nomes dos nós de CPD2 sendo resolvidos para os IPs de SR2, o mesmo valendo para
-\emph{hosts2}, CPD1 e SR1. Com isso, os nós de CPD1 resolviam os nomes dos nós de CPD2
-para os IPs de SR2 e vice-versa. O resultado dessa configuração é que todas as
-requisições que saíam de um centro de processamento de dados para o outro usavam
-o IP da sub-rede de destino, enquanto as requisições para o mesmo centro de
-processamento de dados usavam o IP da rede do Grid5000.
+Sistemas Linux usam o arquivo \emph{/etc/hosts} como fonte primária para
+resolução de nomes, consultando um DNS apenas quando não encontram um nome
+definido ali (o que é a situação mais comum). Todos os nós no Grid5000 possuem
+um nome registrado no DNS que aponta para o seu IP da rede do Grid5000. Nos
+experimentos, dois arquivos \emph{hosts1} e \emph{hosts2} eram criados e
+substituíam o \emph{/etc/hosts} dos nós de CPD1 e CPD2 respectivamente. O
+conteúdo de \emph{hosts1} eram os nomes dos nós de CPD2 sendo resolvidos para os
+IPs de SR2, o mesmo valendo para \emph{hosts2}, CPD1 e SR1. Com isso, os nós de
+CPD1 resolviam os nomes dos nós de CPD2 para os IPs de SR2 e vice-versa. O
+resultado dessa configuração é que todas as requisições que saíam de um centro
+de processamento de dados para o outro usavam o IP da sub-rede de destino,
+enquanto as requisições para o mesmo centro de processamento de dados usavam o
+IP da rede do Grid5000.
 
 A partir dessa configuração foi possível adicionar um filtro baseado em
 sub-redes ao tc de modo que as características de WAN eram aplicadas às
