@@ -230,10 +230,10 @@ modificações do basho\_stats em
 %% ------------------------------------------------------------------------- %%
 \section{Ambiente e Imagem} \label{sec:ambiente_e_imagem}
 
-A operação no Grid5000 se dá através do acesso ssh ao frontend de cada sítio.
+A operação no Grid'5000 se dá através do acesso ssh ao frontend de cada sítio.
 Nele o usuário encontra seu diretório home, onde ele armazena seus scripts e
 dados dos experimentos, e tem acesso a ferramentas específicas da
-infraestrutura. Como o Grid5000 é compartilhado por diversos pesquisadores, ele
+infraestrutura. Como o Grid'5000 é compartilhado por diversos pesquisadores, ele
 oferece um conjunto de ferramentas (OAR\footnote{\url{http://oar.imag.fr/}}) e
 regras para que um pesquisador reserve nós para seu uso exclusivo por um
 determinado período de tempo. Além dos nós, é possível reservar IPs para compor
@@ -244,7 +244,7 @@ de imagens nos nós reservados pelo usuário.
 
 A imagem usada nos experimentos foi um Debian GNU/Linux 6.0 (Squeeze) com kernel
 2.6.32-5-amd64 baseado em uma imagem pré-configurada disponibilizada pelo
-Grid5000 (squeeze-x64-base). Além do conteúdo da imagem base, a imagem usada nos
+Grid'5000 (squeeze-x64-base). Além do conteúdo da imagem base, a imagem usada nos
 experimentos possui o Erlang R14B04 instalado a partir do fonte, o Riak e o
 Basho Bench modificados e algumas ferramentas de monitoração e análise de
 desempenho como
@@ -255,7 +255,7 @@ sendo que a distinção entre nós executando instâncias do Riak ou do Basho Bench
 foi feita pelos scripts que gerenciam os experimentos (subseção
 \ref{sec:execucao_e_analise_dos_experimentos}).
 
-Pesquisadores com acesso ao Grid5000 podem acessar essa imagem, que se encontra
+Pesquisadores com acesso ao Grid'5000 podem acessar essa imagem, que se encontra
 no sítio Sophia em \emph{/home/madediana/images/squeeze-x64-riak.tgz}.
 
 %% ------------------------------------------------------------------------- %%
@@ -289,13 +289,13 @@ dados simulados (ver Seção~\ref{sec:parametros_fixados}). Para simular os
 centros de processamento de dados, em cada experimento os nós que compunham o
 sistema eram divididos em dois conjuntos CPD1 e CPD2, cada um representando um
 centro de processamento de dados. Além dos nós, duas sub-redes SR1 e SR2 eram
-reservadas. Cada nó de CPD1 recebia, além de seu IP da rede do Grid5000, um IP
+reservadas. Cada nó de CPD1 recebia, além de seu IP da rede do Grid'5000, um IP
 de SR1, o mesmo valendo para CPD2 e SR2.
 
 Sistemas Linux usam o arquivo \emph{/etc/hosts} como fonte primária para
 resolução de nomes, consultando um DNS apenas quando não encontram um nome
-definido ali (o que é a situação mais comum). Todos os nós no Grid5000 possuem
-um nome registrado no DNS que aponta para o seu IP da rede do Grid5000. Nos
+definido ali (o que é a situação mais comum). Todos os nós no Grid'5000 possuem
+um nome registrado no DNS que aponta para o seu IP da rede do Grid'5000. Nos
 experimentos, dois arquivos \emph{hosts1} e \emph{hosts2} eram criados e
 substituíam o \emph{/etc/hosts} dos nós de CPD1 e CPD2 respectivamente. O
 conteúdo de \emph{hosts1} eram os nomes dos nós de CPD2 sendo resolvidos para os
@@ -304,7 +304,7 @@ CPD1 resolviam os nomes dos nós de CPD2 para os IPs de SR2 e vice-versa. O
 resultado dessa configuração é que todas as requisições que saíam de um centro
 de processamento de dados para o outro usavam o IP da sub-rede de destino,
 enquanto as requisições para o mesmo centro de processamento de dados usavam o
-IP da rede do Grid5000.
+IP da rede do Grid'5000.
 
 A partir dessa configuração foi possível adicionar um filtro baseado em
 sub-redes ao tc de modo que as características de WAN eram aplicadas às
@@ -321,7 +321,7 @@ A automatização dos experimentos foi feita com dois conjuntos de scripts. O
 primeiro (cmb) foi usado para gerenciamento e execução dos experimentos --
 reserva de nós, implantação da imagem, gerenciamento do sistema de
 armazenamento, configuração e execução do \emph{benchmark} e coleta dos
-resultados. Os scripts se localizavam no frontend do Grid5000 e foram escritos
+resultados. Os scripts se localizavam no frontend do Grid'5000 e foram escritos
 em bash. Esses scripts implementavam o fluxo de trabalho do estudo (ver
 Seção~\ref{sec:fluxo_de_trabalho_dos_experimentos}). O segundo conjunto
 (cmb-local) foi usado na análise dos dados, se localizava no computador do autor

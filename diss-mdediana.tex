@@ -160,26 +160,26 @@ framexrightmargin=10pt
 %   final, corrigida, do trabalho
 %
 %
-\newpage
-\thispagestyle{empty}
-    \begin{center}
-        \vspace*{2.3 cm}
-        \textbf{\Large{Desempenho de sistemas com\\
-      dados georeplicados com consistência\\
-      em momento indeterminado e\\
-      na linha do tempo}}\\
-        \vspace*{2 cm}
-    \end{center}
-
-    \vskip 2cm
-
-    \begin{flushright}
-	Esta é a versão original da dissertação elaborada pelo\\
-	candidato Maurício José de Oliveira De Diana, tal como \\
-	submetida à Comissão Julgadora.
-    \end{flushright}
-
-\pagebreak
+% \newpage
+% \thispagestyle{empty}
+%     \begin{center}
+%         \vspace*{2.3 cm}
+%         \textbf{\Large{Desempenho de sistemas com\\
+%       dados georeplicados com consistência\\
+%       em momento indeterminado e\\
+%       na linha do tempo}}\\
+%         \vspace*{2 cm}
+%     \end{center}
+% 
+%     \vskip 2cm
+% 
+%     \begin{flushright}
+% 	Esta é a versão original da dissertação elaborada pelo\\
+% 	candidato Maurício José de Oliveira De Diana, tal como \\
+% 	submetida à Comissão Julgadora.
+%     \end{flushright}
+% 
+% \pagebreak
 
 
 % ---------------------------------------------------------------------------- %
@@ -195,39 +195,41 @@ framexrightmargin=10pt
 %   à Comissão Julgadora antes da defesa
 %
 %
-%\newpage
-%\thispagestyle{empty}
-%    \begin{center}
-%        \vspace*{2.3 cm}
-%        \textbf{\Large{Título do trabalho a ser apresentado à \\
-%        CPG para a dissertação/tese}}\\
-%        \vspace*{2 cm}
-%    \end{center}
-%
-%    \vskip 2cm
-%
-%    \begin{flushright}
-%	Esta versão da dissertação/tese contém as correções e alterações sugeridas\\
-%	pela Comissão Julgadora durante a defesa da versão original do trabalho,\\
-%	realizada em 14/12/2010. Uma cópia da versão original está disponível no\\
-%	Instituto de Matemática e Estatística da Universidade de São Paulo.
-%
-%    \vskip 2cm
-%
-%    \end{flushright}
-%    \vskip 4.2cm
-%
-%    \begin{quote}
-%    \noindent Comissão Julgadora:
-%    
-%    \begin{itemize}
-%		\item Profª. Drª. Nome Completo (orientadora) - IME-USP [sem ponto final]
-%		\item Prof. Dr. Nome Completo - IME-USP [sem ponto final]
-%		\item Prof. Dr. Nome Completo - IMPA [sem ponto final]
-%    \end{itemize}
-      
-%    \end{quote}
-%\pagebreak
+\newpage
+\thispagestyle{empty}
+    \begin{center}
+        \vspace*{2.3 cm}
+         \textbf{\Large{Desempenho de sistemas com\\
+       dados georeplicados com consistência\\
+       em momento indeterminado e\\
+       na linha do tempo}}\\
+        \vspace*{2 cm}
+    \end{center}
+
+    \vskip 2cm
+
+    \begin{flushright}
+	Esta versão da dissertação/tese contém as correções e alterações sugeridas\\
+	pela Comissão Julgadora durante a defesa da versão original do trabalho,\\
+	realizada em 21/03/2013. Uma cópia da versão original está disponível no\\
+	Instituto de Matemática e Estatística da Universidade de São Paulo.
+
+    \vskip 2cm
+
+    \end{flushright}
+    \vskip 4.2cm
+
+    \begin{quote}
+    \noindent Comissão Julgadora:
+    
+    \begin{itemize}
+		\item Prof. Dr. Marco Aurélio Gerosa (orientador) - IME-USP
+		\item Prof. Dr. Daniel Macedo Batista - IME-USP
+		\item Prof. Dr. Magnos Martinello - UFES
+    \end{itemize}
+     
+    \end{quote}
+\pagebreak
 
 
 \pagenumbering{roman}     % começamos a numerar 
@@ -238,8 +240,8 @@ framexrightmargin=10pt
 \chapter*{Agradecimentos}
 Eu gostaria de agradecer:
 
-Primeiramente, ao Prof. Gerosa, por me mostrar o caminho na academia, também
-pela confiança e paciência.
+Primeiramente, ao Prof. Dr. Marco Aurélio Gerosa, por me mostrar o caminho na
+academia, também pela confiança e paciência.
 
 A Adrien Lèbre, Gustavo Bervian Brand e Louis-Claude Canon pelos ensinamentos
 sobre sistemas distribuídos e análise de desempenho. A Adrien e Gabriel Antoniu
@@ -248,7 +250,7 @@ por me darem oportunidades em seus grupos.
 A Alfredo Goldman e Olivier Richard por viabilizarem a infraestrutura para os
 experimentos.
 
-A Paulo Miotto, Fabio Akita e Gleicon Moraes pelas lições sobre tecnologia e
+A Paulo Miotto, Fabio Akita e Gleicon Moraes pelas lições sobre computação e
 profissão.
 
 A Gustavo Oliva e Mauricio Aniche pelos debates sobre a pesquisa. Ao Aniche,
@@ -298,19 +300,18 @@ difundido é a consistência na linha do tempo. Esse modelo de consistência usa
 uma réplica mestre para garantir que não ocorram conflitos na escrita. Nas
 leituras, os clientes podem ler os valores mais recentes a partir da cópia
 mestre, ou optar explicitamente por ler valores possivelmente desatualizados
-para obter maior desempenho ou disponibilidade.  É possível perceber
-analiticamente que a consistência na linha do tempo apresenta disponibilidade
-menor que a consistência em momento indeterminado, mas ainda não há dados
-comparando o desempenho de ambas.
+para obter maior desempenho ou disponibilidade. A consistência na linha do tempo
+apresenta disponibilidade menor que a consistência em momento indeterminado em
+determinadas situações, mas não há dados comparando o desempenho de ambas.
 
-O objetivo principal deste trabalho é a comparação do desempenho de sistemas de
-armazenamento georeplicados usando esses dois modelos de consistência. Para cada
-modelo de consistência, são realizados experimentos que medem o tempo de
-resposta e a vazão do sistema sob diferentes cargas de trabalho e diferentes
-latências entre centros de processamento de dados. Esse comparativo pode
-auxiliar desenvolvedores e administradores de sistemas no processo de
-planejamento de capacidade e nas estimativas do custo de desenvolvimento de um
-sistema georeplicado.\\
+O objetivo principal deste trabalho foi a comparação do desempenho de sistemas
+de armazenamento georeplicados usando esses dois modelos de consistência. Para
+cada modelo de consistência, foram realizados experimentos que mediram o tempo
+de resposta do sistema sob diferentes cargas de trabalho e diferentes condições
+de rede entre centros de processamento de dados. Esse comparativo pode auxiliar
+desenvolvedores e administradores de sistemas no processo de planejamento de
+capacidade e nas estimativas do custo de desenvolvimento de um sistema
+georeplicado.\\
 
 \noindent \textbf{Palavras-chave:} Sistemas distribuídos, modelos de
 consistência, sistemas web de larga escala, análise de desempenho.
@@ -345,16 +346,16 @@ that is more rigid and less widespread is timeline consistency. This consistency
 model uses a master replica to guarantee that no write conflicts occur. Clients
 can read the most up-to-date values from the master replica, or they can
 explicitly choose to read stale values to obtain greater performance or
-availability. It is possible to see analytically that timeline consistency shows
-lower availability than eventual consistency, but still there are nodata
-comparing their performance.
+availability. Timeline consistency shows lower availability than eventual
+consistency in particular situations, but there are no data comparing their
+performance.
 
-The main goal of this work is to compare the performance of a geo-replicated
+The main goal of this work was to compare the performance of a geo-replicated
 storage system using these consistency models. For each consistency model,
-experiments were run to measure system response time and throughput under
-different workloads and different latencies between data centers. This study may
-help developers and system administrators on capacity planning and when
-estimating development cost of geo-replicated systems.\\
+experiments were run to measure system response time under different workloads
+and network conditions between data centers. This study may help developers and
+system administrators on capacity planning and when estimating development cost
+of geo-replicated systems.\\
 
 \noindent \textbf{Keywords:} Distributed systems, consistency models, large
 scale web systems, performance analysis.

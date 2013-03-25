@@ -493,15 +493,15 @@ descritos na Subseção~\ref{sec:parametros_restantes}.
 \subsection{Aglomerado e mecanismo de armazenamento}
 \label{sec:aglomerado_e_mecanismo_de_armazenamento}
 
-As configurações de hardware estavam limitadas às oferecidas pelo Grid5000. Cada
-aglomerado do Grid5000 possui todos os nós com mesma configuração de hardware, e
+As configurações de hardware estavam limitadas às oferecidas pelo Grid'5000. Cada
+aglomerado do Grid'5000 possui todos os nós com mesma configuração de hardware, e
 aglomerados diferentes são compostos por hardware com configurações diferentes.
 Com isso, decidiu-se restringir os experimentos a um único aglomerado, de forma
 a garantir homogeneidade de hardware. Além disso, do ponto de vista operacional,
 o uso de um único aglomerado simplificou a execução dos experimentos. Dado isso,
 alguns experimentos foram feitos para decidir qual aglomerado seria usado.
 
-Os aglomerados do Grid5000 considerados foram \emph{parapluie}, \emph{sol} e
+Os aglomerados do Grid'5000 considerados foram \emph{parapluie}, \emph{sol} e
 \emph{suno}. A descrição do hardware e a quantidade de nós de cada um deles se
 encontra na Tabela \ref{tab:aglomerados_do_grid5000}.
 
@@ -521,7 +521,7 @@ Aglomerado & CPU & Memória & Disco & Nós \\ \hline
 
 \end{tabular}
 
-\caption{Aglomerados do Grid5000.} \label{tab:aglomerados_do_grid5000}
+\caption{Aglomerados do Grid'5000.} \label{tab:aglomerados_do_grid5000}
 
 \end{center} \end{table}
 
@@ -700,7 +700,7 @@ relaciona diretamente com a quantidade de threads por instância do
 considerado um fator, a taxa de chegada foi fixada.
 
 Vale notar que a LAN nos experimentos foi definida pela infraestrutura do
-Grid5000 usada, mas a WAN foi emulada (ver Seção~\ref{sec:rede}). Dessa forma,
+Grid'5000 usada, mas a WAN foi emulada (ver Seção~\ref{sec:rede}). Dessa forma,
 os parâmetros da LAN estavam limitados pela infraestrutura do estudo, enquanto
 os da WAN foram usados como configuração do emulador.
 
@@ -946,7 +946,7 @@ também seria usada para aquecer o cache de disco.
 
 As quantidade de nós de sistema e \emph{benchmark} não só influenciam as
 respostas, como também afetam questões operacionais, dado que quanto mais nós
-são usados, maiores as dificuldades de conseguir reservá-los no Grid5000.
+são usados, maiores as dificuldades de conseguir reservá-los no Grid'5000.
 Portanto, um estudo foi feito para definir a influência desses fatores e achar
 valores que representassem um compromisso razoável entre tamanho dos
 experimentos e as questões operacionais.
@@ -1023,7 +1023,7 @@ comum alguns poucos nós já estarem reservados por outros pesquisadores, além de
 alguns nós apresentarem falhas no momento da implantação da imagem. Esse último
 problema levou o autor a sempre reservar alguns nós além dos necessários para
 garantir a quantidade mínima de nós para executar os experimentos. Além disso,
-alguns limites de uso do Grid5000 são relativos ao tamanho do aglomerado usado.
+alguns limites de uso do Grid'5000 são relativos ao tamanho do aglomerado usado.
 Por exemplo, uma das regras diz que, entre 9:00 e 19:00, a quantidade de nós
 reservados multiplicada pelo período da reserva deve ser menor ou igual a
 quantidade total de nós do aglomerado multiplicada por 2 horas. Dessa forma,
