@@ -37,9 +37,9 @@ WAN.
 
 TCP/IP é a pilha de protocolos comumente utilizada em sistemas georeplicados. O
 protocolo IP provê os mecanismos de endereçamento e roteamento. O TCP provê
-comunicação ponto-a-ponto confiável. Para tal, usa diversos mecanismos
-relacionados e dependentes entre si para lidar com controle de fluxo e perdas,
-corrupção, reordenação e duplicação de pacotes.
+comunicação fim-a-fim confiável. Para tal, usa diversos mecanismos relacionados
+e dependentes entre si para lidar com controle de fluxo e perdas, corrupção,
+reordenação e duplicação de pacotes.
 
 O controle de fluxo é feito por mecanismos usados nas pontas de uma conexão com
 o objetivo de usar a rede de forma eficiente e evitar o envio de mais dados do
@@ -225,10 +225,9 @@ Os 5 parâmetros de carga de trabalho levantados foram:
 \end{itemize}
 
 Cada um desses parâmetros é explicado nas subseções a seguir. Os parâmetros que
-foram fixados, as justificativas para tal e seus
-valores estão descritos na Seção~\ref{sec:parametros_fixados}. Os restantes
-foram considerados fatores e o tratamento dado a eles está na Seção
-\ref{sec:selecao_dos_fatores}.
+foram fixados, as justificativas para tal e seus valores estão descritos na
+Seção~\ref{sec:parametros_fixados}. Os restantes foram considerados fatores e o
+tratamento dado a eles está na Seção \ref{sec:selecao_dos_fatores}.
 
 Uma última observação é que todos valores de latência relatados referem-se à
 latência de ida e volta.
@@ -493,13 +492,14 @@ descritos na Subseção~\ref{sec:parametros_restantes}.
 \subsection{Aglomerado e mecanismo de armazenamento}
 \label{sec:aglomerado_e_mecanismo_de_armazenamento}
 
-As configurações de hardware estavam limitadas às oferecidas pelo Grid'5000. Cada
-aglomerado do Grid'5000 possui todos os nós com mesma configuração de hardware, e
-aglomerados diferentes são compostos por hardware com configurações diferentes.
-Com isso, decidiu-se restringir os experimentos a um único aglomerado, de forma
-a garantir homogeneidade de hardware. Além disso, do ponto de vista operacional,
-o uso de um único aglomerado simplificou a execução dos experimentos. Dado isso,
-alguns experimentos foram feitos para decidir qual aglomerado seria usado.
+As configurações de hardware estavam limitadas às oferecidas pelo Grid'5000.
+Cada aglomerado do Grid'5000 possui todos os nós com mesma configuração de
+hardware, e aglomerados diferentes são compostos por hardware com configurações
+diferentes.  Com isso, decidiu-se restringir os experimentos a um único
+aglomerado, de forma a garantir homogeneidade de hardware. Além disso, do ponto
+de vista operacional, o uso de um único aglomerado simplificou a execução dos
+experimentos. Dado isso, alguns experimentos foram feitos para decidir qual
+aglomerado seria usado.
 
 Os aglomerados do Grid'5000 considerados foram \emph{parapluie}, \emph{sol} e
 \emph{suno}. A descrição do hardware e a quantidade de nós de cada um deles se
@@ -902,15 +902,15 @@ quantidade de objetos armazenados.
 A influência da popularidade também foi considerada pois ela afetava a
 probabilidade de um determinado objeto ser acessado. Foram feitos testes com os
 dois valores de popularidade usados nos experimentos (ver
-Subseção~\ref{sec:fatores_de_carga_de_trabalho}). Na popularidade uniforme
-os objetos armazenados têm chances iguais de serem acessados,
-enquanto na concentrada os acessos obedecem uma distribuição Pareto.
+Subseção~\ref{sec:fatores_de_carga_de_trabalho}). Na popularidade uniforme os
+objetos armazenados têm chances iguais de serem acessados, enquanto na
+concentrada os acessos obedecem uma distribuição Pareto.
 
-Dado isso, um estudo foi
-realizado para saber quantos passos seriam necessários para cada combinação de
-localidade e popularidade. O estudo com 20.000 objetos executou 30 passos,
-medindo a quantidade de migrações ocorridas em cada um deles. Os resultados
-desse estudo estão na Figura \ref{fig:aquecimento_do_sistema}.
+Dado isso, um estudo foi realizado para saber quantos passos seriam necessários
+para cada combinação de localidade e popularidade. O estudo com 20.000 objetos
+executou 30 passos, medindo a quantidade de migrações ocorridas em cada um
+deles. Os resultados desse estudo estão na Figura
+\ref{fig:aquecimento_do_sistema}.
 
 \begin{figure}[!htb] \centering
 

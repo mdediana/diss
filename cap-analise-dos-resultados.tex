@@ -12,11 +12,12 @@ autor deste trabalho em conversa com o pesquisador visitante no IME Jean-Marc
 Vincent, que possui grande experiência em estudos de desempenho.
 
 O nível de confiança do estudo relativo ao tamanho da amostra está descrito na
- Seção~\ref{sec:nivel_de_confianca_exatidao_tamanho_da_amostra_e_replicacoes}
+Seção~\ref{sec:nivel_de_confianca_exatidao_tamanho_da_amostra_e_replicacoes}
 Seção~\ref{sec:analise_dos_tempos_de_resposta} mostra a análise dos tempos de
-resposta, a Seção~\ref{sec:analise_dos_conflitos}, a análise dos conflitos
-e a Seção~\ref{sec:analise_das_migracoes}, a análise das migrações. A
-Seção~\ref{sec:ameacas_a_validade} descreve as ameaças à validade levantadas e, por fim, a Seção~\ref{sec:trabalhos_relacionados} apresenta os trabalhos
+resposta, a Seção~\ref{sec:analise_dos_conflitos}, a análise dos conflitos e a
+Seção~\ref{sec:analise_das_migracoes}, a análise das migrações. A
+Seção~\ref{sec:ameacas_a_validade} descreve as ameaças à validade levantadas e,
+por fim, a Seção~\ref{sec:trabalhos_relacionados} apresenta os trabalhos
 relacionados.
 
 %% ------------------------------------------------------------------------- %%
@@ -69,13 +70,13 @@ padrão. O valor mínimo de quantidade de requisições de um experimento foi 76137,
 para \emph{lt\_rec}, localidade de 50\% e latência de rede de 300 ms.
 
 Dados esses resultados, foram verificados os tamanhos da amostra dos
-experimentos. Com precisão de 1\%, apenas
-os experimentos para \emph{lt\_rec}, localidade de 50\% e latência de rede 300
-ms não tinham tamanho da amostra suficiente -- para variação de latência de 0\%
-o experimento precisaria de 127789 amostras mas tinha 115175, e para variação de
-latência 60\% ele precisaria de 83030 mas tinha 76137. Se considerado o mesmo
-nível de confiança, mas exatidão de 2\%, todos os
-experimentos tinham o tamanho da amostra suficiente.
+experimentos. Com precisão de 1\%, apenas os experimentos para \emph{lt\_rec},
+localidade de 50\% e latência de rede 300 ms não tinham tamanho da amostra
+suficiente -- para variação de latência de 0\% o experimento precisaria de
+127789 amostras mas tinha 115175, e para variação de latência 60\% ele
+precisaria de 83030 mas tinha 76137. Se considerado o mesmo nível de confiança,
+mas exatidão de 2\%, todos os experimentos tinham o tamanho da amostra
+suficiente.
 
 Vale notar que o tamanho da amostra na maioria dos experimentos foi bem maior do
 que o necessário. Por exemplo, para \emph{ind1}, localidade de 50\% e latência
@@ -113,8 +114,8 @@ Os gráficos das FDAs dos tempos de resposta quando a latência é 0 ms está na
 Figura \ref{fig:fda_dos_tempos_de_resposta_para_latencia_de_rede_de_0_ms}. Como
 esperado, as requisições se comportam como se fossem locais. Um fato a se notar
 é um degrau nos percentis mais altos das leituras em todos os modos. Uma
-explicação possível seria alguma sobrecarga no sistema, mas nesse caso
-seria esperado ver comportamento semelhante nas escritas.
+explicação possível seria alguma sobrecarga no sistema, mas nesse caso seria
+esperado ver comportamento semelhante nas escritas.
 
 \begin{figure}[p] \centering
 
@@ -179,9 +180,9 @@ ms.}
 \label{fig:aproximacao_da_fda_dos_tempos_de_resposta_para_latencia_de_rede_de_0_ms}
 \end{figure}
 
-Os ganhos relativos para requisições remotas da consistência na linha
-do tempo com relação à consistência em momento indeterminado com $W = 2$ e
-latência de rede de 200 ms se encontram na
+Os ganhos relativos para requisições remotas da consistência na linha do tempo
+com relação à consistência em momento indeterminado com $W = 2$ e latência de
+rede de 200 ms se encontram na
 Tabela~\ref{tab:ganhos_e_perdas_relativos_das_requisicoes_remotas}.
 
 \begin{table}[!h] \begin{center} \begin{tabular}{|c|c|c|c|} \hline
@@ -196,13 +197,15 @@ Percentil & Localidade (\%) & \emph{lt\_qqer} & \emph{lt\_rec}\\ \hline
 
 95 & 90 & 27\% & 39\% \\ \hline
 
-\end{tabular} \caption[Ganhos relativos entre modos.]{Ganhos relativos dos tempos de resposta para os modos \emph{lt\_qqer} e lt\_lat com
-relação a \emph{ind2} para latência de 200 ms. O sinal negativo indica perdas.} \label{tab:ganhos_e_perdas_relativos_das_requisicoes_remotas}
-\end{center} \end{table}
+\end{tabular} \caption[Ganhos relativos entre modos.]{Ganhos relativos dos
+tempos de resposta para os modos \emph{lt\_qqer} e lt\_lat com relação a
+\emph{ind2} para latência de 200 ms. O sinal negativo indica perdas.}
+\label{tab:ganhos_e_perdas_relativos_das_requisicoes_remotas} \end{center}
+\end{table}
 
-Com relação ao percentil 75 e localidade de 50\%, os ganhos são altos pois
-as requisições são locais para \emph{lt\_qqer} e \emph{lt\_rec} e são remotas
-para \emph{ind2}.
+Com relação ao percentil 75 e localidade de 50\%, os ganhos são altos pois as
+requisições são locais para \emph{lt\_qqer} e \emph{lt\_rec} e são remotas para
+\emph{ind2}.
 
 Com exceção dos degraus que aparecem nos gráficos para leituras, todos os modos
 apresentaram o comportamento esperado. A hipótese de que a consistência na linha
