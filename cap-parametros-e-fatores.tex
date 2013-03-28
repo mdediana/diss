@@ -47,8 +47,9 @@ que o receptor pode tratar. Perdas acontecem quando um dispositivo na rede
 descarta pacotes, o que pode ser causado por corrupção de pacotes ou
 congestionamento da rede, como \emph{buffers} esgotados em um roteador, por
 exemplo. Reordenação ocorre quando pacotes de uma mesma conexão TCP enviados nos
-instantes T1 e T2 seguem caminhos diferentes na rede, e o pacote enviado em T2
-chega ao receptor antes do enviado em T1. Duplicação normalmente é relacionada a
+instantes $t_1$ e $t_2$ seguem caminhos diferentes na rede, e o pacote enviado
+em $t_2$
+chega ao receptor antes do enviado em $t_1$. Duplicação normalmente é relacionada a
 retransmissões do TCP, mas também acontece devido a balanceamento de carga ou
 problemas de hardware ou software em dispositivos intermediários.
 
@@ -202,7 +203,7 @@ Os 13 parâmetros de rede levantados foram:
 
 \item Taxa de reordenação de pacotes na WAN
 
-\item Variação de TCP
+\item Variante do TCP
 
 \item Quantidade de enlaces de WAN
 
@@ -386,7 +387,7 @@ mecanismo de recuperação rápida, com consequente diminuição da janela de
 transmissão. Além disso, pacotes fora de ordem ocupam espaço no \emph{buffer} do
 receptor, o que pode afetar seu desempenho \cite{Wang2004}.
 
-\paragraph{Variação de TCP}Variações de TCP oferecem diferentes algoritmos de
+\paragraph{Variante do TCP}Variações de TCP oferecem diferentes algoritmos de
 prevenção de congestionamento, responsável pelo dimensionamento da janela de
 congestionamento. Quanto maior a janela de congestionamento, maior a quantidade
 de dados em trânsito e maior a vazão do sistema.
@@ -412,7 +413,7 @@ um cenário de implantação em que uma nuvem semelhante ao EC2 da Amazon fosse
 usada, então a largura de banda foi fixada nos estudos com base em valores
 relatados (ver Seção~\ref{sec:parametros_fixados}).
 
-Por último, a variação de TCP usada é definida na configuração nos nós, e
+Por último, a variante do TCP usada é definida na configuração nos nós, e
 portanto poderia ser considerada um parâmetro de sistema. Mas como uma única
 variação foi usada em todos os nós e a análise do parâmetro fazia mais sentido
 no contexto da rede, a opção foi por classificá-lo como parâmetro de rede.
@@ -751,7 +752,7 @@ Os fatores de rede eram:
 
 \item Taxa de reordenação de pacotes na WAN
 
-\item Variação de TCP
+\item Variante do TCP
 
 \end{itemize}
 
@@ -1172,7 +1173,7 @@ motivo. Os níveis inicialmente selecionados para fatores de rede foram:
 
 \item Taxa de reordenação de pacotes na WAN (\%): 0,05 e 5
 
-\item Variação de TCP: CUBIC e H-TCP
+\item Variante do TCP: CUBIC e H-TCP
 
 \end{itemize}
 
@@ -1212,11 +1213,10 @@ influenciou a resposta (ver abaixo).
 
 Tanto H-TCP \cite{Leith2004} quanto CUBIC \cite{Ha2008} foram projetados com
 foco em redes com largura de banda e latências grandes (BDP alto). Ambos já
-estavam disponíveis no Linux usado nos experimentos, sendo que TCP CUBIC é o
+estavam disponíveis no Linux usado nos experimentos, sendo que o TCP CUBIC é o
 padrão do kernel do Linux a partir da versão 2.6.19. Eles foram escolhidos pois
 são citados nas referências sobre otimizações da pilha TCP para WANs
 \cite{Jones2006,ESNet2012}.
-
 
 No emulador de rede, a latência define o mínimo e a variação o máximo a que ela
 pode chegar. Por exemplo, ao fazer a configuração de 100 ms de latência e 60\%
@@ -1299,7 +1299,7 @@ Os valores fixados dos fatores desconsiderados foram:
 
 \item Taxa de reordenação de pacotes na WAN (\%): 0
 
-\item Algoritmo de congestionamento: CUBIC
+\item Variante de TCP: CUBIC
 
 \end{itemize}
 
