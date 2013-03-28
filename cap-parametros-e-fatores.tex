@@ -892,13 +892,6 @@ momento. Por isso, o aquecimento era necessário após a carga para a consistência
 na linha do tempo. Já a consistência em momento indeterminado não era sujeita à
 influência direta de localidade, portanto não precisava de aquecimento.
 
-Uma forma de implementar o aquecimento seria usar a quantidade de atualizações
-necessárias para levar o sistema para seu estado estacionário. O problema dessa
-abordagem é que a quantidade de requisições iria variar com a quantidade de
-objetos armazenados. Por isso, o aquecimento foi parametrizado por passos, de
-modo que cada passo correspondia a uma quantidade de atualizações igual à
-quantidade de objetos armazenados.
-
 A influência da popularidade também foi considerada pois ela afetava a
 probabilidade de um determinado objeto ser acessado. Foram feitos testes com os
 dois valores de popularidade usados nos experimentos (ver
@@ -906,36 +899,40 @@ Subseção~\ref{sec:fatores_de_carga_de_trabalho}). Na popularidade uniforme os
 objetos armazenados têm chances iguais de serem acessados, enquanto na
 concentrada os acessos obedecem uma distribuição Pareto.
 
-Dado isso, um estudo foi realizado para saber quantos passos seriam necessários
-para cada combinação de localidade e popularidade. O estudo com 20.000 objetos
-executou 30 passos, medindo a quantidade de migrações ocorridas em cada um
-deles. Os resultados desse estudo estão na Figura
-\ref{fig:aquecimento_do_sistema}.
+Dado isso, um estudo foi realizado para saber quantas escritas eram necessárias
+até que o sistema atingisse o regime estacionário para cada combinação de
+localidade e popularidade. O estudo foi feito com 20.000 objetos armazenados.  A
+quantidade de escritas necessárias era proporcional à quantidade total de
+objetos, comportamento verificado por meio de testes com outros valores de
+objetos armazenados e no estudo final (ver
+Seção~\ref{sec:analise_das_migracoes}).
 
 \begin{figure}[!htb] \centering
 
 \includegraphics[width=0.8\textwidth]{warmup.png}
 
-\caption{Aquecimento do sistema.} \label{fig:aquecimento_do_sistema}
-\end{figure}
+\caption[Aquecimento do sistema.]{Aquecimento do sistema. As linhas tracejadas
+indicam o ponto onde o sistema atinge o regime estacionário.}
+\label{fig:aquecimento_do_sistema} \end{figure}
 
-A quantidade de migrações aumenta nos primeiros passos. Para localidade de 50\%,
-a quantidade de migrações estabiliza após o 3\textsuperscript{o} passo e a
-popularidade não influencia. Já para localidade de 90\%, a estabilização demora
-cerca de 17 passos e as curvas são diferentes para popularidade apenas nos
-primeiros passos. Com isso, a fase de aquecimento nos estudos foi configurada
-para usar uma quantidade de passos de acordo com a localidade. Os valores para
-quantidade de passos configurados foram:
+A Figura~\ref{fig:aquecimento_do_sistema} mostra que, independente da
+popularidade, o sistema atinge o regime estacionário para localidade de 50\% em
+aproximadamente 60 mil escritas (3 vezes o total de objetos armazenados). No
+início existe um aumento das migrações enquanto os objetos ainda não receberam
+em média três acessos, após esse ponto as migrações estabilizam.
 
-\begin{itemize}
+A mesma figura mostra que, independente de popularidade, o sistema atinge o
+regime estacionário para localidade de 90\% em aproximadamente 340 mil escritas
+(17 vezes o total de objetos armazenados). A popularidade concentrada significa
+que poucos objetos precisam migrar para atingir o regime estacionário, e a
+quantidade logo cai pois a localidade alta significa que eles são ``atraídos''
+para seu centro de processamento de dados preferencial rapidamente e nele ficam.
+No caso da popularidade uniforme, muitos objetos precisam migrar para atingir o
+regime estacionário, mas uma vez que receberam em média três acessos, as
+migrações caem rapidamente pois a alta localidade significa que estão no seu
+centro de processamento de dados ``preferencial''.
 
-\item Localidade 50\%: 3
-
-\item Localidade 90\%: 17
-
-\end{itemize}
-
-O aquecimento só levou em consideração a localização das réplicas pois o
+O aquecimento teve apenas a função de acertar a localização das réplicas pois o
 mecanismo de armazenamento usado foi memória (ver Seção
 \ref{sec:aglomerado_e_mecanismo_de_armazenamento}). Caso fosse disco, essa fase
 também seria usada para aquecer o cache de disco.
