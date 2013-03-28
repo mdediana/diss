@@ -70,7 +70,7 @@ interação entre três fatores.
 das combinações de fatores e níveis usados.
 
 %% ------------------------------------------------------------------------- %%
-\section{Metas do estudo} \label{sec:metas_do_estudo}
+\section{Metas do Estudo} \label{sec:metas_do_estudo}
 
 A meta deste estudo foi comparar o desempenho de um sistema de armazenamento
 georeplicado usando consistência em momento indeterminado e consistência na
@@ -81,10 +81,11 @@ consistência na linha do tempo apresentaria um desempenho competitivo com a
 consistência em momento indeterminado para algumas cargas de trabalho, como uma
 que apresentasse localidade alta, por exemplo. Essa hipótese se baseava em uma
 segunda hipótese, a de que os tempos de resposta das requisições para o sistema
-seriam dominadas pela latência (e variação da latência) da WAN. Um exemplo de
-fenômeno que poderia invalidar a hipótese seria a réplica mestre se comportar
-como gargalo na consistência na linha do tempo. Essa hipótese é verificada pela
-distribuição acumulada dos tempos de resposta para cada modo usado no estudo.
+seriam dominados pela latência e pelo \emph{jitter} (variação da latência) da
+WAN. Um exemplo de fenômeno que poderia invalidar a hipótese seria a réplica
+mestre se comportar como gargalo na consistência na linha do tempo. Essa
+hipótese é verificada pela distribuição acumulada dos tempos de resposta para
+cada modo usado no estudo.
 
 Outra hipótese é que as proporções de conflitos identificados durante as
 leituras em ambos os modelos de consistência seriam próximas. Conflitos na
@@ -116,7 +117,7 @@ quantidade de conflitos (ambas dadas pela porcentagem com relação ao total de
 operações do experimento). A quantidade de migrações, exclusiva da consistência
 na linha do tempo, oferece uma visão da dinâmica de um sistema usando esse
 modelo de consistência. A quantidade de conflitos proporciona uma noção da
-frequência com que cliente acessam valores desatualizados.  Uma diferença entre
+frequência com que clientes acessam valores desatualizados.  Uma diferença entre
 conflitos nos dois modelos é que na consistência na linha do tempo eles são
 causados apenas por atualizações que ainda não chegaram a todas as réplicas,
 portanto serão automaticamente resolvidos em algum momento no futuro. Já na
@@ -126,7 +127,7 @@ criando assim uma situação em que um mecanismo de resolução de conflitos precisa
 atuar.
 
 %% ------------------------------------------------------------------------- %%
-\section{Técnica de avaliação} \label{sec:tecnica_de_avaliacao}
+\section{Técnica de Avaliação} \label{sec:tecnica_de_avaliacao}
 
 A escolha da técnica de avaliação depende em parte dos parâmetros e fatores
 \cite{Jain1991}. Apesar de o levantamento de parâmetros e a seleção de fatores
@@ -225,10 +226,11 @@ dos resultados e a reprodutibilidade dos experimentos.
 Os sítios do Grid'5000 são conectados por redes de alta velocidade. Suas redes
 apresentam latências da ordem de centenas de microssegundos entre nós de um
 mesmo aglomerado e da ordem de 20 ms entre sítios, e portanto não caracterizam
-uma WAN. De qualquer forma, mesmo que caracterizassem, ter controle sobre esses
-valores era necessário para medir o desempenho do sistema em diferentes
-condições de rede e possibilitar a reprodutibilidade dos experimentos. Por isso,
-a WAN foi emulada nos experimentos (ver Seção~\ref{sec:rede}).
+uma WAN convencional. De qualquer forma, mesmo que caracterizassem, ter controle
+sobre esses valores era necessário para medir o desempenho do sistema em
+diferentes condições de rede e possibilitar a reprodutibilidade dos
+experimentos. Por isso, a WAN foi emulada nos experimentos (ver
+Seção~\ref{sec:rede}).
 
 %% ------------------------------------------------------------------------- %%
 \section{Fluxo de Trabalho dos Experimentos}
@@ -348,10 +350,6 @@ posteriormente.
 %% ------------------------------------------------------------------------- %%
 \section{Experimentos Fatoriais} \label{sec:experimentos_fatoriais}
 
-São alguns os tipos de experimentos usados em um estudo experimental. A escolha
-entre eles se dá principalmente pelo balanço entre recursos utilizados na sua
-execução (tempo, dinheiro, energia, etc.) e quantidade de informação adquirida.
-
 Experimentos fatoriais consistem da combinação de dois ou mais fatores em cada
 experimento que compõe o estudo. Um projeto que considere todos os fatores em
 todos os níveis é chamado completo, caso contrário é chamado fracionado
@@ -369,10 +367,10 @@ i$^{\textrm{\'esimo}}$ fator.
 Esse tipo de projeto de experimentos tem a vantagem de identificar com precisão
 a influência de todos os fatores e suas interações nas variáveis de resposta.
 Mas quanto maior a quantidade de fatores e de níveis em um estudo experimental,
-maior a quantidade de recursos necessários para sua execução. Normalmente os
-fatores não afetam igualmente as variáveis de resposta, pelo contrário, é comum
-alguns poucos fatores explicarem a maior parte dos efeitos na resposta
-\cite{Jain1991}. Para esses casos, um projeto de experimentos fatoriais
+mais recursos (tempo, dinheiro, etc) são necessários para sua execução.
+Normalmente os fatores não afetam igualmente as variáveis de resposta, pelo
+contrário, é comum alguns poucos fatores explicarem a maior parte dos efeitos na
+resposta \cite{Jain1991}. Para esses casos, um projeto de experimentos fatoriais
 2\textsuperscript{k}, que é um tipo de projeto de experimentos completo, é
 utilizado para fazer uma triagem dos fatores, identificando quais deles são os
 mais influentes.

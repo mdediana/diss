@@ -225,9 +225,9 @@ seção.
 \section{Modelos de Consistência para Replicação}
 \label{sec:modelos_de_consistencia_para_replicacao}
 
-Um modelo de consistência define o momento em que determinada os resultados de
-determinada escrita serão retornados por leituras subsequentes em sistemas de
-memória compartilhada distribuída \cite{Tanenbaum2006}. Do ponto de vista do
+Um modelo de consistência define o momento em que os resultados de determinada
+escrita serão retornados por leituras subsequentes em sistemas de memória
+compartilhada distribuída \cite{Tanenbaum2006}. Do ponto de vista do
 desenvolvedor, um modelo de consistência define a ordem global em que as
 operações sobre os dados parecem ser executadas \cite{Tanenbaum2006,Adve1995}. O
 modelo de consistência funciona como a especificação do que o sistema deve
@@ -391,11 +391,13 @@ $R_3$ &        &          & b = L(x) & a = L(x)	\\
 
 \begin{table}[!h] \begin{center} \begin{tabular}{c|c|c|c|c|c}
 
-& $t_0$     & $t_1$ & $t_2$ & $t_3$       &	$t_4$			\\ \hline
+& $t_0$     & $t_1$ & $t_2$ & $t_3$       &	$t_4$			\\
+\hline
 
-$R_1$ & E(x,a) &          &          & &				\\ \hline
+$R_1$ & E(x,a) &          &          & &				\\
+\hline
 
-$R_2$ &        & a = L(x) & E(x,b)   &          &				\\ \hline
+$R_2$ &        & a = L(x) & E(x,b)   &          & \\ \hline
 
 $R_3$ & & & & b = L(x) & a = L(x)	\\
 
@@ -416,11 +418,13 @@ Subseção~\ref{sec:consistencia_disponibilidade_tolerancia_a_particionamento}.
 
 \begin{table}[!h] \begin{center} \begin{tabular}{c|c|c|c|c|c}
 
-& $t_0$     & $t_1$ & $t_2$ & $t_3$       &	$t_4$			\\ \hline
+& $t_0$     & $t_1$ & $t_2$ & $t_3$       &	$t_4$			\\
+\hline
 
 $R_1$ & E(x,a) &          &          & b = L(x) & b = L(x)	\\ \hline
 
-$R_2$ &        & E(x,b)   & a = L(x) &          &	b = L(x)	\\ \hline
+$R_2$ &        & E(x,b)   & a = L(x) &          &	b = L(x)	\\
+\hline
 
 $R_3$ &        &          & b = L(x) & a = L(x) & b = L(x)	\\
 
@@ -449,8 +453,8 @@ Subseção~\ref{sec:consistencia_disponibilidade_tolerancia_a_particionamento}.
 O modelo de consistência de um sistema replicado impacta o seu desempenho,
 disponibilidade e manutenibilidade. Sistemas web georeplicados normalmente usam
 os modelos de consistência mais relaxados para atingir maiores desempenho e
-disponibilidade. Conceitos que ajudam os desenvolvedores a entender essas trocas
-são discutidos na seção seguinte.
+disponibilidade. Conceitos que ajudam os desenvolvedores a entender a relação
+entre esses requisitos são discutidos na seção seguinte.
 
 %% ------------------------------------------------------------------------- %%
 \section{Consistência, Desempenho e Disponibilidade em Sistemas Georeplicados}
@@ -468,17 +472,18 @@ diferentes modelos de consistência.
 \subsection{Propriedades ACID em sistemas distribuídos de larga escala}
 \label{sec:propriedades_acid_em_sistemas_distribuidos_de_larga_escala}
 
-Transações ACID simplificam o projeto e desenvolvimento de um sistema, pois
-oferecem garantias que livram o desenvolvedor de se preocupar com a integridade
-dos dados. ACID se refere a Atomicidade, Consistência, Isolamento e Durabilidade
-\cite{Gray1981,Haerder1983}. Atomicidade é a propriedade de uma transação de ter
-os efeitos de todas ou de nenhuma de suas operações aplicados ao banco de dados,
-não sendo assim permitida uma execução parcial. Consistência é a propriedade de
-uma transação de levar o banco de dados de um estado válido para outro estado
-válido. Isolamento é a propriedade pela qual uma transação executa como se não
-existissem outras transações sendo executadas simultaneamente. Durabilidade é a
-propriedade que garante que os efeitos de uma transação são permanentes após sua
-execução, estando disponíveis para todas as futuras transações.
+ACID se refere a Atomicidade, Consistência, Isolamento e Durabilidade
+\cite{Gray1981,Haerder1983}. Transações ACID simplificam o projeto e
+desenvolvimento de um sistema, pois oferecem garantias que livram o
+desenvolvedor de se preocupar com a integridade dos dados. Atomicidade é a
+propriedade de uma transação de ter os efeitos de todas ou de nenhuma de suas
+operações aplicados ao banco de dados, não sendo assim permitida uma execução
+parcial. Consistência é a propriedade de uma transação de levar o banco de dados
+de um estado válido para outro estado válido. Isolamento é a propriedade pela
+qual uma transação executa como se não existissem outras transações sendo
+executadas simultaneamente. Durabilidade é a propriedade que garante que os
+efeitos de uma transação são permanentes após sua execução, estando disponíveis
+para todas as futuras transações.
 
 A garantia de que essas propriedades são sempre válidas em um sistema tem um
 preço em termos de escalabilidade, desempenho e disponibilidade. Por isso,

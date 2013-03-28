@@ -12,7 +12,7 @@ autor deste trabalho em conversa com o pesquisador visitante no IME Jean-Marc
 Vincent, que possui grande experiência em estudos de desempenho.
 
 O nível de confiança do estudo relativo ao tamanho da amostra está descrito na
-Seção~\ref{sec:nivel_de_confianca_exatidao_tamanho_da_amostra_e_replicacoes}
+Seção~\ref{sec:nivel_de_confianca_exatidao_tamanho_da_amostra_e_replicacoes}, a
 Seção~\ref{sec:analise_dos_tempos_de_resposta} mostra a análise dos tempos de
 resposta, a Seção~\ref{sec:analise_dos_conflitos}, a análise dos conflitos e a
 Seção~\ref{sec:analise_das_migracoes}, a análise das migrações. A
@@ -72,11 +72,10 @@ para \emph{lt\_rec}, localidade de 50\% e latência de rede de 300 ms.
 Dados esses resultados, foram verificados os tamanhos da amostra dos
 experimentos. Com precisão de 1\%, apenas os experimentos para \emph{lt\_rec},
 localidade de 50\% e latência de rede 300 ms não tinham tamanho da amostra
-suficiente -- para variação de latência de 0\% o experimento precisaria de
-127789 amostras mas tinha 115175, e para variação de latência 60\% ele
-precisaria de 83030 mas tinha 76137. Se considerado o mesmo nível de confiança,
-mas exatidão de 2\%, todos os experimentos tinham o tamanho da amostra
-suficiente.
+suficiente -- para \emph{jitter} de 0\% o experimento precisaria de 127789
+amostras mas tinha 115175, e para \emph{jitter} de 60\% ele precisaria de 83030
+mas tinha 76137. Se considerado o mesmo nível de confiança, mas exatidão de 2\%,
+todos os experimentos tinham o tamanho da amostra suficiente.
 
 Vale notar que o tamanho da amostra na maioria dos experimentos foi bem maior do
 que o necessário. Por exemplo, para \emph{ind1}, localidade de 50\% e latência
@@ -132,8 +131,7 @@ de 200 ms está na Figura
 
 No caso de leituras e localidade de 50\%, apenas \emph{lt\_rec} apresenta
 requisições remotas. Uma porção pequena dessas leituras tem tempo de resposta
-menor que a latência da rede, o que se explica pela variação da latência de até
-60\%.
+menor que a latência da rede, o que se explica pelo \emph{jitter} de até 60\%.
 
 Para leituras e localidade de 90\%, \emph{lt\_rec} é beneficiado, mas continua
 apresentando tempos de resposta mais altos que os outros modos para parte das
@@ -197,7 +195,7 @@ Percentil & Localidade (\%) & \emph{lt\_qqer} & \emph{lt\_rec}\\ \hline
 95 & 90 & 1,4 & 1,6 \\ \hline
 
 \end{tabular} \caption[Ganhos relativos entre modos.]{Ganhos relativos dos
-tempos de resposta para os modos \emph{lt\_qqer} e lt\_lat com relação a
+tempos de resposta para os modos \emph{lt\_qqer} e lt\_rec com relação a
 \emph{ind2} para latência de 200 ms. O sinal negativo indica perdas.}
 \label{tab:ganhos_relativos_das_requisicoes_remotas} \end{center} \end{table}
 
@@ -218,8 +216,7 @@ principalmente caso leituras de ``qualquer versão'' sejam usadas.
 
 A análise dos conflitos indicou uma proporção muito alta de conflitos, da ordem
 de 30\%, para todos os casos com latência diferente de 0 ms e variação de
-latência de 60\%. Para variação de latência de 0\%, os conflitos são da ordem de
-0,1\%.
+latência de 60\%. Para \emph{jitter} de 0\%, os conflitos são da ordem de 0,1\%.
 
 Esses números resultam da forma como conflitos são contabilizados no Riak.
 Sempre que uma leitura é feita, ela é enviada para todas as réplicas do objeto
@@ -233,10 +230,9 @@ conflitos.
 No caso em que a latência é 0 ms, as respostas das réplicas para o coordenador
 chegam em instantes muito próximos. Já quando existe latência, as réplicas no
 mesmo centro de processamento de dados respondem rapidamente, enquanto as
-remotas demoram centenas de milissegundos. Quando não há variação de latência,
-duas requisições saindo de um CPD chegam no outro CPD na ordem em que foram
-emitidas. Mas quando há variação da latência, é possível que a segunda chegue
-antes da primeira.
+remotas demoram centenas de milissegundos. Quando não há \emph{jitter}, duas
+requisições saindo de um CPD chegam no outro CPD na ordem em que foram emitidas.
+Mas quando há \emph{jitter}, é possível que a segunda chegue antes da primeira.
 
 O \emph{benchmark} emite uma leitura antes de toda escrita (ver
 Subseção~\ref{sec:fatores_de_carga_de_trabalho}). Considerando que o tempo de
@@ -247,14 +243,13 @@ latência de rede de 100 ms, por exemplo, varia de 100 a 160 ms. No caso em que a
 escrita chega antes da leitura, a leitura retorna o valor que acabou de ser
 escrito para o coordenador, que por sua vez identifica o conflito. 
 
-Estudos foram feitos com outros valores de variação de latência de 5\%, 15\%,
-30\% e 45\%, e com exceção da variação de 5\%, que apresentou 17\% de conflitos,
-todos apresentaram valores de conflitos acima de 30\%.
+Estudos foram feitos com outros valores de \emph{jitter} de 5\%, 15\%, 30\% e
+45\%, e com exceção da variação de 5\%, que apresentou 17\% de conflitos, todos
+apresentaram valores de conflitos acima de 30\%.
 
 Esse comportamento é um problema para a consistência em momento indeterminado em
-uma WAN, pois ela muitas vezes ela vai acionar o mecanismo de resolução de
-conflitos desnecessariamente, resultando em duas escritas consecutivas na
-réplica remota.
+uma WAN, pois muitas vezes ela vai acionar o mecanismo de resolução de conflitos
+desnecessariamente, resultando em duas escritas consecutivas na réplica remota.
 
 Apesar de as proporções de conflitos serem semelhantes para os dois modelos de
 consistência, não se pode dizer que a hipótese foi confirmada. A hipótese
@@ -297,7 +292,7 @@ desempenho analisado neste estudo foi mais afetado for fatores de rede e carga
 de trabalho.
 
 %% ------------------------------------------------------------------------- %%
-\section{Trabalhos relacionados} \label{sec:trabalhos_relacionados}
+\section{Trabalhos Relacionados} \label{sec:trabalhos_relacionados}
 
 Uma abordagem comum na literatura de sistemas distribuídos é a proposta de um
 novo conceito e a implementação de um sistema que use esse conceito seguida de

@@ -38,18 +38,19 @@ WAN.
 TCP/IP é a pilha de protocolos comumente utilizada em sistemas georeplicados. O
 protocolo IP provê os mecanismos de endereçamento e roteamento. O TCP provê
 comunicação fim-a-fim confiável. Para tal, usa diversos mecanismos relacionados
-e dependentes entre si para lidar com controle de fluxo e perdas, corrupção,
-reordenação e duplicação de pacotes.
+e dependentes entre si para lidar com controle de fluxo, controle de
+congestionamento, perdas, corrupção, reordenação e duplicação de pacotes.
 
-O controle de fluxo é feito por mecanismos usados nas pontas de uma conexão com
-o objetivo de usar a rede de forma eficiente e evitar o envio de mais dados do
-que o receptor pode tratar. Perdas acontecem quando um dispositivo na rede
-descarta pacotes, o que pode ser causado por corrupção de pacotes ou
-congestionamento da rede, como \emph{buffers} esgotados em um roteador, por
-exemplo. Reordenação ocorre quando pacotes de uma mesma conexão TCP enviados nos
-instantes $t_1$ e $t_2$ seguem caminhos diferentes na rede, e o pacote enviado
-em $t_2$
-chega ao receptor antes do enviado em $t_1$. Duplicação normalmente é relacionada a
+No TCP, o controle de fluxo é feito por mecanismos usados nas pontas de uma
+conexão com o objetivo de usar a rede de forma eficiente e evitar o envio de
+mais dados do que o receptor pode tratar. O controle de congestionamento
+controla o tráfego em uma conexão para evitar sobrecarregar elementos de rede
+intermediários. Perdas acontecem quando um dispositivo na rede descarta pacotes,
+o que pode ser causado por corrupção de pacotes ou congestionamento da rede,
+como \emph{buffers} esgotados em um roteador, por exemplo. Reordenação ocorre
+quando pacotes de uma mesma conexão TCP enviados nos instantes $t_1$ e $t_2$
+seguem caminhos diferentes na rede, e o pacote enviado em $t_2$ chega ao
+receptor antes do enviado em $t_1$. Duplicação normalmente é relacionada a
 retransmissões do TCP, mas também acontece devido a balanceamento de carga ou
 problemas de hardware ou software em dispositivos intermediários.
 
@@ -127,9 +128,9 @@ seu tamanho no momento em que o terceiro ACK em duplicata foi recebido.
 receptor.
 
 \paragraph{Pacotes corrompidos}O TCP tem um campo com uma soma de verificação
-que é usada no receptor para checar se o pacote foi corrompido em trânsito. Em
-caso positivo, ele é descartado. Do ponto de vista do transmissor, o pacote foi
-perdido, então os mecanismos usuais de controle de fluxo são acionados.
+que é usada no receptor para verificar se o pacote foi corrompido em trânsito.
+Em caso positivo, ele é descartado. Do ponto de vista do transmissor, o pacote
+foi perdido, então os mecanismos usuais de controle de fluxo são acionados.
 
 %% ------------------------------------------------------------------------- %%
 \section{Lista de Parâmetros} \label{sec:lista_de_parametros}
@@ -189,13 +190,13 @@ Os 13 parâmetros de rede levantados foram:
 
 \item Latência da LAN
 
-\item Variação da latência da LAN
+\item \emph{Jitter} da LAN
 
 \item Largura de banda da WAN
 
 \item Latência da WAN
 
-\item Variação da latência da WAN
+\item \emph{Jitter} da WAN
 
 \item Taxa de perda de pacotes na WAN
 
@@ -333,6 +334,10 @@ congestionamento na rede, com perda de desempenho do sistema.
 o desempenho do sistema, por exemplo, a quantidade de segmentos de rede pelos
 quais uma requisição passa para chegar ao destino afeta o seu tempo de resposta.
 
+\paragraph{Quantidade de enlaces de WAN}Se os diferentes enlaces tiverem
+diferentes características de rede, o tempo de resposta de uma dada requisição
+depende de sua origem e destino.
+
 \paragraph{Largura de banda da LAN}A largura de banda limita a vazão máxima do
 sistema em bits/s.
 
@@ -340,15 +345,14 @@ sistema em bits/s.
 soma dos seus tempos de envio, de processamento e de recebimento. A latência
 afeta os tempos de envio e recebimento.
 
-\paragraph{Variação da latência da LAN}A latência em uma rede não é constante,
-dado que dentre suas causas está a dinâmica da rede
-\cite{Gurtov2002,Kraska2012}. Por exemplo, rajadas de tráfego aumentam a fila de
-pacotes a serem processados em um roteador, o que se manifesta como aumento de
-latência nas conexões passando por ele. Quando o roteador volta à sua operação
-normal, a latência diminui. A latência não varia aleatoriamente, ela tem
-períodos de aumento e de diminuição gradual. No exemplo, a latência diminui em
-função da diminuição da fila no roteador, ela não cai imediatamente para o seu
-valor médio.
+\paragraph{\emph{Jitter} da LAN}A latência em uma rede não é constante, dado que
+dentre suas causas está a dinâmica da rede \cite{Gurtov2002,Kraska2012}. Por
+exemplo, rajadas de tráfego aumentam a fila de pacotes a serem processados em um
+roteador, o que se manifesta como aumento de latência nas conexões passando por
+ele. Quando o roteador volta à sua operação normal, a latência diminui. A
+latência não varia aleatoriamente, ela tem períodos de aumento e de diminuição
+gradual. No exemplo, a latência diminui em função da diminuição da fila no
+roteador, ela não cai imediatamente para o seu valor médio.
 
 \paragraph{Largura de banda da WAN}A mesma justificativa usada para largura de
 banda da LAN é válida para largura de banda da WAN.
@@ -358,13 +362,12 @@ válida para latência da WAN. Um agravante é que latências em WANs são ordens de
 grandeza maiores que em LANs já que as distâncias percorridas pelos pacotes são
 muito maiores.
 
-\paragraph{Variação da latência da WAN}Mesma justificativa que para variação de
-latência na LAN. Um agravante é que requisições em uma WAN atravessam mais
-segmentos de rede e dispositivos intermediários, portanto são mais suscetíveis à
-variação da latência. Quando a variação é muita e a latência torna-se maior que
-o tempo de expiração do temporizador de transmissão, o transmissor interpreta a
-demora na recepção de ACKs como perda de pacotes, o que diminui a vazão do
-sistema (a seguir).
+\paragraph{\emph{Jitter} da WAN}Mesma justificativa que para \emph{jitter} da
+LAN. Um agravante é que requisições em uma WAN atravessam mais segmentos de rede
+e dispositivos intermediários, portanto são mais suscetíveis ao \emph{jitter}.
+Quando a variação é muita e a latência torna-se maior que o tempo de expiração
+do temporizador de transmissão, o transmissor interpreta a demora na recepção de
+ACKs como perda de pacotes, o que diminui a vazão do sistema (a seguir).
 
 \paragraph{Taxa de perda de pacotes na WAN}Após uma perda\footnote{Perdas
 acontecem por corrupção de pacotes ou congestionamento. A ocorrência de
@@ -387,20 +390,16 @@ mecanismo de recuperação rápida, com consequente diminuição da janela de
 transmissão. Além disso, pacotes fora de ordem ocupam espaço no \emph{buffer} do
 receptor, o que pode afetar seu desempenho \cite{Wang2004}.
 
-\paragraph{Variante do TCP}Variações de TCP oferecem diferentes algoritmos de
+\paragraph{Variante do TCP}Variantes do TCP oferecem diferentes algoritmos de
 prevenção de congestionamento, responsável pelo dimensionamento da janela de
 congestionamento. Quanto maior a janela de congestionamento, maior a quantidade
 de dados em trânsito e maior a vazão do sistema.
 
-\paragraph{Quantidade de enlaces de WAN}Se os diferentes enlaces tiverem
-diferentes características de rede, o tempo de resposta de uma dada requisição
-depende de sua origem e destino.
-
-Taxas de perda, de duplicação e reordenação de pacotes não foram consideradas
-para LAN pois ocorrem com menor frequência e geram pouco impacto nesse tipo de
-rede. Em WANs, esses fenômenos são relacionados a uma maior quantidade de nós
-intermediários (incluindo roteadores e \emph{proxies}) e redes heterogêneas que
-os pacotes atravessam.
+\paragraph{}Taxas de perda, de duplicação e reordenação de pacotes não foram
+consideradas para LAN pois ocorrem com menor frequência e geram pouco impacto
+nesse tipo de rede. Em WANs, esses fenômenos são relacionados a uma maior
+quantidade de nós intermediários (incluindo roteadores e \emph{proxies}) e redes
+heterogêneas que os pacotes atravessam.
 
 O Produto Banda-Latência (\emph{Bandwidth Delay Product} -- BDP) representa a
 quantidade máxima de dados em trânsito em uma conexão TCP e é comumente usado
@@ -528,8 +527,8 @@ Aglomerado & CPU & Memória & Disco & Nós \\ \hline
 
 Os experimentos mostraram diferenças consideráveis no desempenho do Riak nesses
 aglomerados. Considerando que os experimentos eram limitados por E/S (e não por
-CPU) e que não havia gargalo de rede, decidiu-se checar o desempenho dos discos
-em cada aglomerado. A especificação do hardware mostrava tipos de discos
+CPU) e que não havia gargalo de rede, decidiu-se verificar o desempenho dos
+discos em cada aglomerado. A especificação do hardware mostrava tipos de discos
 diferentes entre aglomerados.  Dada essa diferença, experimentos foram
 realizados para quantificá-la e tomar uma decisão mais informada.
 
@@ -653,8 +652,9 @@ sistema era controlada, e implementar os parâmetros da consistência na linha do
 tempo na interface HTTP era mais simples.
 
 \paragraph{Nível de log:}WARN. Alguns experimentos exploratórios mostraram perda
-de desempenho quando o  nível de log estava em INFO. De qualquer forma, como a
-carga sobre o sistema era controlada, esse parâmetro era pouco relevante.
+de desempenho quando o  nível de log estava em INFO, que resulta em muito mais
+escritas no log que WARN. De qualquer forma, como a carga sobre o sistema era
+controlada, esse parâmetro era pouco relevante.
 
 \paragraph{Configuração de hardware dos dispositivos de rede intermediários
 (comutadores, roteadores, etc.)}O único dispositivo de rede no aglomerado usado
@@ -665,6 +665,12 @@ banda.
 
 \paragraph{Topologia da rede:}Topologia da rede em estrela do aglomerado usado
 nos experimentos.
+
+\paragraph{Quantidade de enlaces de WAN:} 1. Um único enlace significa que o
+estudo usou dois centros de processamento de dados. Esse valor simplificou a
+modificação do algoritmo de particionamento do Riak (ver
+Seção~\ref{sec:sistema_de_armazenamento}) e a análise dos resultados, que
+precisou considerar heterogeneidade da rede.
 
 \paragraph{Largura de banda da LAN:} 1 Gb/s. Essa é a largura de banda
 disponível nas placas de rede dos nós do aglomerado e não foram encontrados
@@ -678,21 +684,15 @@ com ping com 60 amostras espaçadas em 5 s no aglomerado mediu 167 $\mu$s de
 latência média.
 % ping -i 5 -c 60 sol-20
 
-\paragraph{Variação de latência da LAN:}Variação de latência do aglomerado
-utilizado no estudo. A mesma medição feita para a latência mostrou desvio padrão
-de 90 $\mu$s.
+\paragraph{\emph{Jitter} da LAN:}\emph{Jitter} do aglomerado utilizado no
+estudo. A mesma medição feita para a latência mostrou desvio padrão de 90
+$\mu$s.
 
 \paragraph{Largura de banda da WAN:} 100 Mb/s. Um estudo informal entre os
 serviços EC2 e S3 da Amazon com 9 segmentos de rede entre eles (indício de que
 estão em centros de processamento de dados diferentes) mediu 400 Mb/s
 \cite{Thorsten2007}. Outro estudo cita que é comum medir 100 Mb/s como largura
 de banda entre zonas de disponibilidade \cite{Pujol2012}.
-
-\paragraph{Quantidade de enlaces de WAN:} 1. Um único enlace significa que o
-estudo usou dois centros de processamento de dados. Esse valor simplificou a
-modificação do algoritmo de particionamento do Riak (ver
-Seção~\ref{sec:sistema_de_armazenamento}) e a análise dos resultados, que
-precisou considerar heterogeneidade da rede.
 
 \paragraph{Taxa de chegada de requisições}15 operações/s para cada thread de
 cada instância do \emph{benchmark}. Esse valor foi usado pois esse parâmetro se
@@ -744,7 +744,7 @@ Os fatores de rede eram:
 
 \item Latência da WAN
 
-\item Variação da latência da WAN
+\item \emph{Jitter} da WAN
 
 \item Taxa de perda de pacotes na WAN
 
@@ -801,18 +801,18 @@ influente não implica necessariamente em ameaça à validade. O método de análise
 de variação de um estudo 2\textsuperscript{k} mostra a importância relativa de
 cada fator, o que não significa que esses fatores sejam de fato influentes. Por
 exemplo, ao testar o desempenho de um software com duas CPUs e dois tamanhos de
-memória diferentes (4 experimentos), um estudo fatorial vai indicar a influência
-de um ou dos dois fatores mesmo que a maior diferença entre as respostas seja de
-0,001\%. Nesse caso, a variação é pouco significativa, mas o estudo fatorial vai
-indicar qual a influência relativa de cada fator nesses 0,001\% de variação.
-Para tratar esses casos, também foram calculados os coeficientes de
-variação\footnote{O coeficiente de variação é a divisão do desvio padrão pela
-média e é uma maneira de representar a variabilidade dos dados desconsiderando
-sua ordem de grandeza} (CVs) das respostas para estimar qual a influência
-daquele conjunto de fatores e interações como um todo. Assim, quando o CV era
-baixo (1\%, por exemplo), nenhum dos fatores usados no estudo era influente, já
-que nenhuma combinação de fatores e níveis resultou em variação significativa da
-resposta.
+memória diferentes (quatro experimentos), um estudo fatorial vai indicar a
+influência de um ou dos dois fatores mesmo que a maior diferença entre as
+respostas seja de 0,001\%. Nesse caso, a variação é pouco significativa, mas o
+estudo fatorial vai indicar qual a influência relativa de cada fator nesses
+0,001\% de variação.  Para tratar esses casos, também foram calculados os
+coeficientes de variação\footnote{O coeficiente de variação é a divisão do
+desvio padrão pela média e é uma maneira de representar a variabilidade dos
+dados desconsiderando sua ordem de grandeza} (CVs) das respostas para estimar
+qual a influência daquele conjunto de fatores e interações como um todo. Assim,
+quando o CV era baixo (1\%, por exemplo), nenhum dos fatores usados no estudo
+era influente, já que nenhuma combinação de fatores e níveis resultou em
+variação significativa da resposta.
 
 Os tempos de resposta das requisições remotas dominam a média dos tempos de
 resposta pois são ordens de grandeza maiores que os das requisições locais. Por
@@ -1122,8 +1122,8 @@ Os níveis selecionados foram:
 
 O estudo usou modo \emph{lt\_rec} e localidade de 50\%. Esses valores foram
 escolhidos pois por meio deles obtém-se uma quantidade balanceada de leituras e
-escritas locais e remotas. Para a rede, a variação de latência foi de 50\%.  A
-alta variabilidade ajuda a criar um cenário que pressiona os \emph{buffers} de
+escritas locais e remotas. Para a rede, o \emph{jitter} foi de 50\%.  A alta
+variabilidade ajuda a criar um cenário que pressiona os \emph{buffers} de
 transmissão e recepção. O resultado do estudo está na Tabela
 \ref{tab:estudo_para_tamanho_dos_buffers_de_transmissao_e_recepcao}.
 
@@ -1143,7 +1143,7 @@ escrita & 90 & \cellcolor[gray]{0.5} 99 & 0 & 0 & 0 & 0 & 0 & 0\\ \hline
 recepção.]{Estudo para tamanho dos \emph{buffers} de transmissão e recepção. L
 representa a latência, O representa a taxa de reordenação de pacotes e B
 representa o tamanho dos \emph{buffers}.}
-\label{tab:estudo_para_tamanho_dos_buffers_de_transmissao_e_recepcao}.
+\label{tab:estudo_para_tamanho_dos_buffers_de_transmissao_e_recepcao}
 
 \end{center} \end{table}
 
@@ -1165,7 +1165,7 @@ motivo. Os níveis inicialmente selecionados para fatores de rede foram:
 
 \item Latência da WAN (ms): 100 e 300 
 
-\item Variação da latência da WAN (\%): 1 e 60
+\item \emph{Jitter} da WAN (\%): 1 e 60
 
 \item Taxa de perda de pacotes na WAN (\%): 0,01 e 0,3
 
@@ -1177,7 +1177,7 @@ motivo. Os níveis inicialmente selecionados para fatores de rede foram:
 
 \end{itemize}
 
-Os níveis da latências foram baseados em um estudo que relata as latências entre
+Os níveis de latência foram baseados em um estudo que relata as latências entre
 os centros de processamento de dados dos Amazon Web Services \cite{Sovran2011}.
 Os centros de processamento de dados considerados são Califórnia (EUA -- Costa
 Oeste), Virginia (EUA -- Costa Leste), Irlanda e Singapura. A menor latência
@@ -1193,12 +1193,12 @@ vez, mostra em janeiro de 2013 uma média de latência de 238,062 ms com desvio
 padrão de 142,996, o que resulta em uma variação de 60\%. Os 11 meses anteriores
 apresentavam valores semelhantes.
 
-As taxas de perda foram escolhidas com base em medidas feitas pelo projeto
-PingER, que mede desempenho de conexões fim-a-fim na Internet. A mediana das
-perdas medidas em janeiro de 2013 foi 0,119\% e a mediana do último ano foi
-0,178\%. O mesmo relatório mostra perdas bem mais altas em medições específicas,
-mas este trabalho considerou que a WAN entre os dois centros de processamento de
-dados é de boa qualidade, portanto não apresentaria taxas de perda muito altas.
+As taxas de perda também foram escolhidas com base em medidas pelo projeto
+PingER. A mediana das perdas medidas em janeiro de 2013 foi 0,119\% e a mediana
+do último ano foi 0,178\%. O mesmo relatório mostra perdas bem mais altas em
+medições específicas, mas este trabalho considerou que a WAN entre os dois
+centros de processamento de dados é de boa qualidade, portanto não apresentaria
+taxas de perda muito altas.
 
 O mesmo estudo mostra taxas de duplicação de pacotes muitos baixas (0\%). Embora
 os valores usados neste estudo tenham sido muito grandes, duplicação de pacotes
@@ -1223,19 +1223,18 @@ pode chegar. Por exemplo, ao fazer a configuração de 100 ms de latência e 60\%
 de variação, o emulador vai gerar valores entre 100 ms e 160 ms aleatoriamente.
 Mas redes não apresentam uma variação aleatória de latência e é possível
 configurar uma distribuição da latência no emulador. No caso deste estudo, foi
-usada a distribuição normal. Além disso, o emulador foi configurado com 100
-Mb/so como largura de banda da WAN (ver
-Subseção~\ref{sec:parametros_restantes}).
+usada a distribuição normal. Além disso, o emulador foi configurado com 100 Mb/s
+como largura de banda da WAN (ver Subseção~\ref{sec:parametros_restantes}).
 
 O resultado do estudo está na Tabela \ref{tab:estudo_para_fatores_de_rede}. Com
-exceção dos fatores e da interação entre latência e variação de latência, todas
-as outras colunas apresentavam valores nulos e foram suprimidas. As respostas
-das requisições locais apresentaram CVs de 1\%, portanto as respectivas linhas
+exceção dos fatores e da interação entre latência e \emph{jitter}, todas as
+outras colunas apresentavam valores nulos e foram suprimidas. As respostas das
+requisições locais apresentaram CVs de 1\%, portanto as respectivas linhas
 também foram suprimidas.
 
 \begin{table}[!h] \begin{center} \begin{tabular}{|c|c|c|c|c|c|c|c|c|} \hline
 
-Operação & Percentil & L & V & P & D & O & C & LV\\ \hline
+Operação & Percentil & L & J & P & D & O & C & LJ\\ \hline
 
 leitura & 90 & \cellcolor[gray]{0.7} 72 & \cellcolor[gray]{0.9} 21 & 1 & 0 & 0 &
 0 & 6\\ \hline
@@ -1246,10 +1245,10 @@ escrita & 90 & \cellcolor[gray]{0.7} 69 & \cellcolor[gray]{0.9} 23 & 1 & 0 & 0 &
 \end{tabular}
 
 \caption[Estudo para fatores de rede.]{Estudo para fatores de rede. L representa
-a latência, V representa a variação da latência, P representa as taxa de perdas,
-D representa a taxa de pacotes duplicados, O representa a taxa de pacotes fora
-de ordem e C representa o algoritmo de congestionamento. A soma para escritas
-não é 100\% devido a arredondamento.} \label{tab:estudo_para_fatores_de_rede}
+a latência, J representa o \emph{jitter}, P representa as taxa de perdas, D
+representa a taxa de pacotes duplicados, O representa a taxa de pacotes fora de
+ordem e C representa o algoritmo de congestionamento. A soma para escritas não é
+100\% devido a arredondamento.} \label{tab:estudo_para_fatores_de_rede}
 
 \end{center} \end{table}
 
@@ -1273,20 +1272,20 @@ não é 100\% devido a arredondamento.} \label{tab:estudo_para_fatores_de_rede}
 
 %requisições remotas: CVs 58\% (leituras) e 62\% (escritas)
 
-A latência, a variação de latência e a interação de primeira ordem entre elas
-respondem por 100\% dos resultados. Assim, os níveis escolhidos para esses
-fatores nos experimentos foram:
+A latência, o \emph{jitter} e a interação de primeira ordem entre eles respondem
+por 100\% dos resultados. Assim, os níveis escolhidos para esses fatores nos
+experimentos foram:
 
 \begin{itemize} \item Latência da WAN (ms): 0, 100, 200 e 300
 
-\item Variação da latência da WAN (\%): 0 e 60
+\item \emph{Jitter} da WAN (\%): 0 e 60
 
 \end{itemize}
 
-Níveis nulos de latência e variação da latência equivalem a ter todo o sistema
-operando em uma rede local. Os resultados obtidos para esses casos foram usados
-como auxílio na interpretação dos resultados, mas não foram considerados na
-análise final dado que sistemas georeplicados, por definição, não operam nessas
+Níveis nulos de latência e \emph{jitter} equivalem a ter todo o sistema operando
+em uma rede local. Os resultados obtidos para esses casos foram usados como
+auxílio na interpretação dos resultados, mas não foram considerados na análise
+final dado que sistemas georeplicados, por definição, não operam nessas
 condições.
 
 Os valores fixados dos fatores desconsiderados foram:
@@ -1308,14 +1307,14 @@ final. O algoritmo de congestionamento foi fixado como CUBIC, pois esse é o
 padrão no sistema Linux utilizado nos experimentos.
 
 Apesar da taxa de reordenação de pacotes ser fixada, a ocorrência de alguns
-pacotes fora de ordem é possível dada a variação da latência. Por exemplo, com
-uma latência de 100 ms e uma variação de 50\%, é possível que o emulador aplique
+pacotes fora de ordem é possível dada o \emph{jitter}. Por exemplo, com uma
+latência de 100 ms e \emph{jitter} de 50\%, é possível que o emulador aplique
 atrasos de 120ms para um pacote e 80 ms para um outro no mesmo milissegundo, o
 que faz com que o segundo pacote seja transmitido antes do primeiro.
 
 Um comentário final é que o mesmo estudo havia sido realizado anteriormente com
 níveis de perda de pacotes 0,01\% e 1\%. Nesse estudo, a perda de pacotes era
-mais influente até do que a variação da latência. Mas como redes normalmente não
+mais influente até do que o \emph{jitter}. Mas como redes normalmente não
 apresentam taxas de perda de pacotes tão altas quanto 1\%, o estudo foi refeito
 com nível máximo de 0,1\% e a perda de pacotes não afetou o resultado nesse
 caso.
@@ -1463,7 +1462,7 @@ escritas. O valor de popularidade é o mais simples para a interpretação dos
 resultados.
 
 %% ------------------------------------------------------------------------- %%
-\section{Fatores selecionados} \label{sec:fatores_selecionados}
+\section{Fatores Selecionados} \label{sec:fatores_selecionados}
 
 Os fatores selecionados nos estudos 2\textsuperscript{k} compuseram o estudo
 final e são apresentados junto com seus níveis na
@@ -1478,7 +1477,7 @@ Modo & \emph{ind1}, \emph{ind2}, \emph{lt\_qqer} e \emph{lt\_rec} & 4\\ \hline
 
 Latência da WAN (ms) & 0, 100, 200 e 300 & 4\\ \hline
 
-Variação da latência da WAN (\%) & 0 e 60 & 2\\ \hline
+\emph{Jitter} da WAN (\%) & 0 e 60 & 2\\ \hline
 
 Localidade & 0,5 e 0,9 & 2\\ \hline
 
