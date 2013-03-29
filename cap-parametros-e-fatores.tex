@@ -75,17 +75,17 @@ de recepção. O receptor envia o valor da janela em todas as suas respostas para
 o transmissor. Esse mecanismo evita que o transmissor envie mais dados do que o
 receptor pode tratar.
 
-\paragraph{Início lento}Ao contrário da janela de recebimento, a janela de
+\paragraph{Partida lenta}Ao contrário da janela de recebimento, a janela de
 congestionamento é mantida pelo transmissor, e é uma estimativa do
 congestionamento da rede. O transmissor calcula o tamanho da janela ($cwnd$ --
-\emph{Congestion window}) a partir dos ACKs recebidos. O mecanismo de início
-lento atua no início de uma conexão, quando o transmissor ainda não recebeu
+\emph{Congestion window}) a partir dos ACKs recebidos. O mecanismo de partida
+lenta atua no início de uma conexão, quando o transmissor ainda não recebeu
 ACKs. No primeiro pacote, $cwnd$ é igual a 1 ou 2 vezes o tamanho máximo de
 segmento TCP ($MSS$ -- \emph{Maximum Segment Size}). Para cada ACK recebido,
 $cwnd$ é incrementada em 1 $MSS$. Assim, a janela dobra de tamanho a cada tempo
 de ida e volta até que atinja o tamanho da janela de recebimento ou uma perda
 aconteça. Quando uma perda acontece, um segundo valor passa a ser levado em
-consideração, o limiar do início lento ($ssthresh$ -- \emph{Slow start
+consideração, o limiar da partida lenta ($ssthresh$ -- \emph{Slow start
 threshold} onde $ssthresh = cwnd / 2$) e o processo começa de novo, com $cwnd$
 igual a 1 ou 2 $MSS$, até atingir $ssthresh$.  A partir desse ponto, o TCP entra
 em modo de prevenção de congestionamento.
@@ -95,7 +95,7 @@ diferentes algoritmos de prevenção de congestionamento. Um dos primeiros
 algoritmos de prevenção de congestionamento implementados no TCP aumenta a
 janela de congestionamento em $1 / cwnd$ a cada ACK recebido
 \cite{Jacobson1988}. Assim, durante essa fase, o aumento da janela de
-transmissão é linear, e não mais exponencial como no início lento. Variações de
+transmissão é linear, e não mais exponencial como na partida lenta. Variantes de
 TCP oferecem outras opções de algoritmos de prevenção de congestionamento,
 inclusive algumas delas sendo focadas em redes com latência e largura de banda
 grandes (ver Subseção~\ref{sec:fatores_de_rede}).
@@ -114,7 +114,7 @@ acionado indica que uma perda aconteceu, portanto algum mecanismo de prevenção
 de congestionamento deve atuar. Mas o recebimento de ACKs de pacotes posteriores
 ao perdido indica que o congestionamento foi uma situação pontual, já que o
 fluxo de dados entre transmissor e receptor não foi totalmente cortado. Por
-isso, reduzir drasticamente a janela de transmissão pelo uso do início lento
+isso, reduzir drasticamente a janela de transmissão pelo uso da partida lenta
 implicaria em perda de vazão desnecessária. Assim, a recuperação rápida atua
 juntamente com a retransmissão rápida. Quando o terceiro ACK em duplicata é
 recebido, ssthresh assume o valor de $cwnd / 2$, o pacote é retransmitido e a
@@ -375,8 +375,8 @@ corrupção de pacotes é um fenômeno mais frequente em redes sem fio ou via
 satélite, [Stevens] cita que esse valor é muito menor que 1\% normalmente. Além
 disso, o tratamento dado pelo TCP para perda de pacotes é o mesmo independente
 do motivo da perda, por isso este trabalho apenas considera perdas por
-congestionamento.}, o transmissor aciona o mecanismo de início lento (no caso de
-expiração do temporizador de transmissão) ou o mecanismo de prevenção de
+congestionamento.}, o transmissor aciona o mecanismo de partida lenta (no caso
+de expiração do temporizador de transmissão) ou o mecanismo de prevenção de
 congestionamento (no caso do recebimento de ACKS em duplicata). Com isso, a
 janela de transmissão é diminuída, com consequente diminuição da vazão.
 

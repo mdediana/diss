@@ -573,7 +573,7 @@ mesmo valor para que uma leitura seja bem sucedida e W a quantidade de réplicas
 que precisam confirmar a execução da escrita para que ela seja bem sucedida. Nas
 situações em que $N >= R + W$, existe a possibilidade do surgimento de
 conflitos. Seja um exemplo em que um sistema é composto dos nós N1, N2 e N3, e
-$N = 3$, $R = 1$ e $N = 2$. Nesse caso é possível que um cliente escreva em um
+$N = 3$, $R = 1$ e $W = 2$. Nesse caso é possível que um cliente escreva em um
 determinado objeto em N1, e esse valor seja replicado para N2, mas ocorra um
 particionamento na rede antes da escrita atingir N3. Dado que $R = 1$, um
 cliente solicitando a leitura desse objeto em N3 lerá o valor anterior do
