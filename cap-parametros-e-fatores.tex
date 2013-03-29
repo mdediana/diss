@@ -374,12 +374,11 @@ acontecem por corrupção de pacotes ou congestionamento. A ocorrência de
 corrupção de pacotes é um fenômeno mais frequente em redes sem fio ou via
 satélite, [Stevens] cita que esse valor é muito menor que 1\% normalmente. Além
 disso, o tratamento dado pelo TCP para perda de pacotes é o mesmo independente
-do motivo da perda.  Assim, este trabalho considera perdas por congestionamento,
-mesmo que o netem seja capaz de emular ambas as situações.}, o transmissor
-aciona o mecanismo de início lento (no caso de expiração do temporizador de
-transmissão) ou o mecanismo de prevenção de congestionamento (no caso do
-recebimento de ACKS em duplicata). Com isso, a janela de transmissão é
-diminuída, com consequente diminuição da vazão.
+do motivo da perda, por isso este trabalho apenas considera perdas por
+congestionamento.}, o transmissor aciona o mecanismo de início lento (no caso de
+expiração do temporizador de transmissão) ou o mecanismo de prevenção de
+congestionamento (no caso do recebimento de ACKS em duplicata). Com isso, a
+janela de transmissão é diminuída, com consequente diminuição da vazão.
 
 \paragraph{Taxa de duplicação de pacotes na WAN}Duplicação de pacotes gera
 tráfego e processamento desnecessários, o que pode causar diminuição de vazão
@@ -537,7 +536,7 @@ do desempenho, os experimentos usaram o
 hdparm\footnote{\url{http://linux.die.net/man/8/hdparm}} para acesso sequencial
 e o
 seeker\footnote{\url{http://www.linuxinsight.com/how\_fast\_is\_your\_disk.html}}
-para acesso aleatório. Os resultados confirmaram as grandes diferenças de
+para acesso aleatório. As médias obtidas confirmaram as grandes diferenças de
 desempenho, como pode ser visto na Tabela
 \ref{tab:comparacao_de_desempenho_de_acessos_dos_discos_entre_aglomerados}.
 
@@ -708,8 +707,6 @@ os da WAN foram usados como configuração do emulador.
 %% ------------------------------------------------------------------------- %%
 \section{Seleção dos Fatores} \label{sec:selecao_dos_fatores}
 
-% Tabelas: \cellcolor[gray]{c} % c=0.9: 20-50, c=0.7: 51-80, c=0.5: 81-100
-
 Os parâmetros que não foram fixados consequentemente eram candidatos a fatores
 nos experimentos finais. Como a lista precisava ser reduzida pois ainda era
 grande, experimentos fatoriais 2\textsuperscript{k} foram realizados. Dada a
@@ -830,9 +827,13 @@ requisições locais e remotas diferentes. Assim, esses fatores foram tratados
 como um único fator chamado modo, descrito na Subseção~\ref{sec:modo}. Os
 fatores localidade e popularidade na consistência na linha do tempo impuseram a
 necessidade de uma fase de aquecimento após a carga do sistema, o processo é
-explicado na Subseção~\ref{sec:aquecimento}. Projetos de experimentos fatoriais
-2\textsuperscript{k} foram realizados para cada um dos fatores restantes e são
-descritos nas subseções subsequentes.
+explicado na Subseção~\ref{sec:aquecimento}. Experimentos fatoriais
+2\textsuperscript{k} foram realizados para estimar a influência dos fatores
+restantes e são descritos nas subseções subsequentes. Nas tabelas de influência
+nessas subseções, células mais escuras indicam valores de influência mais altos.
+Os valores estão divididos em quatro faixas: 0 a 20\% (sem cor), 21\% a 50\%,
+51\% a 80\% e 81\% a 100\%.
+% Tabelas: \cellcolor[gray]{c} % c=0.9: 20-50, c=0.7: 51-80, c=0.5: 81-100
 
 %% ------------------------------------------------------------------------- %%
 \subsection{Modo} \label{sec:modo}
@@ -1103,10 +1104,12 @@ pacotes em trânsito. Um gargalo comum em WANs é o tamanho dos \emph{buffers} de
 transmissão e recepção das pontas serem menores que o BDP. Recomendações sugerem
 a configuração de \emph{buffers} com tamanho em bytes igual ao dobro do BDP
 \cite{Jones2006,ESNet2012}. Em princípio essa otimização seria aplicada aos
-estudos, mas experimentos com iperf mostraram ganhos de desempenho para
-\emph{buffers} de até quatro vezes o BDP, portanto um estudo fatorial foi feito
-para verificar esse fato. O estudo usou latência e reordenação de pacotes para
-criar cenários que pressionassem os \emph{buffers} de forma diferente.
+estudos, mas experimentos com a ferramenta para medição de largura de banda
+iperf\footnote{\url{http://iperf.sourceforge.net/}} mostraram ganhos de
+desempenho para \emph{buffers} de até quatro vezes o BDP, portanto um estudo
+fatorial foi feito para verificar esse fato. O estudo usou latência e
+reordenação de pacotes para criar cenários que pressionassem os \emph{buffers}
+de forma diferente.
 
 Os níveis selecionados foram:
 

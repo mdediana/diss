@@ -103,7 +103,10 @@ disponibilidade pois considera fundamental que seus usuários consigam adicionar
 itens em seus carrinhos de compras, mesmo que isso implique em problemas que
 precisem ser corrigidos depois, como itens previamente removidos do carrinho
 ressurgirem -- algo que pode acontecer ao usar o Dynamo como sistema de
-armazenamento \cite{DeCandia2007}.
+armazenamento \cite{DeCandia2007}. Os casos mais simples geram inconvenientes
+para o usuário, que precisa refazer uma operação por exemplo. Os casos mais
+complicados precisam de ações de compensação, como o estorno do valor de um item
+que o usuário não queria ter comprado.
 
 Entretanto, nem todas as aplicações web de larga escala podem usar consistência
 em momento indeterminado. Existem aplicações que necessitam de modelos de
@@ -137,6 +140,11 @@ valores desatualizados. A principal desvantagem da consistência na linha do
 tempo é que a existência de uma réplica mestre implica que escritas e leituras
 consistentes (leituras do valor mais recente) ficam indisponíveis em caso de uma
 falha que impeça um cliente de acessar essa réplica.
+
+Se esse modelo fosse usado para um carrinho de compras como o citado acima, o
+problema de itens ressurgirem não aconteceria. Por outro lado, um usuário
+poderia ser impedido de adicionar novos itens a seu carrinho de compras
+temporariamente caso a réplica mestre ficasse indisponível.
 
 Portanto, um modelo de consistência oferece um balanço entre desempenho,
 disponibilidade e consistência. Considerando que usuários de algumas aplicações
