@@ -105,41 +105,29 @@ para leituras e 5\% para escritas.
 
 A principal métrica usada neste estudo foi o tempo de resposta. Tomou-se o
 cuidado de evitar sobrecarregar o sistema, de modo que os tempos de resposta
-representassem o comportamento do sistema no estado estacionário. As figuras
-desta seção apresentam duas linhas de grade para auxiliar na interpretação: a
-linha vertical indica a latência de rede e a horizontal indica a localidade.
+representassem o comportamento do sistema no estado estacionário.
 
-Os gráficos das FDAs dos tempos de resposta quando a latência é 0 ms está na
-Figura \ref{fig:fda_dos_tempos_de_resposta_para_latencia_de_rede_de_0_ms}. Como
-esperado, as requisições se comportam como se fossem locais. Um fato a se notar
-é um degrau nos percentis mais altos das leituras em todos os modos. Uma
-explicação possível seria alguma sobrecarga no sistema, mas nesse caso seria
-esperado ver comportamento semelhante nas escritas.
+Os resultados para latências de 100 ms, 200 ms e 300 ms apresentam o mesmo
+comportamento, portanto a opção foi fazer a análise para um deles apenas. O
+\emph{boxplot} para latência de rede de 200~ms está na Figura
+\ref{fig:fda_dos_tempos_de_resposta_para_latencia_de_rede_de_200_ms}. Os casos
+em que a caixa não aparece indicam que todas as requisições delimitadas pelos
+bigodes eram locais.
 
 \begin{figure}[p] \centering
 
-\includegraphics[width=1\textwidth]{ecdf0.png}
+\includegraphics[width=1\textwidth]{boxplot200.png}
 
-\caption{FDAs dos tempos de resposta para latência de rede de 0 ms.}
-\label{fig:fda_dos_tempos_de_resposta_para_latencia_de_rede_de_0_ms}
+\caption{\emph{Boxplot} dos tempos de resposta para latência de rede de 200 ms.}
+\label{fig:boxplot_dos_tempos_de_resposta_para_latencia_de_rede_de_200_ms}
 \end{figure}
-
-Os gráficos das FDAs para 100 ms, 200 ms e 300 ms têm a mesma forma, portanto a
-opção foi fazer a análise para um deles apenas. O gráfico para latência de rede
-de 200 ms está na Figura
-\ref{fig:fda_dos_tempos_de_resposta_para_latencia_de_rede_de_200_ms}.
 
 No caso de leituras e localidade de 50\%, apenas \emph{lt\_rec} apresenta
 requisições remotas. Uma porção pequena dessas leituras tem tempo de resposta
 menor que a latência da rede, o que se explica pelo \emph{jitter} de até 60\%.
 
 Para leituras e localidade de 90\%, \emph{lt\_rec} é beneficiado, mas continua
-apresentando tempos de resposta mais altos que os outros modos para parte das
-requisições. O degrau que aparecia nos gráficos para latência de 0 ms permanece,
-mas no caso de \emph{lt\_rec} ele surge próximo do percentil equivalente a
-localidade (50 ou 90). Isso sugere que esse é um efeito que sempre acontece com
-requisições locais, independente da proporção que representem do total de
-requisições.
+apresentando requisições remotas (valores atípicos no gráfico).
 
 No caso de escritas e localidade de 50\%, \emph{lt\_rec} apresenta um desempenho
 um pouco melhor que \emph{ind2} e \emph{lt\_qqer}. A explicação provável para
@@ -149,33 +137,23 @@ comprovado pela vazão dos modos \emph{lt\_rec}, ev2 e \emph{lt\_qqer},
 respectivamente, 594, 1072, 941 operações/s.
 
 Para escritas e localidade de 90\%, \emph{lt\_rec} e \emph{lt\_qqer} apresentam
-melhor desempenho devido à localidade, enquanto \emph{ind2} continua
-apresentando o mesmo perfil que para localidade de 50\%.
+melhor desempenho devido à localidade, mas ainda apresentam requisições remotas
+(valores atípicos no gráfico). Já \emph{ind2} continua apresentando o mesmo
+perfil que para localidade de 50\%.
 
-% grep 0.5,uni,2:1,200,60 res.1/summary.csv | cut -d, -f1,11
+Os gráficos das FDAs para latência de rede de 200 ms estão na
+Figura~\ref{fig:fda_dos_tempos_de_resposta_para_latencia_de_rede_de_200_ms}.
+Eles mostram a proporção entre requisições locais e remotas, e confirmam que a
+localidade define essa proporção para \emph{lt\_qqer} e \emph{lt\_rec}.
 
 \begin{figure}[p] \centering
 
 \includegraphics[width=1\textwidth]{ecdf200.png}
 
-\caption{FDAs dos tempos de resposta para latência de rede de 200 ms.}
+\caption[FDAs dos tempos de resposta para latência de rede de 200 ms.]{FDAs dos
+tempos de resposta para latência de rede de 200 ms. A linha vertical indica a
+latência da rede (200 ms).}
 \label{fig:fda_dos_tempos_de_resposta_para_latencia_de_rede_de_200_ms}
-\end{figure}
-
-Uma investigação dos degraus que apareceram nos gráficos para leituras mostra
-que em torno do percentil 90 o tempo de resposta aumenta em 10 vezes -- por
-exemplo, para \emph{ind1}, localidade de 50\% e latência de 0 ms, o percentil 91
-é 3,8 ms e o percentil 92 é 38,0 ms. A partir daí, os tempos de resposta crescem
-linearmente, como pode ser visto na
-Figura~\ref{fig:aproximacao_da_fda_dos_tempos_de_resposta_para_latencia_de_rede_de_0_ms}.
-
-\begin{figure}[!t] \centering
-
-\includegraphics[width=0.5\textwidth]{ecdf_zoom.png}
-
-\caption{Aproximação da FDA dos tempos de resposta para latência de rede de 0
-ms.}
-\label{fig:aproximacao_da_fda_dos_tempos_de_resposta_para_latencia_de_rede_de_0_ms}
 \end{figure}
 
 Os ganhos para requisições remotas da consistência na linha do tempo com relação
